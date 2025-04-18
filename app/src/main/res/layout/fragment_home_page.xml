@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:context=".auth.MainActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/main_activity_mainpage_lottie"
+        android:layout_width="400dp"
+        android:layout_height="375dp"
+        android:layout_marginHorizontal="0dp"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/mainpage_lottie"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/main_activity_title"
+        android:fontFamily="@font/poppins_semibold"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/app_name"
+        android:textSize="42dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_activity_mainpage_lottie"
+        tools:ignore="SpUsage" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/main_activity_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:text="Creating a safe space every step of the way"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_activity_title"
+        tools:ignore="HardcodedText,SpUsage" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/main_activity_login_button"
+        style="@style/BloomsButton"
+        android:layout_marginTop="80dp"
+        android:text="@string/login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_activity_subtitle"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/main_activity_signup_button"
+        android:layout_marginTop="20dp"
+        android:text="@string/sign_up"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_activity_login_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="50dp"
+        android:backgroundTint="#00000000"
+        android:fontFamily="@font/poppins_medium"
+        android:letterSpacing="0"
+        android:padding="14dp"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:cornerRadius="30dp"
+        app:strokeColor="@color/button_pink"
+        app:strokeWidth="3dp"
+        tools:ignore="SpUsage"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

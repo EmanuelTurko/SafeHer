@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Safe Her</string>
+    <string name="login">LOGIN</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="loading_quote">טוען ציטוט...</string>
+    <string name="error_loading_quote">לא ניתן לטעון ציטוט כרגע</string>
+
+
+</resources>
