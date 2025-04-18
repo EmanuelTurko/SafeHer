@@ -7,17 +7,27 @@
     android:background="@drawable/gradient_background">
 
     <!-- Top Bar with Back and Home buttons -->
-    <ImageButton
-        android:id="@+id/backButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/backButtonCard"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="Back"
-        android:src="@drawable/ic_back"
+        app:cardBackgroundColor="#000000"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back"
+            app:tint="#FFFFFF" />
+    </androidx.cardview.widget.CardView>
 
     <ImageButton
         android:id="@+id/homeButton"
@@ -352,7 +362,7 @@
         app:cornerRadius="24dp"
         app:icon="@drawable/ic_delete"
         app:iconGravity="textStart"
-        app:iconTint="#FFFFFF"
+        app:iconTint=""
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -371,7 +381,7 @@
         android:text="Save"
         app:icon="@drawable/ic_heart"
         app:iconGravity="end"
-        app:iconTint="#FFFFFF"
+        app:iconTint=""
         app:layout_constraintBottom_toTopOf="@id/removeAccountButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
