@@ -80,4 +80,24 @@
         app:strokeWidth="3dp"
         tools:ignore="SpUsage"/>
 
+
+    <!-- test textview -->
+
+    <TextView
+        android:id="@+id/api_test_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Waiting for response..."
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.537"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.03" />
+
+    <!-- test textview -->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
