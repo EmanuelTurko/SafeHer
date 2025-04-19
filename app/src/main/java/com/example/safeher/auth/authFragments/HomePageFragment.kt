@@ -5,17 +5,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
+import com.example.safeher.api.RetroFitClient
 import com.example.safeher.auth.authViewModel.AuthViewModel
 import com.example.safeher.general.REMEMBER_MY_LOGIN
 import com.example.safeher.general.SharedPrefsHelper
 import com.example.safeher.settings.SettingsMainActivity
 import com.google.android.material.button.MaterialButton
+import com.example.safeher.model.Test
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.jvm.Throws
 
 const val LOGIN = 1
 const val REGISTER = 2
@@ -30,6 +37,9 @@ class HomePageFragment : Fragment() {
     private val viewModel: AuthViewModel by viewModels()
 
 
+    private lateinit var mApiTestMessage: TextView
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,12 +51,15 @@ class HomePageFragment : Fragment() {
         mMainSubtitle = view.findViewById(R.id.main_activity_subtitle)
         mLoginButton = view.findViewById(R.id.main_activity_login_button)
         mSignupButton = view.findViewById(R.id.main_activity_signup_button)
-        if(viewModel.getCurrentUser()
+        if (viewModel.getCurrentUser()
             && SharedPrefsHelper(requireContext()).get(REMEMBER_MY_LOGIN, false)
         ) {
             activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
         }
         setupClickListeners()
+
+        mApiTestMessage = view.findViewById(R.id.api_test_message)
+        callApiTest()
 
         return view
     }
@@ -63,7 +76,7 @@ class HomePageFragment : Fragment() {
     }
 
     private fun handleButtonClick(moveTo: Int) {
-        when(moveTo) {
+        when (moveTo) {
             LOGIN -> findNavController().navigate(R.id.action_homePageFragment_to_loginFragment)
             REGISTER -> findNavController().navigate(R.id.action_homePageFragment_to_registerFragment)
         }
@@ -73,4 +86,20 @@ class HomePageFragment : Fragment() {
         fun newInstance() = HomePageFragment()
     }
 
+    private fun callApiTest() {
+        RetroFitClient.apiService.getTest().enqueue(object : Callback<Test> {
+            override fun onResponse(call: Call<Test>, response: Response<Test>) {
+                if (response.isSuccessful) {
+                    val message = response.body()?.message ?: "No Message"
+                    mApiTestMessage.text = "Api message: $message"
+                } else {
+                    mApiTestMessage.text = "Api Failed ${response.code()}"
+                }
+            }
+
+            override fun onFailure(call: Call<Test>, t: Throwable) {
+                mApiTestMessage.text = "Error ${t.message}"
+            }
+        })
+    }
 }

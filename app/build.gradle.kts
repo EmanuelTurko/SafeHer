@@ -57,6 +57,9 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
     implementation(libs.picasso)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx.v261)
 
