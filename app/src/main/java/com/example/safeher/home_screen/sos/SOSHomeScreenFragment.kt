@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
+import com.example.safeher.settings.SettingsMainActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -92,7 +93,7 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSettingsButtonCard.setOnClickListener {
-
+            activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
         }
     }
 
