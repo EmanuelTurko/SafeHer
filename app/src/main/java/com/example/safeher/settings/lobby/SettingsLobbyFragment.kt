@@ -18,6 +18,7 @@ class SettingsLobbyFragment : Fragment() {
     lateinit var mBackBtn: CardView
     lateinit var mLogoutBtn: CardView
     lateinit var mVideoLibraryOption: ConstraintLayout
+    lateinit var mPairOption: ConstraintLayout
 
 
     override fun onCreateView(
@@ -34,6 +35,7 @@ class SettingsLobbyFragment : Fragment() {
         mBackBtn = view.findViewById(R.id.backButtonCard)
         mLogoutBtn = view.findViewById(R.id.logoutButton)
         mVideoLibraryOption = view.findViewById(R.id.videoLibraryOption)
+        mPairOption = view.findViewById(R.id.pairOption)
     }
 
     private fun initListener() {
@@ -52,6 +54,10 @@ class SettingsLobbyFragment : Fragment() {
         mVideoLibraryOption.setOnClickListener {
             val action = SettingsLobbyFragmentDirections.actionSettingsLobbyFragmentToVideoLibraryFragment2(true)
             findNavController().navigate(action)
+        }
+
+        mPairOption.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_pairFragment)
         }
     }
 }

@@ -15,6 +15,9 @@
             android:name="from_settings"
             app:argType="boolean" />
         </action>
+        <action
+            android:id="@+id/action_settingsLobbyFragment_to_pairFragment"
+            app:destination="@id/pairFragment" />
     </fragment>
     <fragment
         android:id="@+id/videoLibraryFragment2"
@@ -26,5 +29,13 @@
         <argument
             android:name="from_settings"
             app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/pairFragment"
+        android:name="com.example.safeher.settings.pair.PairFragment"
+        android:label="PairFragment" >
+        <action
+            android:id="@+id/action_pairFragment_to_settingsLobbyFragment"
+            app:destination="@id/settingsLobbyFragment" />
     </fragment>
 </navigation>
