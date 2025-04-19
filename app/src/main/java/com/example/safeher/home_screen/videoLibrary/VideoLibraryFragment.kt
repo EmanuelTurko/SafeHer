@@ -37,7 +37,7 @@ class VideoLibraryFragment :Fragment() {
         }
 
         mHome.setOnClickListener {
-            findNavController().navigate(R.id.action_sistersFragment_to_SOSHomeScreenFragment)
+            findNavController().navigate(R.id.action_videoLibraryFragment_to_SOSHomeScreenFragment)
         }
     }
 }

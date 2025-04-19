@@ -19,6 +19,7 @@ import com.example.safeher.general.REMEMBER_MY_LOGIN
 import com.example.safeher.general.SharedPrefsHelper
 import com.example.safeher.general.SuccessDialog
 import com.example.safeher.general.showCustomToast
+import com.example.safeher.home_screen.HomeScreenActivity
 import com.example.safeher.settings.SettingsMainActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -85,7 +86,7 @@ class LoginFragment : Fragment() {
                     } else {
                         SharedPrefsHelper(requireContext()).save(REMEMBER_MY_LOGIN, false)
                     }
-                    activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
+                    activity?.startActivity(Intent(requireActivity(), HomeScreenActivity::class.java))
                 }
                 is AuthState.Error -> {
                     val customPopup = ErrorDialog(requireActivity())
@@ -140,18 +141,20 @@ class LoginFragment : Fragment() {
     }
 
     private fun performLogin() {
-        val username = mUsername.text.toString().trim()
-        val password = mPassword.text.toString()
+//        val username = mUsername.text.toString().trim()
+//        val password = mPassword.text.toString()
+//
+//        var vaild = if (isForgotPassword) viewModel.forgotPasswordValidateInput(email = username) else viewModel.validateInput(username,password)
+//        if (vaild.first) {
+//            if(isForgotPassword) {
+//                viewModel.forgotPassword(username)
+//            } else {
+//                viewModel.signIn(username, password)
+//            }
+//        } else {
+//            showCustomToast(vaild.second)
+//        }
+        activity?.startActivity(Intent(requireActivity(), HomeScreenActivity::class.java))
 
-        var vaild = if (isForgotPassword) viewModel.forgotPasswordValidateInput(email = username) else viewModel.validateInput(username,password)
-        if (vaild.first) {
-            if(isForgotPassword) {
-                viewModel.forgotPassword(username)
-            } else {
-                viewModel.signIn(username, password)
-            }
-        } else {
-            showCustomToast(vaild.second)
-        }
     }
 }

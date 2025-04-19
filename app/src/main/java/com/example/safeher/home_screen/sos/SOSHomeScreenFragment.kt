@@ -63,6 +63,7 @@ class SOSHomeScreenFragment : Fragment() {
 
     private fun initListener() {
         mSistersButton.setOnClickListener {
+            findNavController().navigate(R.id.action_SOSHomeScreenFragment_to_sistersFragment)
 
         }
 
