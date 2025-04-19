@@ -1,4 +1,4 @@
-package com.example.safeher.home_screen.videoLibrary
+package com.example.safeher.home_screen.sisters
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,17 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
 
-class VideoLibraryFragment :Fragment() {
-
+class SistersFragment :Fragment() {
     lateinit var mBackBtn: CardView
     lateinit var mHome: CardView
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_video_library, container, false)
+        val view = inflater.inflate(R.layout.fragment_sisters, container, false)
         initView(view)
         initListener()
         return view
@@ -28,12 +26,11 @@ class VideoLibraryFragment :Fragment() {
     private fun initView(view: View) {
         mBackBtn = view.findViewById(R.id.backButtonCard)
         mHome = view.findViewById(R.id.homeButtonCard)
-
     }
 
     private fun initListener() {
         mBackBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_videoLibraryFragment_to_SOSHomeScreenFragment)
+            findNavController().navigate(R.id.action_sistersFragment_to_SOSHomeScreenFragment)
         }
 
         mHome.setOnClickListener {

@@ -1,7 +1,7 @@
 package com.example.safeher.settings.lobby
 
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 
-class SettingsLobbyFragment : AppCompatActivity() {
+class SettingsLobbyFragment : Fragment() {
 
 }

@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_SOSHomeScreenFragment_to_videoLibraryFragment"
             app:destination="@id/videoLibraryFragment" />
+        <action
+            android:id="@+id/action_SOSHomeScreenFragment_to_sistersFragment"
+            app:destination="@id/sistersFragment" />
     </fragment>
     <fragment
         android:id="@+id/videoLibraryFragment"
@@ -18,6 +21,14 @@
         android:label="VideoLibraryFragment" >
         <action
             android:id="@+id/action_videoLibraryFragment_to_SOSHomeScreenFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sistersFragment"
+        android:name="com.example.safeher.home_screen.sisters.SistersFragment"
+        android:label="SistersFragment" >
+        <action
+            android:id="@+id/action_sistersFragment_to_SOSHomeScreenFragment"
             app:destination="@id/SOSHomeScreenFragment" />
     </fragment>
 </navigation>
