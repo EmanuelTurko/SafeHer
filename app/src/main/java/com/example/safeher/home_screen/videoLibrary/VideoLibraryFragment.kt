@@ -11,6 +11,7 @@ import com.example.safeher.R
 
 class VideoLibraryFragment :Fragment() {
 
+    var isFromSettings = false
     lateinit var mBackBtn: CardView
     lateinit var mHome: CardView
 
@@ -22,6 +23,15 @@ class VideoLibraryFragment :Fragment() {
         val view = inflater.inflate(R.layout.fragment_video_library, container, false)
         initView(view)
         initListener()
+        try {
+            // Retrieve the Goal object passed from the Activity
+            if (arguments != null) {
+                val args = VideoLibraryFragmentArgs.fromBundle(requireArguments())
+                isFromSettings = args.fromSettings
+            }
+        }catch (e:Exception) {
+            isFromSettings = false
+        }
         return view
     }
 
@@ -33,11 +43,19 @@ class VideoLibraryFragment :Fragment() {
 
     private fun initListener() {
         mBackBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_videoLibraryFragment_to_SOSHomeScreenFragment)
+            if(isFromSettings) {
+                findNavController().navigate(R.id.action_videoLibraryFragment2_to_settingsLobbyFragment)
+            } else {
+                findNavController().navigate(R.id.action_videoLibraryFragment_to_SOSHomeScreenFragment)
+            }
         }
 
         mHome.setOnClickListener {
-            findNavController().navigate(R.id.action_videoLibraryFragment_to_SOSHomeScreenFragment)
+            if(isFromSettings) {
+                findNavController().navigate(R.id.action_videoLibraryFragment2_to_settingsLobbyFragment)
+            } else {
+                findNavController().navigate(R.id.action_videoLibraryFragment_to_SOSHomeScreenFragment)
+            }
         }
     }
 }

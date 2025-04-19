@@ -10,7 +10,11 @@
         android:label="SettingsLobbyFragment" >
         <action
             android:id="@+id/action_settingsLobbyFragment_to_videoLibraryFragment2"
-            app:destination="@id/videoLibraryFragment2" />
+            app:destination="@id/videoLibraryFragment2" >
+        <argument
+            android:name="from_settings"
+            app:argType="boolean" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/videoLibraryFragment2"
@@ -19,5 +23,8 @@
         <action
             android:id="@+id/action_videoLibraryFragment2_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
+        <argument
+            android:name="from_settings"
+            app:argType="boolean" />
     </fragment>
 </navigation>

@@ -1,6 +1,7 @@
 package com.example.safeher.home_screen.sos
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -31,6 +32,15 @@ class SOSHomeScreenFragment : Fragment() {
     lateinit var mHelperStatusText: TextView
     lateinit var mWelcomeText: TextView
     lateinit var mSettingsButtonCard: MaterialCardView
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val logoutSuccess = result.data?.getBooleanExtra("LOGOUT_SUCCESS", false) ?: false
+            if(logoutSuccess) {
+                activity?.finish()
+            }
+
+        }
+    }
     private val requestCallPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -94,7 +104,8 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSettingsButtonCard.setOnClickListener {
-            activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
+            val intent = Intent(requireContext(), SettingsMainActivity::class.java)
+            launcher.launch(intent)
         }
     }
 
