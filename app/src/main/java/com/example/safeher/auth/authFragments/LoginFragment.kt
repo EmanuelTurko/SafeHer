@@ -2,11 +2,9 @@ package com.example.safeher.auth.authFragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
@@ -21,7 +19,7 @@ import com.example.safeher.general.REMEMBER_MY_LOGIN
 import com.example.safeher.general.SharedPrefsHelper
 import com.example.safeher.general.SuccessDialog
 import com.example.safeher.general.showCustomToast
-import com.example.safeher.mainApp.MainAppActivity
+import com.example.safeher.settings.SettingsMainActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -87,7 +85,7 @@ class LoginFragment : Fragment() {
                     } else {
                         SharedPrefsHelper(requireContext()).save(REMEMBER_MY_LOGIN, false)
                     }
-                    activity?.startActivity(Intent(requireActivity(), MainAppActivity::class.java))
+                    activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
                 }
                 is AuthState.Error -> {
                     val customPopup = ErrorDialog(requireActivity())

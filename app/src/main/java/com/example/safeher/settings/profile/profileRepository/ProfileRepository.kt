@@ -1,10 +1,7 @@
-package com.example.safeher.mainApp.profile.profileRepository
+package com.example.safeher.settings.profile.profileRepository
 
-import android.util.Log
 import com.example.safeher.model.User
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await

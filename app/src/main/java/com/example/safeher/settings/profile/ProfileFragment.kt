@@ -1,4 +1,4 @@
-package com.example.safeher.mainApp.profile
+package com.example.safeher.settings.profile
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,7 +9,6 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
@@ -17,7 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.safeher.mainApp.profile.ProfileFragmentArgs
 import com.example.safeher.R
 import com.example.safeher.auth.MainActivity
 import com.example.safeher.general.ErrorDialog
@@ -25,12 +23,11 @@ import com.example.safeher.general.LoadingDialog
 import com.example.safeher.general.SuccessDialog
 import com.example.safeher.general.showCustomToast
 import com.example.safeher.general.showDatePicker
-import com.example.safeher.mainApp.MainAppActivity
-import com.example.safeher.mainApp.profile.profileViewModel.ProfileState
-import com.example.safeher.mainApp.profile.profileViewModel.ProfileViewModel
+import com.example.safeher.settings.SettingsMainActivity
+import com.example.safeher.settings.profile.profileViewModel.ProfileState
+import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
 import com.example.safeher.model.User
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.android.material.textfield.TextInputLayout
@@ -89,14 +86,13 @@ class ProfileFragment : Fragment() {
 
     private fun initializeViews(view : View) {
         saveButton = view.findViewById(R.id.saveButton)
-        nameInput = view.findViewById(R.id.etName)
-        lastNameInput = view.findViewById(R.id.etLastName)
-        birthDateInput = view.findViewById(R.id.etBirthDate)
-        emailInput = view.findViewById(R.id.etEmail)
-        passwordInput = view.findViewById(R.id.etPassword)
-        oldPasswordInput = view.findViewById(R.id.etOldPassword)
-        tilPasswordOld = view.findViewById(R.id.tilOldPassword)
-        tilPassword = view.findViewById(R.id.tilPassword)
+        nameInput = view.findViewById(R.id.nameEditText)
+//        birthDateInput = view.findViewById(R.id.etBirthDate)
+//        emailInput = view.findViewById(R.id.etEmail)
+//        passwordInput = view.findViewById(R.id.etPassword)
+//        oldPasswordInput = view.findViewById(R.id.etOldPassword)
+//        tilPasswordOld = view.findViewById(R.id.tilOldPassword)
+//        tilPassword = view.findViewById(R.id.tilPassword)
         logoutButton = view.findViewById(R.id.logoutButton)
         profileImage = view.findViewById(R.id.ivProfile)
         addImage = view.findViewById(R.id.btnAddPhoto)
@@ -162,7 +158,7 @@ class ProfileFragment : Fragment() {
                 is ProfileState.SaveUserDataSuccess -> {
                     loadingDialog.dismiss()
                     if(isAfterRegistrationScreen){
-                        activity?.startActivity(Intent(requireActivity(), MainAppActivity::class.java))
+                        activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
                     } else {
                         val customPopup = SuccessDialog(requireActivity())
                         customPopup.show(
