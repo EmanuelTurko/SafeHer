@@ -372,7 +372,6 @@
         app:cornerRadius="24dp"
         app:icon="@drawable/ic_delete"
         app:iconGravity="textStart"
-        app:iconTint=""
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -391,7 +390,6 @@
         android:text="Save"
         app:icon="@drawable/ic_heart"
         app:iconGravity="end"
-        app:iconTint=""
         app:layout_constraintBottom_toTopOf="@id/removeAccountButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

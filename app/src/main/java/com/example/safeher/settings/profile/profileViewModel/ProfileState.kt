@@ -1,4 +1,4 @@
-package com.example.safeher.mainApp.profile.profileViewModel
+package com.example.safeher.settings.profile.profileViewModel
 
 import com.example.safeher.model.User
 

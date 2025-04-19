@@ -1,17 +1,15 @@
-package com.example.safeher.mainApp.profile.profileViewModel
+package com.example.safeher.settings.profile.profileViewModel
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.util.Base64
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 //import androidx.lifecycle.LiveData
 //import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.safeher.mainApp.profile.profileRepository.ProfileRepository
+import com.example.safeher.settings.profile.profileRepository.ProfileRepository
 import com.example.safeher.model.User
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream

@@ -14,7 +14,7 @@ import com.example.safeher.R
 import com.example.safeher.auth.authViewModel.AuthViewModel
 import com.example.safeher.general.REMEMBER_MY_LOGIN
 import com.example.safeher.general.SharedPrefsHelper
-import com.example.safeher.mainApp.MainAppActivity
+import com.example.safeher.settings.SettingsMainActivity
 import com.google.android.material.button.MaterialButton
 
 const val LOGIN = 1
@@ -44,7 +44,7 @@ class HomePageFragment : Fragment() {
         if(viewModel.getCurrentUser()
             && SharedPrefsHelper(requireContext()).get(REMEMBER_MY_LOGIN, false)
         ) {
-            activity?.startActivity(Intent(requireActivity(), MainAppActivity::class.java))
+            activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
         }
         setupClickListeners()
 
