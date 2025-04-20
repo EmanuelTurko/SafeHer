@@ -16,13 +16,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
 import com.example.safeher.settings.SettingsMainActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
+import android.util.Log
 
 class SOSHomeScreenFragment : Fragment() {
+
+
+    private lateinit var  viewModel: BluetoothViewModel
+    private var isSosActive = false
 
     lateinit var mSistersButton: LinearLayout
     lateinit var mVideoLibraryButton: LinearLayout
@@ -60,6 +66,19 @@ class SOSHomeScreenFragment : Fragment() {
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel = ViewModelProvider(this)[BluetoothViewModel::class.java]
+
+        viewModel.sosResponse.observe(viewLifecycleOwner) { res ->
+            isSosActive = !isSosActive
+        }
+        viewModel.error.observe(viewLifecycleOwner) { err ->
+            Log.e("esp", "Error: $err")
+        }
+    }
+
     private fun initView(view: View) {
         mSistersButton = view.findViewById(R.id.sistersButton)
         mVideoLibraryButton = view.findViewById(R.id.videoLibraryButton)
@@ -90,7 +109,8 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSosButton.setOnClickListener {
-
+            val command = if(isSosActive) "STOP" else "START"
+            viewModel.sendCommand(command)
         }
 
         mHelperSwitch.setOnCheckedChangeListener { _, isChecked ->
