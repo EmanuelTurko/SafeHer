@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.ffmpeg.kit.full)
+    implementation(libs.play.services.location)
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx.v261)
 

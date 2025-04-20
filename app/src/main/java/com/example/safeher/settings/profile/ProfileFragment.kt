@@ -59,13 +59,13 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
-        try{
+        /*try{
             val args = ProfileFragmentArgs.fromBundle(requireArguments())
             isAfterRegistrationScreen = args.isAfterRegistrationScreen
 
         } catch (e: Exception) {
             isAfterRegistrationScreen = false
-        }
+        }*/
         initializeViews(view)
         setupClickListeners()
         if(isAfterRegistrationScreen) {

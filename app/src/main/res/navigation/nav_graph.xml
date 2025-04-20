@@ -30,16 +30,16 @@
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
-        <action
+        <!--<action
             android:id="@+id/action_registerFragment_to_profileFragment2"
-            app:destination="@id/profileFragment2" />
+            app:destination="@id/profileFragment2" />-->
     </fragment>
-    <fragment
+    <!--<fragment
         android:id="@+id/profileFragment2"
         android:name="com.example.safeher.settings.profile.ProfileFragment"
         android:label="ProfileFragment">
     <argument
         android:name="isAfterRegistrationScreen"
         app:argType="boolean" />
-    </fragment>
+    </fragment> -->
 </navigation>
