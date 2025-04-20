@@ -2,10 +2,12 @@ package com.example.safeher.home_screen.sos
 
 import android.Manifest
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,13 +24,21 @@ import com.example.safeher.R
 import com.example.safeher.settings.SettingsMainActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
-import android.util.Log
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.safeher.bluetooth.BluetoothController
+import com.example.safeher.util.PermissionManager
+import kotlinx.coroutines.launch
 
 class SOSHomeScreenFragment : Fragment() {
 
+    private lateinit var bluetoothViewModel : BluetoothViewModelBLE
+    private lateinit var permissionManager: PermissionManager
+    private var bSosActiveValue : Boolean = false
 
-    private lateinit var  viewModel: BluetoothViewModel
-    private var isSosActive = false
 
     lateinit var mSistersButton: LinearLayout
     lateinit var mVideoLibraryButton: LinearLayout
@@ -55,6 +65,23 @@ class SOSHomeScreenFragment : Fragment() {
                 Toast.makeText(requireActivity(), "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
+    private val enableBluetoothLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                bluetoothViewModel.checkPermissionsAndScan()
+            } else {
+                Toast.makeText(requireContext(), "Bluetooth not enabled", Toast.LENGTH_SHORT).show()
+            }
+        }
+    private val requestBluetoothPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            if(permissions[Manifest.permission.BLUETOOTH] == true &&
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+                bluetoothViewModel.checkPermissionsAndScan()
+            } else {
+                Toast.makeText(requireContext(), "Permissions denied", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,21 +90,53 @@ class SOSHomeScreenFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_sos_home_screen, container, false)
         initView(view)
         initListener()
+        bluetoothViewModel = initBluetoothViewModel()
+
         return view
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this)[BluetoothViewModel::class.java]
-
-        viewModel.sosResponse.observe(viewLifecycleOwner) { res ->
-            isSosActive = !isSosActive
-        }
-        viewModel.error.observe(viewLifecycleOwner) { err ->
-            Log.e("esp", "Error: $err")
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                bluetoothViewModel.bleEvent.collect { event ->
+                    when (event) {
+                        is BleEvent.RequestPermissions -> {
+                            requestPermissions()
+                        }
+                        is BleEvent.showRationale -> {
+                            showPermissionRationale()
+                        }
+                        is BleEvent.promptBluetoothEnable -> {
+                            promptEnableBluetooth()
+                        }
+                        is BleEvent.ReadyToScan -> {
+                            bluetoothViewModel.startScan()
+                        }
+                    }
+                }
+            }
         }
     }
+
+    private fun initBluetoothViewModel(): BluetoothViewModelBLE {
+        return ViewModelProvider(
+            this,
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    val bluetoothController = BluetoothController(
+                        requireContext().applicationContext,
+                        permissionManager = PermissionManager(requireContext())
+                    )
+                    return BluetoothViewModelBLE(
+                        bluetoothController,
+                        permissionManager = PermissionManager(requireContext())
+                    ) as T
+                }
+            }
+        )[BluetoothViewModelBLE::class.java]
+    }
+
 
     private fun initView(view: View) {
         mSistersButton = view.findViewById(R.id.sistersButton)
@@ -109,8 +168,11 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSosButton.setOnClickListener {
-            val command = if(isSosActive) "STOP" else "START"
-            viewModel.sendCommand(command)
+            if(!bSosActiveValue){
+                bluetoothViewModel.sendCommand("START")
+            } else {
+                bluetoothViewModel.sendCommand("STOP")
+            }
         }
 
         mHelperSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -141,4 +203,27 @@ class SOSHomeScreenFragment : Fragment() {
             Toast.makeText(requireActivity(), "Call permission not granted", Toast.LENGTH_SHORT).show()
         }
     }
+    private fun showPermissionRationale() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Permissions Required")
+            .setMessage("This app needs Bluetooth and location permissions to discover nearby devices")
+            .setPositiveButton("Grant") { _, _ ->
+                permissionManager.requestScanPermissions(PermissionManager.REQUEST_CODE_SCAN)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    private fun requestPermissions(){
+        requestBluetoothPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            )
+        )
+    }
+    private fun promptEnableBluetooth(){
+        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        enableBluetoothLauncher.launch(intent)
+    }
+
 }
