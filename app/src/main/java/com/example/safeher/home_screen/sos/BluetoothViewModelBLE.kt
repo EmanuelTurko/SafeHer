@@ -1,8 +1,7 @@
 package com.example.safeher.home_screen.sos
 
 import android.bluetooth.BluetoothDevice
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContentProviderCompat.requireContext
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,8 +20,8 @@ import javax.inject.Inject
 
 sealed class BleEvent{
     object RequestPermissions : BleEvent()
-    object showRationale : BleEvent()
-    object promptBluetoothEnable : BleEvent()
+    object ShowRationale : BleEvent()
+    object PromptBluetoothEnable : BleEvent()
     object ReadyToScan : BleEvent()
 }
 
@@ -31,10 +30,10 @@ class BluetoothViewModelBLE @Inject constructor(
     private val permissionManager: PermissionManager
     ) : ViewModel(), BluetoothCallback {
 
-
     init {
-        checkPermissionsAndScan()
+        bluetoothController.setCallback(this)
     }
+
 
     private val _bleEvent = MutableStateFlow<BleEvent>(BleEvent.RequestPermissions)
     val bleEvent: StateFlow<BleEvent> = _bleEvent
@@ -45,34 +44,54 @@ class BluetoothViewModelBLE @Inject constructor(
     private val _error = MutableSharedFlow<String>()
     val error: SharedFlow<String> = _error
 
+    private val _imageData = MutableLiveData<ByteArray>()
+    val imageData: LiveData<ByteArray> = _imageData
 
-    internal fun checkPermissionsAndScan() {
+    private var _isConverting = MutableLiveData<Boolean>(true)
+    val isConverting: LiveData<Boolean> = _isConverting
+
+
+    var totalImagesExpected: Int = 0
+    var imagesReceived: Int = 0
+
+
+    @Synchronized
+     fun checkPermissionsAndScan() {
+         Log.d("PermissionsLog", "Checking permissions and scan")
         when {
             !permissionManager.hasScanPermissions() -> {
+                Log.d("PermissionsLog", "No permissions granted")
                 if (permissionManager.shouldShowScanRationale()) {
-                    _bleEvent.value = BleEvent.showRationale
+                    Log.d("PermissionsLog", "Show rationale for permissions")
+                    _bleEvent.value = BleEvent.ShowRationale
                 } else {
+                    Log.d("PermissionsLog", "Requesting permissions")
                     _bleEvent.value = BleEvent.RequestPermissions
                 }
             }
             bluetoothController.bluetoothAdapter?.isEnabled != true -> {
-                _bleEvent.value = BleEvent.promptBluetoothEnable
+                Log.d("PermissionsLog", "Bluetooth is not enabled")
+                _bleEvent.value = BleEvent.PromptBluetoothEnable
             }
             else -> {
+                Log.d("PermissionsLog", "Bluetooth is enabled and permissions are granted")
                 _bleEvent.value = BleEvent.ReadyToScan
                 startScan()
             }
         }
     }
-
+    @Synchronized
     fun startScan(){
         bluetoothController.scanDevices()
     }
     fun connectToDevice(device: BluetoothDevice){
         bluetoothController.connectToDevice(device)
     }
+    @Synchronized
     fun sendCommand(command:String){
         bluetoothController.sendCommand(command)
+        _isConverting.value = _isConverting.value != true
+        Log.d("PermissionsLog", "converting value is: ${_isConverting.value}")
     }
     fun disconnect(){
         bluetoothController.disconnect()
@@ -84,7 +103,7 @@ class BluetoothViewModelBLE @Inject constructor(
 
 
     override fun onDeviceFound(device: BluetoothDevice) {
-        TODO("Not yet implemented")
+        Log.d("PermissionsLog", "Device found: $device - ${device.address}")
     }
 
     override fun onError(error: BluetoothError, message: String) {
@@ -94,24 +113,27 @@ class BluetoothViewModelBLE @Inject constructor(
     }
 
     override fun onTransferComplete() {
-        TODO("Not yet implemented")
+        Log.d("PermissionsLog", "Transfer complete")
     }
 
     override fun onMetadataReceived(totalImages: Int) {
-        TODO("Not yet implemented")
+        totalImagesExpected = totalImages
     }
 
     override fun onServicesDiscovered() {
-        TODO("Not yet implemented")
+        Log.d("PermissionsLog", "Services discovered")
     }
     override fun onCommandSent(command: String) {
-        TODO("Not yet implemented")
+        Log.d("PermissionsLog", "Command sent: $command")
     }
     override fun onDataReceived(data: ByteArray, isCompleteFile: Boolean) {
-        TODO("Not yet implemented")
+        if(isCompleteFile){
+            imagesReceived++
+            _imageData.postValue(data)
+        }
     }
 
     override fun onNotificationStatusChanged(enabled: Boolean, status: String) {
-        TODO("Not yet implemented")
+        Log.d("PermissionsLog", "Notification status changed: $enabled, $status")
     }
 }

@@ -1,0 +1,76 @@
+package com.example.safeher.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
+import java.io.File
+import com.example.safeher.R
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.FileProvider
+import android.util.Log
+import android.widget.ImageView
+import android.widget.Toast
+
+class VideoAdapter(private val context: Context, private var videoFiles: List<File>) : RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): VideoViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_video, parent, false)
+        return VideoViewHolder(view)
+    }
+
+
+
+    override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
+        val video = videoFiles[position]
+        holder.dateText.text = video.name
+        holder.addressText.text = video.absolutePath
+
+        holder.playButton.setOnClickListener {
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider",
+                video
+            )
+            Log.d("VideoProcessor", "Video URI: $uri")
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setDataAndType(uri, "video/*")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            context.startActivity(intent)
+        }
+        holder.deleteButton.setOnClickListener {
+            val file = videoFiles[position]
+            if(file.exists()){
+                if(file.delete()){
+                    Toast.makeText(context, "File deleted successfully", Toast.LENGTH_SHORT).show()
+                    videoFiles = videoFiles.toMutableList().also { it.removeAt(position) }
+                    notifyItemRemoved(position)
+                } else {
+                    Toast.makeText(context, "Failed to delete file", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    override fun getItemCount(): Int = videoFiles.size
+
+    inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val dateText: TextView = itemView.findViewById(R.id.dateText1)
+        val addressText: TextView = itemView.findViewById(R.id.addressText1)
+        val playButton: ImageView = itemView.findViewById(R.id.play_btn)
+        val deleteButton: ImageView = itemView.findViewById(R.id.delete_btn)
+
+
+        init {
+            playButton.setOnClickListener {
+                //TODO : Implement video playback functionality
+            }
+        }
+    }
+}

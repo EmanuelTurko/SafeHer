@@ -92,12 +92,24 @@ class PermissionManager(private val context: Context) {
         requestMissingPermissions(getConnectPermissions(), requestCode)
     }
     fun requestStoragePermissions(requestCode: Int) {
-        val permissionsToRequest = storagePermissions.filter { permission ->
-            !hasPermission(permission)
-        }.toTypedArray()
+        if (SdkVersion.VersionCodeTiramisu) {
+            // For Android 13 (API level 33), the READ_MEDIA_VIDEO permission is needed.
+            val permissionsToRequest = storagePermissions.filter { permission ->
+                !hasPermission(permission)
+            }.toTypedArray()
 
-        if (permissionsToRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(context as Activity, permissionsToRequest, requestCode)
+            if (permissionsToRequest.isNotEmpty()) {
+                ActivityCompat.requestPermissions(context as Activity, permissionsToRequest, requestCode)
+            }
+        } else {
+            // For Android versions below 10, we request the classic permissions.
+            val permissionsToRequest = storagePermissions.filter { permission ->
+                !hasPermission(permission)
+            }.toTypedArray()
+
+            if (permissionsToRequest.isNotEmpty()) {
+                ActivityCompat.requestPermissions(context as Activity, permissionsToRequest, requestCode)
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,12 +32,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.safeher.bluetooth.BluetoothController
 import com.example.safeher.util.PermissionManager
+import com.example.safeher.util.PermissionManager.Companion.REQUEST_CODE_STORAGE
 import kotlinx.coroutines.launch
 
 class SOSHomeScreenFragment : Fragment() {
 
-    private lateinit var bluetoothViewModel : BluetoothViewModelBLE
+
+    private val bluetoothViewModel: BluetoothViewModelBLE by lazy {
+        ViewModelProvider(this)[BluetoothViewModelBLE::class.java]
+    }
     private lateinit var permissionManager: PermissionManager
+    private lateinit var videoViewModel: VideoViewModel
     private var bSosActiveValue : Boolean = false
 
 
@@ -75,8 +81,15 @@ class SOSHomeScreenFragment : Fragment() {
         }
     private val requestBluetoothPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            if(permissions[Manifest.permission.BLUETOOTH] == true &&
-                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+            val isBluetoothGranted = permissions[Manifest.permission.BLUETOOTH] == true
+            val isLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+
+            // For Android 12 and higher, Bluetooth permissions are handled separately
+            val isBluetoothConnectGranted = permissions[Manifest.permission.BLUETOOTH_CONNECT] == true
+            val isBluetoothScanGranted = permissions[Manifest.permission.BLUETOOTH_SCAN] == true
+
+            if (isBluetoothGranted || (isBluetoothConnectGranted && isBluetoothScanGranted) && isLocationGranted) {
+                Log.d("PermissionsLog", "Bluetooth and location permissions granted. Starting scan...")
                 bluetoothViewModel.checkPermissionsAndScan()
             } else {
                 Toast.makeText(requireContext(), "Permissions denied", Toast.LENGTH_SHORT).show()
@@ -90,28 +103,53 @@ class SOSHomeScreenFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_sos_home_screen, container, false)
         initView(view)
         initListener()
-        bluetoothViewModel = initBluetoothViewModel()
 
         return view
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initBluetoothViewModel()
+        videoViewModel = initVideoViewModel()
+        bluetoothViewModel.checkPermissionsAndScan()
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bluetoothViewModel.bleEvent.collect { event ->
                     when (event) {
                         is BleEvent.RequestPermissions -> {
+                            Log.d("PermissionsLog", "Requesting permissions...")
                             requestPermissions()
                         }
-                        is BleEvent.showRationale -> {
+                        is BleEvent.ShowRationale -> {
+                            Log.d("PermissionsLog", "Showing rationale...")
                             showPermissionRationale()
                         }
-                        is BleEvent.promptBluetoothEnable -> {
+                        is BleEvent.PromptBluetoothEnable -> {
+                            Log.d("PermissionsLog", "Prompting to enable Bluetooth...")
                             promptEnableBluetooth()
                         }
                         is BleEvent.ReadyToScan -> {
+                            Log.d("PermissionsLog", "Ready to scan...")
                             bluetoothViewModel.startScan()
+                        }
+                    }
+                }
+            }
+        }
+        bluetoothViewModel.isConverting.observe(viewLifecycleOwner) { isConverting ->
+            bluetoothViewModel.imageData.observe(viewLifecycleOwner) { data ->
+                Log.d("PermissionsLog", "Received image data: $data")
+
+                if (isConverting == true) {
+                    val saved = videoViewModel.videoManager.saveImageData(data, videoViewModel.frameIndex)
+                    if (saved) {
+                        videoViewModel.frameIndex++
+
+                        if (bluetoothViewModel.imagesReceived >= bluetoothViewModel.totalImagesExpected) {
+                            Log.d("PermissionsLog", "total ${bluetoothViewModel.totalImagesExpected}")
+                            Log.d("PermissionsLog", "received ${bluetoothViewModel.imagesReceived}")
+                            videoViewModel.processVideo()
                         }
                     }
                 }
@@ -135,6 +173,16 @@ class SOSHomeScreenFragment : Fragment() {
                 }
             }
         )[BluetoothViewModelBLE::class.java]
+    }
+    private fun initVideoViewModel(): VideoViewModel {
+        return ViewModelProvider(
+            this,
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return VideoViewModel(requireContext().applicationContext) as T
+                }
+            }
+        )[VideoViewModel::class.java]
     }
 
 
@@ -170,8 +218,11 @@ class SOSHomeScreenFragment : Fragment() {
         mSosButton.setOnClickListener {
             if(!bSosActiveValue){
                 bluetoothViewModel.sendCommand("START")
+                videoViewModel.cleanUpTempFiles()
+                bSosActiveValue = true
             } else {
                 bluetoothViewModel.sendCommand("STOP")
+                bSosActiveValue = false
             }
         }
 
@@ -216,8 +267,12 @@ class SOSHomeScreenFragment : Fragment() {
     private fun requestPermissions(){
         requestBluetoothPermissionLauncher.launch(
             arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_SCAN
             )
         )
     }

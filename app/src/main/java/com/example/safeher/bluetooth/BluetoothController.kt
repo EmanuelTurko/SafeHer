@@ -22,7 +22,7 @@ class BluetoothController(
     private val commandUUID = UUID.fromString("ABCD0002-0000-1000-8000-00805F9B34FB")
     private val dataUUID = UUID.fromString("ABCD0003-0000-1000-8000-00805F9B34FB")
 
-    private val callback: BluetoothCallback? = null
+    private var callback: BluetoothCallback? = null
     private val bluetoothManager by lazy { context.getSystemService(BluetoothManager::class.java) }
     val bluetoothAdapter by lazy { bluetoothManager?.adapter }
     private val bluetoothLeScanner by lazy { bluetoothAdapter?.bluetoothLeScanner }
@@ -482,6 +482,9 @@ class BluetoothController(
                     "$type notification failed: ${e.message}")
             }
         }
+    }
+    fun setCallback(callback: BluetoothCallback) {
+        this.callback = callback
     }
 }
 
