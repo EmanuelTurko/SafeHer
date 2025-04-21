@@ -279,6 +279,7 @@
                 android:orientation="vertical">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/supportCall_btn"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     app:cardBackgroundColor="#D0E6FF"

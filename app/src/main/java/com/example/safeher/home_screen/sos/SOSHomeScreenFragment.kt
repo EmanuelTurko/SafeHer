@@ -36,6 +36,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.safeher.bluetooth.BluetoothController
+import com.example.safeher.home_screen.videoLibrary.VideoViewModel
 import com.example.safeher.util.PermissionManager
 import com.example.safeher.util.PermissionManager.Companion.REQUEST_CODE_STORAGE
 import com.example.safeher.util.SdkVersion
@@ -219,11 +220,12 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSupportCallButton.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            findNavController().navigate(R.id.supportCallFragment)
+           /* if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                 makePhoneCall()
             } else {
                 requestCallPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
-            }
+            }*/
         }
 
         mSosButton.setOnClickListener {

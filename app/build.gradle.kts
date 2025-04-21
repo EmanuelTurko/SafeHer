@@ -35,6 +35,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -62,6 +65,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.ffmpeg.kit.full)
     implementation(libs.play.services.location)
+    implementation(libs.play.services.auth)
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx.v261)
 

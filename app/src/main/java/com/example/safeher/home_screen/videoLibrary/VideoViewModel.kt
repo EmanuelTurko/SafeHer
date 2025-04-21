@@ -1,12 +1,12 @@
-package com.example.safeher.home_screen.sos
+package com.example.safeher.home_screen.videoLibrary
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.safeher.video.VideoManager
-import android.util.Log
 import java.io.File
 
 class VideoViewModel(context: Context): ViewModel() {

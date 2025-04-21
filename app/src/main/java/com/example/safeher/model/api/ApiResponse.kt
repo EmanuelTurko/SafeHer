@@ -1,4 +1,4 @@
-package com.example.safeher.model
+package com.example.safeher.model.api
 
 data class ApiResponse<T>(
     val message: String? = null,

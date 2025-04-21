@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.safeher.api.auth.AuthRepository
-import com.example.safeher.model.ApiResponse
+import com.example.safeher.model.api.ApiResponse
 import com.example.safeher.model.LoginRequest
 import com.example.safeher.model.RegisterRequest
 import com.example.safeher.model.User

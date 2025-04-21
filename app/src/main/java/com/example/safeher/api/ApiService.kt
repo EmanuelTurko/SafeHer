@@ -1,6 +1,6 @@
 package com.example.safeher.api
 
-import com.example.safeher.model.ApiResponse
+import com.example.safeher.model.api.ApiResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import com.example.safeher.model.Test

@@ -42,4 +42,5 @@
         android:name="isAfterRegistrationScreen"
         app:argType="boolean" />
     </fragment> -->
+
 </navigation>
