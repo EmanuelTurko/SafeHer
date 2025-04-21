@@ -34,7 +34,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 
-class ProfileFragment : Fragment() {
+/*class ProfileFragment : Fragment() {
 
     private var mAuth = FirebaseAuth.getInstance()
     private lateinit var saveButton: MaterialButton
@@ -360,4 +360,4 @@ class ProfileFragment : Fragment() {
     }
     /*********END***********/
 
-}
+}*/

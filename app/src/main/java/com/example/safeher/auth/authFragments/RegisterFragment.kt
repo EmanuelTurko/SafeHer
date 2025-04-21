@@ -1,33 +1,45 @@
 package com.example.safeher.auth.authFragments
 
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.LottieAnimationView
-import com.example.safeher.auth.authFragments.RegisterFragmentDirections
 import com.example.safeher.R
+import com.example.safeher.api.ApiService
+import com.example.safeher.api.RetroFitClient
+import com.example.safeher.api.auth.AuthRepository
 import com.example.safeher.auth.authViewModel.AuthState
 import com.example.safeher.auth.authViewModel.AuthViewModel
+import com.example.safeher.auth.authViewModel.AuthViewModelApi
+import com.example.safeher.auth.authViewModel.AuthViewModelFactory
 import com.example.safeher.general.ErrorDialog
 import com.example.safeher.general.showCustomToast
+import com.example.safeher.model.RegisterRequest
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
-import kotlin.getValue
 
 class RegisterFragment : Fragment() {
 
     private var mMoveToLoginScreenBtn: AppCompatTextView? = null
-    private var mUsername: TextInputEditText? = null
+    private var mFullName: TextInputEditText? = null
     private var mPassword: TextInputEditText? = null
     private var mRegisterBtn: MaterialButton? = null
+    private var mPhone: TextInputEditText? = null
+    //private var mIdPhotoUrl: TextInputEditText? = null
+    private var mEmail: TextInputEditText? = null
     private var mAnimationView: LottieAnimationView? = null
     private val viewModel: AuthViewModel by viewModels()
+
+    private lateinit var viewModelApi : AuthViewModelApi
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,11 +53,19 @@ class RegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeViews(view)
         setupClickListeners()
-        setupObservers()
+
+        val authRepository = AuthRepository(RetroFitClient.apiService)
+
+        val factory = AuthViewModelFactory(authRepository)
+        viewModelApi = ViewModelProvider(this, factory)[AuthViewModelApi::class.java]
+
+        //setupObservers()
+        registerObserver()
     }
 
     private fun initializeViews(view: View) {
-        mUsername = view.findViewById(R.id.emailEditTextRegister)
+        mFullName = view.findViewById(R.id.usernameEditText)
+        mEmail = view.findViewById(R.id.emailEditTextRegister)
         mPassword = view.findViewById(R.id.passwordEditTextRegister)
         mRegisterBtn = view.findViewById(R.id.registerButton)
         mMoveToLoginScreenBtn = view.findViewById(R.id.loginText)
@@ -59,11 +79,12 @@ class RegisterFragment : Fragment() {
         }
 
         mRegisterBtn?.setOnClickListener {
-            performRegistration()
+            registerUser()
+            //performRegistration()
         }
     }
 
-    private fun performRegistration() {
+    /*private fun performRegistration() {
         val username = mUsername?.text.toString().trim()
         val password = mPassword?.text.toString()
 
@@ -71,7 +92,7 @@ class RegisterFragment : Fragment() {
             showLoadingState(true)
             viewModel.signUp(username, password)
         }
-    }
+    }*/
 
     private fun validateInput(email: String, password: String): Boolean {
         var isValid = true
@@ -89,7 +110,7 @@ class RegisterFragment : Fragment() {
         return isValid
     }
 
-    private fun setupObservers() {
+   /*private fun setupObservers() {
         viewModel.authState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is AuthState.Loading -> {}
@@ -109,10 +130,46 @@ class RegisterFragment : Fragment() {
                 else -> {}
             }
         }
-    }
+    }*/
 
     private fun showLoadingState(isLoading: Boolean) {
         mRegisterBtn?.isEnabled = !isLoading
+    }
+
+    private fun registerUser() {
+        val fullName = mFullName?.text.toString().trim()
+        val email = mEmail?.text.toString().trim()
+        val password = mPassword?.text.toString()
+        val phoneNumber = mPhone?.text.toString().trim()
+        //val idPhotoUrl = mIdPhotoUrl?.text.toString().trim()
+        Log.d("RegisterFragment", "registerUser: $fullName, $email, $password, $phoneNumber")
+        val request = RegisterRequest(
+            fullName = fullName,
+            email = email,
+            password = password,
+            phoneNumber = phoneNumber,
+            idPhotoUrl = "" //idPhotoUrl,
+        )
+        Log.d("RegisterFragment", "registerUser: $request")
+        viewModelApi.registerUser(request)
+    }
+    private fun registerObserver(){
+        viewModelApi.registerResponse.observe(viewLifecycleOwner) { response ->
+            showLoadingState(false)
+
+            if(response.error != null){
+                val customProp = ErrorDialog(requireActivity())
+                customProp.show(
+                    "Oops",
+                    response.error,
+                    "TRY AGAIN"
+                )
+                mRegisterBtn?.isEnabled = true
+            } else {
+                showCustomToast("Registration successful")
+                findNavController().navigate(R.id.loginFragment)
+            }
+        }
     }
 
 }

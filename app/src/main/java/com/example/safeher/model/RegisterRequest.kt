@@ -1,11 +1,9 @@
 package com.example.safeher.model
 
-data class User(
-    val id: String? = null,
+data class RegisterRequest(
     val fullName : String = "",
     val email: String = "",
     val password: String = "",
-    val phoneNumber: Number = 0,
-    val birthDate: String? = null,
+    val phoneNumber: String = "",
     val idPhotoUrl: String = "",
 )
