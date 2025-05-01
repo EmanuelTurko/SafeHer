@@ -15,8 +15,8 @@
             android:id="@+id/action_SOSHomeScreenFragment_to_sistersFragment"
             app:destination="@id/sistersFragment" />
         <action
-            android:id="@+id/action_homePageFragment_to_supportCallFragment"
-            app:destination="@id/supportCallFragment" />
+            android:id="@+id/action_homePageFragment_to_supportCallAiFragment"
+            app:destination="@id/SupportCallAiFragment" />
     </fragment>
     <fragment
         android:id="@+id/videoLibraryFragment"
@@ -33,14 +33,6 @@
         <action
             android:id="@+id/action_sistersFragment_to_SOSHomeScreenFragment"
             app:destination="@id/SOSHomeScreenFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/supportCallFragment"
-        android:name="com.example.safeher.home_screen.support.SupportCallFragment"
-        android:label="SupportCallFragment" >
-        <action
-            android:id="@+id/action_supportCallFragment_to_supportCallAIFragment"
-            app:destination="@id/SupportCallAiFragment" />
     </fragment>
     <fragment
         android:id="@+id/SupportCallAiFragment"

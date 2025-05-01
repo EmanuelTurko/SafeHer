@@ -46,6 +46,8 @@ class TextToSpeechManager(context: Context) : TextToSpeech.OnInitListener {
                     Log.w("SupportCallAiFragment", "⚠️ Preferred voice not found, using default")
                 }
                 ttsReady = true
+                val voice = textToSpeech.voice
+                Log.d("SupportCallAiFragment", "Voice name: ${voice.name}, isNetworkConnectionRequired: ${voice.isNetworkConnectionRequired}, isNotInstalled: ${voice.features?.contains("notInstalled")}")
                 Log.d("SupportCallAiFragment", "TextToSpeech initialization succeeded")
             }
         } else {

@@ -3,15 +3,9 @@ package com.example.safeher.home_screen.sos
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,30 +14,24 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
-import com.example.safeher.R
-import com.example.safeher.settings.SettingsMainActivity
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.example.safeher.R
 import com.example.safeher.bluetooth.BluetoothController
 import com.example.safeher.home_screen.videoLibrary.VideoViewModel
+import com.example.safeher.settings.SettingsMainActivity
 import com.example.safeher.util.PermissionManager
-import com.example.safeher.util.PermissionManager.Companion.REQUEST_CODE_STORAGE
-import com.example.safeher.util.SdkVersion
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
-import java.io.IOException
-import java.util.Locale
 
 class SOSHomeScreenFragment : Fragment() {
 
@@ -220,7 +208,7 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSupportCallButton.setOnClickListener {
-            findNavController().navigate(R.id.supportCallFragment)
+            supportCallAlertBuilder()
            /* if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                 makePhoneCall()
             } else {
@@ -291,6 +279,22 @@ class SOSHomeScreenFragment : Fragment() {
     private fun promptEnableBluetooth(){
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         enableBluetoothLauncher.launch(intent)
+    }
+    fun supportCallAlertBuilder(){
+        AlertDialog.Builder(requireContext())
+            .setTitle("Support Call")
+            .setMessage("Do you want a support call?")
+            .setPositiveButton("Human support") { dialog, _ ->
+                //sister's logic
+
+            }
+            .setNegativeButton("Virtual intelligence support") { dialog, _ ->
+                //AI logic
+                findNavController().navigate(R.id.action_homePageFragment_to_supportCallAiFragment)
+            }
+            .setCancelable(true)
+            .show()
+
     }
 
 }

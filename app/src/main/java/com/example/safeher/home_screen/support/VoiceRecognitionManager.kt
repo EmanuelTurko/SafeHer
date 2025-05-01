@@ -51,15 +51,46 @@ class VoiceRecognitionManager(
         speechRecognizer.setRecognitionListener(listener)
 
     }
-    fun startListening(){
+    fun startListening() {
+
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("he", "IL"))
-    }
-    speechRecognizer.startListening(intent)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "he-IL") // Strictly Hebrew
+            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false) // Try offline first
+
+            // These help restrict it to Hebrew only
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "he-IL")
+            putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, "he-IL")
+        }
+
+        if (!isHebrewOfflineModelAvailable()) {
+            Log.e("VoiceRecognition", "Hebrew offline speech model not available on this device")
+            // Optional: fallback to online mode by disabling EXTRA_PREFER_OFFLINE
+            // or show a UI message
+        }
+
+        Log.d("VoiceRecognition", "Starting recognition in Hebrew only")
+        speechRecognizer.startListening(intent)
     }
 
     fun stopListening() {
         speechRecognizer.stopListening()
+    }
+    fun isHebrewOfflineModelAvailable(): Boolean {
+        val intent = Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS)
+        var availableLanguages: List<String>? = null
+
+        val receiver = object : android.content.BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                availableLanguages = intent
+                    ?.getStringArrayListExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES)
+            }
+        }
+
+        context.sendOrderedBroadcast(intent, null, receiver, null, 0, null, null)
+
+        // You might need to delay this check slightly or persist the result
+        // Because it's async
+        return availableLanguages?.contains("he-IL") ?: false
     }
 }

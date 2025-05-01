@@ -32,11 +32,16 @@ class SupportCallAiViewModel: ViewModel() {
         Log.d("SupportCallAiFragment", "Sending message to Gemini: $message")
         viewModelScope.launch {
             try{
+                val prompt = """
+                            Speak gently and supportively to the user's request, Use only 1–2 short sentences, speak only in Hebrew as a female to a female.
+                            "$message"
+                            """.trimIndent()
+
                 val request = AiChatRequest(
                     contents = listOf(
                         Content(
                             parts = listOf(
-                                Part(text = message)
+                                Part(text = prompt)
                             )
                         )
                     )
