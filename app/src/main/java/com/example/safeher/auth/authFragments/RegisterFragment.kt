@@ -20,6 +20,7 @@ import com.example.safeher.api.auth.AuthRepository
 import com.example.safeher.auth.authViewModel.AuthViewModel
 import com.example.safeher.auth.authViewModel.AuthViewModelApi
 import com.example.safeher.auth.authViewModel.AuthViewModelFactory
+import com.example.safeher.databinding.FragmentRegisterBinding
 import com.example.safeher.general.ErrorDialog
 import com.example.safeher.general.showCustomToast
 import com.example.safeher.model.RegisterRequest
@@ -29,6 +30,7 @@ import com.google.android.material.textfield.TextInputLayout
 
 class RegisterFragment : Fragment() {
 
+    private var binding: FragmentRegisterBinding? = null
     private var mMoveToLoginScreenBtn: AppCompatTextView? = null
     private var mFullName: TextInputEditText? = null
     private var mPassword: TextInputEditText? = null
@@ -46,7 +48,8 @@ class RegisterFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_register, container, false)
+        binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,18 +65,15 @@ class RegisterFragment : Fragment() {
     }
 
     private fun initializeViews(view: View) {
-        mFullName = view.findViewById(R.id.usernameEditText)
-        mEmail = view.findViewById(R.id.emailEditTextRegister)
-        mPassword = view.findViewById(R.id.passwordEditTextRegister)
-        mRegisterBtn = view.findViewById(R.id.registerButton)
-        mMoveToLoginScreenBtn = view.findViewById(R.id.loginText)
-        mPhone = view.findViewById(R.id.phoneEditText)
-        mIdPhoto = view.findViewById(R.id.idPhotoEditText)
+        mFullName = binding?.fullNameEditText
+        mEmail = binding?.emailEditTextRegister
+        mPassword = binding?.passwordEditTextRegister
+        mRegisterBtn = binding?.registerButton
+        mMoveToLoginScreenBtn = binding?.loginText
+        mPhone = binding?.phoneEditText
+        mIdPhoto = binding?.idPhotoEditText
+        binding?.idPhotoInputLayout?.setOnClickListener { openGallery() }
 
-        val idPhotoInputLayout = view.findViewById<TextInputLayout>(R.id.idPhotoInputLayout)
-        idPhotoInputLayout.setEndIconOnClickListener {
-            openGallery()
-        }
     }
 
     private fun setupClickListeners() {
@@ -86,41 +86,19 @@ class RegisterFragment : Fragment() {
         }
     }
 
-    private fun validateInput(email: String, password: String): Boolean {
-        var isValid = true
-
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            showCustomToast("Invalid email address")
-            isValid = false
-        }
-
-        if (password.isEmpty() || password.length < 6) {
-            showCustomToast("Password must be at least 6 characters")
-            isValid = false
-        }
-
-        return isValid
-    }
 
     private fun showLoadingState(isLoading: Boolean) {
         mRegisterBtn?.isEnabled = !isLoading
     }
 
     private fun registerUser() {
-        val fullName = mFullName?.text.toString().trim()
-        val email = mEmail?.text.toString().trim()
-        val password = mPassword?.text.toString()
-        val phoneNumber = mPhone?.text.toString().trim()
-        val idPhotoUrl = mIdPhoto?.text.toString().trim()
-
-        Log.d("RegisterFragment", "registerUser: $fullName, $email, $password, $phoneNumber, $idPhotoUrl")
 
         val request = RegisterRequest(
-            fullName = fullName,
-            email = email,
-            password = password,
-            phoneNumber = phoneNumber,
-            idPhotoUrl = idPhotoUrl
+            fullName = mFullName?.text.toString().trim(),
+            email = mEmail?.text.toString().trim(),
+            password = mPassword?.text.toString(),
+            phoneNumber = mPhone?.text.toString().trim(),
+            idPhotoUrl = mIdPhoto?.text.toString().trim()
         )
 
         viewModelApi.registerUser(request)
