@@ -1,5 +1,6 @@
 package com.example.safeher.auth.authViewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,7 +33,14 @@ class AuthViewModelApi(private val authRepository: AuthRepository) :ViewModel() 
         viewModelScope.launch{
             try{
                 val response = authRepository.loginUser(data)
-                _loginResponse.postValue(response)
+                if(response.error != null){
+                    _loginResponse.postValue(ApiResponse(error = response.error))
+                }
+                else {
+                    Log.d("LoginFragment", "Login successful: ${response.data}")
+                    _loginResponse.postValue(response)
+                }
+                Log.d("LoginFragment", "Got login response: $response")
             } catch( e: Exception){
                 _loginResponse.postValue(ApiResponse(error = e.message))
             }

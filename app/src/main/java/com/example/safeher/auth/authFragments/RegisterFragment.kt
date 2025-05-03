@@ -134,4 +134,8 @@ class RegisterFragment : Fragment() {
     private fun openGallery() {
         pickImageLauncher.launch("image/*")
     }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
 }

@@ -125,13 +125,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Username"
+                    android:text="Email"
                     android:textColor="#2D2D2D"
                     android:textSize="14sp" />
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/usernameInputLayout"
+                android:id="@+id/emailInputLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -139,7 +139,7 @@
                 app:boxBackgroundMode="none">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/usernameEditText"
+                    android:id="@+id/emailEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@null"
