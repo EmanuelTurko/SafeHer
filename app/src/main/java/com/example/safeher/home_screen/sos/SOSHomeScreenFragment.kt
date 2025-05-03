@@ -3,9 +3,15 @@ package com.example.safeher.home_screen.sos
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,24 +20,30 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import androidx.annotation.RequiresPermission
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
-import com.example.safeher.bluetooth.BluetoothController
-import com.example.safeher.home_screen.videoLibrary.VideoViewModel
 import com.example.safeher.settings.SettingsMainActivity
-import com.example.safeher.util.PermissionManager
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.safeher.bluetooth.BluetoothController
+//import com.example.safeher.home_screen.videoLibrary.VideoViewModel
+import com.example.safeher.util.PermissionManager
+import com.example.safeher.util.PermissionManager.Companion.REQUEST_CODE_STORAGE
+import com.example.safeher.util.SdkVersion
+import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.launch
+import java.io.IOException
+import java.util.Locale
 
 class SOSHomeScreenFragment : Fragment() {
 
@@ -40,7 +52,7 @@ class SOSHomeScreenFragment : Fragment() {
         ViewModelProvider(this)[BluetoothViewModelBLE::class.java]
     }
     private lateinit var permissionManager: PermissionManager
-    private lateinit var videoViewModel: VideoViewModel
+//    private lateinit var videoViewModel: VideoViewModel
     private var bSosActiveValue : Boolean = false
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -110,7 +122,7 @@ class SOSHomeScreenFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initBluetoothViewModel()
-        videoViewModel = initVideoViewModel()
+//        videoViewModel = initVideoViewModel()
         bluetoothViewModel.checkPermissionsAndScan()
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -141,18 +153,18 @@ class SOSHomeScreenFragment : Fragment() {
             bluetoothViewModel.imageData.observe(viewLifecycleOwner) { data ->
                 Log.d("PermissionsLog", "Received image data: $data")
 
-                if (isConverting == true) {
-                    val saved = videoViewModel.videoManager.saveImageData(data, videoViewModel.frameIndex)
-                    if (saved) {
-                        videoViewModel.frameIndex++
-
-                        if (bluetoothViewModel.imagesReceived >= bluetoothViewModel.totalImagesExpected) {
-                            Log.d("PermissionsLog", "total ${bluetoothViewModel.totalImagesExpected}")
-                            Log.d("PermissionsLog", "received ${bluetoothViewModel.imagesReceived}")
-                            videoViewModel.processVideo()
-                        }
-                    }
-                }
+//                if (isConverting == true) {
+////                    val saved = videoViewModel.videoManager.saveImageData(data, videoViewModel.frameIndex)
+//                    if (saved) {
+//                        videoViewModel.frameIndex++
+//
+//                        if (bluetoothViewModel.imagesReceived >= bluetoothViewModel.totalImagesExpected) {
+//                            Log.d("PermissionsLog", "total ${bluetoothViewModel.totalImagesExpected}")
+//                            Log.d("PermissionsLog", "received ${bluetoothViewModel.imagesReceived}")
+//                            videoViewModel.processVideo()
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -174,16 +186,16 @@ class SOSHomeScreenFragment : Fragment() {
             }
         )[BluetoothViewModelBLE::class.java]
     }
-    private fun initVideoViewModel(): VideoViewModel {
-        return ViewModelProvider(
-            this,
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return VideoViewModel(requireContext().applicationContext) as T
-                }
-            }
-        )[VideoViewModel::class.java]
-    }
+//    private fun initVideoViewModel(): VideoViewModel {
+//        return ViewModelProvider(
+//            this,
+//            object : ViewModelProvider.Factory {
+//                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//                    return VideoViewModel(requireContext().applicationContext) as T
+//                }
+//            }
+//        )[VideoViewModel::class.java]
+//    }
 
 
     private fun initView(view: View) {
@@ -208,7 +220,7 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSupportCallButton.setOnClickListener {
-            supportCallAlertBuilder()
+            findNavController().navigate(R.id.supportCallFragment)
            /* if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                 makePhoneCall()
             } else {
@@ -219,7 +231,7 @@ class SOSHomeScreenFragment : Fragment() {
         mSosButton.setOnClickListener {
             if(!bSosActiveValue){
                 bluetoothViewModel.sendCommand("START")
-                videoViewModel.cleanUpTempFiles()
+//                videoViewModel.cleanUpTempFiles()
                 bSosActiveValue = true
             } else {
                 bluetoothViewModel.sendCommand("STOP")
@@ -279,22 +291,6 @@ class SOSHomeScreenFragment : Fragment() {
     private fun promptEnableBluetooth(){
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         enableBluetoothLauncher.launch(intent)
-    }
-    fun supportCallAlertBuilder(){
-        AlertDialog.Builder(requireContext())
-            .setTitle("Support Call")
-            .setMessage("Do you want a support call?")
-            .setPositiveButton("Human support") { dialog, _ ->
-                //sister's logic
-
-            }
-            .setNegativeButton("Virtual intelligence support") { dialog, _ ->
-                //AI logic
-                findNavController().navigate(R.id.action_homePageFragment_to_supportCallAiFragment)
-            }
-            .setCancelable(true)
-            .show()
-
     }
 
 }

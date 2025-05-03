@@ -1,23 +1,22 @@
 package com.example.safeher.auth.authFragments
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.activity.result.contract.ActivityResultContracts
 import com.airbnb.lottie.LottieAnimationView
 import com.example.safeher.R
-import com.example.safeher.api.ApiService
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.api.auth.AuthRepository
-import com.example.safeher.auth.authViewModel.AuthState
 import com.example.safeher.auth.authViewModel.AuthViewModel
 import com.example.safeher.auth.authViewModel.AuthViewModelApi
 import com.example.safeher.auth.authViewModel.AuthViewModelFactory
@@ -26,6 +25,7 @@ import com.example.safeher.general.showCustomToast
 import com.example.safeher.model.RegisterRequest
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class RegisterFragment : Fragment() {
 
@@ -34,12 +34,12 @@ class RegisterFragment : Fragment() {
     private var mPassword: TextInputEditText? = null
     private var mRegisterBtn: MaterialButton? = null
     private var mPhone: TextInputEditText? = null
-    //private var mIdPhotoUrl: TextInputEditText? = null
     private var mEmail: TextInputEditText? = null
+    private var mIdPhoto: TextInputEditText? = null
     private var mAnimationView: LottieAnimationView? = null
     private val viewModel: AuthViewModel by viewModels()
 
-    private lateinit var viewModelApi : AuthViewModelApi
+    private lateinit var viewModelApi: AuthViewModelApi
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,11 +55,9 @@ class RegisterFragment : Fragment() {
         setupClickListeners()
 
         val authRepository = AuthRepository(RetroFitClient.apiService)
-
         val factory = AuthViewModelFactory(authRepository)
         viewModelApi = ViewModelProvider(this, factory)[AuthViewModelApi::class.java]
 
-        //setupObservers()
         registerObserver()
     }
 
@@ -69,8 +67,13 @@ class RegisterFragment : Fragment() {
         mPassword = view.findViewById(R.id.passwordEditTextRegister)
         mRegisterBtn = view.findViewById(R.id.registerButton)
         mMoveToLoginScreenBtn = view.findViewById(R.id.loginText)
-//        mAnimationView = view.findViewById(R.id.registerAnimation)
-//        mAnimationView?.playAnimation()
+        mPhone = view.findViewById(R.id.phoneEditText)
+        mIdPhoto = view.findViewById(R.id.idPhotoEditText)
+
+        val idPhotoInputLayout = view.findViewById<TextInputLayout>(R.id.idPhotoInputLayout)
+        idPhotoInputLayout.setEndIconOnClickListener {
+            openGallery()
+        }
     }
 
     private fun setupClickListeners() {
@@ -80,57 +83,24 @@ class RegisterFragment : Fragment() {
 
         mRegisterBtn?.setOnClickListener {
             registerUser()
-            //performRegistration()
         }
     }
-
-    /*private fun performRegistration() {
-        val username = mUsername?.text.toString().trim()
-        val password = mPassword?.text.toString()
-
-        if(validateInput(username, password)) {
-            showLoadingState(true)
-            viewModel.signUp(username, password)
-        }
-    }*/
 
     private fun validateInput(email: String, password: String): Boolean {
         var isValid = true
 
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            showCustomToast( "Invalid email address")
+            showCustomToast("Invalid email address")
             isValid = false
         }
 
         if (password.isEmpty() || password.length < 6) {
-            showCustomToast( "Password must be at least 6 characters")
+            showCustomToast("Password must be at least 6 characters")
             isValid = false
         }
 
         return isValid
     }
-
-   /*private fun setupObservers() {
-        viewModel.authState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is AuthState.Loading -> {}
-                is AuthState.Success -> {
-                    //al action = RegisterFragmentDirections.actionRegisterFragmentToProfileFragment2(isAfterRegistrationScreen = true)
-                    findNavController().navigate(R.id.loginFragment)
-                }
-                is AuthState.Error -> {
-                    val customPopup = ErrorDialog(requireActivity())
-                    customPopup.show(
-                        "Oops",
-                        state.message,
-                        "TRY AGAIN"
-                    )
-                    mRegisterBtn?.isEnabled = true
-                }
-                else -> {}
-            }
-        }
-    }*/
 
     private fun showLoadingState(isLoading: Boolean) {
         mRegisterBtn?.isEnabled = !isLoading
@@ -141,23 +111,26 @@ class RegisterFragment : Fragment() {
         val email = mEmail?.text.toString().trim()
         val password = mPassword?.text.toString()
         val phoneNumber = mPhone?.text.toString().trim()
-        //val idPhotoUrl = mIdPhotoUrl?.text.toString().trim()
-        Log.d("RegisterFragment", "registerUser: $fullName, $email, $password, $phoneNumber")
+        val idPhotoUrl = mIdPhoto?.text.toString().trim()
+
+        Log.d("RegisterFragment", "registerUser: $fullName, $email, $password, $phoneNumber, $idPhotoUrl")
+
         val request = RegisterRequest(
             fullName = fullName,
             email = email,
             password = password,
             phoneNumber = phoneNumber,
-            idPhotoUrl = "" //idPhotoUrl,
+            idPhotoUrl = idPhotoUrl
         )
-        Log.d("RegisterFragment", "registerUser: $request")
+
         viewModelApi.registerUser(request)
     }
-    private fun registerObserver(){
+
+    private fun registerObserver() {
         viewModelApi.registerResponse.observe(viewLifecycleOwner) { response ->
             showLoadingState(false)
 
-            if(response.error != null){
+            if (response.error != null) {
                 val customProp = ErrorDialog(requireActivity())
                 customProp.show(
                     "Oops",
@@ -172,4 +145,15 @@ class RegisterFragment : Fragment() {
         }
     }
 
+    // מאפשר לבחור תמונה מהגלריה
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                mIdPhoto?.setText(it.toString())
+            }
+        }
+
+    private fun openGallery() {
+        pickImageLauncher.launch("image/*")
+    }
 }
