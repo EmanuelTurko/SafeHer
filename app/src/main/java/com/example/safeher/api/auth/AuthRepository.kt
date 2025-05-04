@@ -1,6 +1,7 @@
 package com.example.safeher.api.auth
 
 import com.example.safeher.api.ApiService
+import com.example.safeher.model.ContactItem
 import com.example.safeher.model.api.ApiResponse
 import com.example.safeher.model.LoginRequest
 import com.example.safeher.model.RegisterRequest

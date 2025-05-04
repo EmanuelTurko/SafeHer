@@ -1,5 +1,6 @@
 package com.example.safeher.auth.authFragments
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -27,6 +28,7 @@ import com.example.safeher.model.RegisterRequest
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import androidx.core.content.edit
 
 class RegisterFragment : Fragment() {
 
@@ -101,7 +103,13 @@ class RegisterFragment : Fragment() {
             idPhotoUrl = mIdPhoto?.text.toString().trim()
         )
 
+        val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("fullName", request.fullName)
+            apply()
+        }
         viewModelApi.registerUser(request)
+
     }
 
     private fun registerObserver() {
@@ -118,7 +126,7 @@ class RegisterFragment : Fragment() {
                 mRegisterBtn?.isEnabled = true
             } else {
                 showCustomToast("Registration successful")
-                findNavController().navigate(R.id.loginFragment)
+                findNavController().navigate(R.id.pairFragment)
             }
         }
     }

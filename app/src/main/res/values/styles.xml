@@ -59,4 +59,7 @@
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">@color/light_purple</item>
     </style>
+    <style name="Widget.AppCompat.SearchView" parent="Base.Widget.AppCompat.SearchView">
+        <item name="searchIcon">@null</item> <!-- removes magnifying glass -->
+    </style>
 </resources>

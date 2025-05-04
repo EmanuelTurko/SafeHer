@@ -1,4 +1,4 @@
-package com.example.safeher.settings.pair.adapter
+package com.example.safeher.auth.pair.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,14 +6,15 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
 import com.example.safeher.model.ContactItem
 
 class ContactAdapter(
-    private val contacts: List<ContactItem>,
     private val maxSelection: Int = 5
-) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {
+) : ListAdapter<ContactItem, ContactAdapter.ContactViewHolder>(ContactDiffCallback()) {
 
     private val selectedItems = mutableListOf<ContactItem>()
 
@@ -29,7 +30,7 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
-        val item = contacts[position]
+        val item = getItem(position)
         holder.name.text = item.name
         holder.checkbox.isChecked = item.isSelected
 
@@ -50,7 +51,15 @@ class ContactAdapter(
         }
     }
 
-    override fun getItemCount(): Int = contacts.size
+    override fun getItemCount(): Int = currentList.size
 
     fun getSelectedContacts(): List<ContactItem> = selectedItems
+}
+class ContactDiffCallback: DiffUtil.ItemCallback<ContactItem>(){
+    override fun areItemsTheSame(oldItem: ContactItem,newItem: ContactItem): Boolean {
+        return oldItem.name == newItem.name
+    }
+    override fun areContentsTheSame(oldItem: ContactItem, newItem: ContactItem): Boolean {
+        return oldItem == newItem
+    }
 }
