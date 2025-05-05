@@ -1,15 +1,10 @@
 package com.example.safeher.home_screen.videoLibrary
 
-import android.content.ContentValues
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -18,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
 import com.example.safeher.adapters.VideoAdapter
 import java.io.File
-import kotlin.apply
 
 class VideoLibraryFragment :Fragment() {
 

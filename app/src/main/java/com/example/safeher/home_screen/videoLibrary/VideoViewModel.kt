@@ -10,87 +10,60 @@ import com.example.safeher.video.VideoManager
 import java.io.File
 
 class VideoViewModel(context: Context): ViewModel() {
-    private val videoManager = VideoManager(context)
-    private var frameIndex: Int = 0
+
+    val videoManager = VideoManager(context)
+    var frameIndex : Int = 0
     @Volatile
-    private var isConverting: Boolean = false
+    var isConverting:Boolean = false
 
     private val _videoToGallery = MutableLiveData<Result<Uri>>()
     val videoToGallery: LiveData<Result<Uri>> = _videoToGallery
 
-    private val _conversionProgress = MutableLiveData<Int>()
-    val conversionProgress: LiveData<Int> = _conversionProgress
-
-    private val _conversionError = MutableLiveData<String?>()
-    val conversionError: LiveData<String?> = _conversionError
-
-    fun cleanUpTempFiles() {
+    fun cleanUpTempFilesBeforeConverting(){
         videoManager.cleanupTempFiles()
         frameIndex = 0
-        _conversionError.postValue(null)
     }
-
     fun processVideo() {
+        Log.d("VideoViewModel", "stopRecording: $isConverting ")
         if (isConverting) {
             Log.d("VideoViewModel", "Video is already being converted")
             return
         }
-
-        if (getFrameCount() == 0) {
-            _conversionError.postValue("No frames available to convert")
-            return
-        }
-
         isConverting = true
-        _conversionProgress.postValue(0)
-        _conversionError.postValue(null)
-
         videoManager.convertToVideo(frameRate = 12, object : VideoManager.ConversionCallback {
             override fun onSuccess(outputFile: File) {
-                Log.d("VideoViewModel", "Video conversion successful: ${outputFile.path}")
-                _conversionProgress.postValue(100)
-
                 videoManager.saveToPublicStorage(outputFile) { publicUri ->
-                    isConverting = false
                     if (publicUri != null) {
                         Log.d("VideoViewModel", "Video saved to gallery: $publicUri")
                         _videoToGallery.postValue(Result.success(publicUri))
+                        Log.d("VideoViewModel", "is converting: $isConverting ")
+                        isConverting = false
+                        cleanUpTempFilesBeforeConverting()
                     } else {
                         Log.e("VideoViewModel", "Failed to save video to gallery")
-                        _conversionError.postValue("Failed to save video to gallery")
                         _videoToGallery.postValue(Result.failure(Exception("Failed to save video to gallery")))
+                        Log.d("VideoViewModel", "is converting2: $isConverting ")
+                        isConverting = false
+                        cleanUpTempFilesBeforeConverting()
                     }
                 }
+
             }
 
             override fun onFailure(error: String) {
-                Log.e("VideoViewModel", "Video conversion failed: $error")
-                isConverting = false
-                _conversionError.postValue(error)
+                Log.d("VideoViewModel", "onFailure: $error")
                 _videoToGallery.postValue(Result.failure(Exception(error)))
             }
         })
     }
 
-    fun saveImageData(data: ByteArray): Boolean {
-        val success = videoManager.saveImageData(data, frameIndex)
-        if (success) {
-            frameIndex++
-        }
-        return success
+    fun saveImageData(data: ByteArray, index: Int): Boolean {
+        return videoManager.saveImageData(data, index)
     }
-
-    fun getFrameCount(): Int {
+    fun getFrameCount(): Int{
         return videoManager.getFrameCount()
     }
-
-    fun getCurrentFrameIndex(): Int {
-        return frameIndex
-    }
-
-    fun resetConversionState() {
-        isConverting = false
-        _conversionError.postValue(null)
-        _conversionProgress.postValue(0)
+    fun nextFrame(){
+        frameIndex++
     }
 }

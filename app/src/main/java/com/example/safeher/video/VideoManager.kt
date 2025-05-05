@@ -4,22 +4,69 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.*
+import android.media.MediaCodec
 import android.media.MediaCodec.BufferInfo
+import android.media.MediaCodecInfo
+import android.media.MediaCodecList
+import android.media.MediaFormat
 import android.media.MediaFormat.MIMETYPE_VIDEO_AVC
+import android.media.MediaMuxer
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
-import java.nio.ByteBuffer
-import androidx.core.net.toUri
+import java.util.Date
+
+@Volatile
+private var isEncoding = false
 
 class VideoManager(private val context: Context) {
-    private val tempImageDir by lazy {
-        File(context.getExternalFilesDir(null), "esp32_images").apply {
+
+    private lateinit var tempImageDir: File
+
+    init{
+        prepareTempDir()
+    }
+    fun prepareTempDir() {
+        // Create a unique folder for each session
+        val sessionId = System.currentTimeMillis().toString()
+        tempImageDir = File(context.getExternalFilesDir(null), "esp32_images_$sessionId").apply {
             if (!exists()) mkdirs()
+        }
+        Log.d("VideoProcessorDirectory", "Temp image directory: ${tempImageDir.absolutePath}")
+    }
+
+    internal fun cleanupTempFiles() {
+        if (!::tempImageDir.isInitialized) {
+            Log.w("VideoProcessorDirectory", "Temp directory not initialized. Skipping cleanup.")
+            return
+        }
+
+        Log.d("VideoProcessorDirectory", "Cleaning up temporary files from: ${tempImageDir.absolutePath}")
+        tempImageDir.listFiles()?.forEach {
+            try {
+                Log.d("VideoProcessorDirectory", "Found file: ${it.name}, lastModified: ${Date(it.lastModified())}")
+                if (it.delete()) {
+                    Log.d("VideoProcessorDirectory", "Deleted temporary file: ${it.name}")
+                } else {
+                    Log.w("VideoProcessorDirectory", "Failed to delete temporary file: ${it.name}")
+                }
+            } catch (e: Exception) {
+                Log.e("VideoProcessorDirectory", "Error deleting temporary file ${it.name}", e)
+            }
+        }
+
+        // Optionally delete the folder itself after cleaning its contents
+        try {
+            if (tempImageDir.delete()) {
+                Log.d("VideoProcessorDirectory", "Deleted temp folder: ${tempImageDir.name}")
+            } else {
+                Log.w("VideoProcessorDirectory", "Failed to delete temp folder: ${tempImageDir.name}")
+            }
+        } catch (e: Exception) {
+            Log.e("VideoProcessorDirectory", "Error deleting temp folder", e)
         }
     }
 
@@ -28,12 +75,19 @@ class VideoManager(private val context: Context) {
         fun onFailure(error: String)
     }
 
+    private var beforeAll = true
     fun saveImageData(data: ByteArray, index: Int): Boolean {
+        if(tempImageDir.listFiles()?.size != 0 && beforeAll) {
+            cleanupTempFiles()
+            Log.d("VideoProcessor", "Dir is not empty, cleaning up")
+        }
+        beforeAll = false
         return try {
             val imageFile = File(tempImageDir, "frame_${index.toString().padStart(4, '0')}.jpg")
+            Log.d("VideoProcessor", "Attempting to save frame $index to ${imageFile.absolutePath}")
+
             FileOutputStream(imageFile).use { it.write(data) }
 
-            // Validate image dimensions
             val options = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
             }
@@ -44,7 +98,7 @@ class VideoManager(private val context: Context) {
                 imageFile.delete()
                 false
             } else {
-                Log.d("VideoProcessor", "Saved frame $index (${data.size} bytes, ${options.outWidth}x${options.outHeight})")
+                Log.d("VideoProcessor", "Successfully saved frame $index (${data.size} bytes, ${options.outWidth}x${options.outHeight})")
                 true
             }
         } catch (e: Exception) {
@@ -55,50 +109,67 @@ class VideoManager(private val context: Context) {
 
     fun convertToVideo(frameRate: Int = 12, callback: ConversionCallback? = null) {
         try {
+            Log.d("VideoProcessor", "Starting video conversion with frame rate: $frameRate")
+
             val frames = tempImageDir.listFiles { file ->
                 file.name.matches(Regex("frame_\\d{4}\\.jpg"))
-            }?.sortedBy { it.name }
+            }?.sortedBy { it.name }?.drop(2)
+            Log.d("TestSample", "Found frame files: ${frames?.joinToString { it.name }}")
 
             if (frames.isNullOrEmpty()) {
-                callback?.onFailure("No frames found in ${tempImageDir.absolutePath}")
+                val error = "No frames found in ${tempImageDir.absolutePath}"
+                Log.e("VideoProcessor", error)
+                callback?.onFailure(error)
                 return
             }
 
-            // Validate frames
-            frames.forEachIndexed { index, file ->
-                if (!file.exists() || file.length() == 0L) {
-                    callback?.onFailure("Missing or empty frame: ${file.name}")
-                    return
+            Log.d("VideoProcessor", "Found ${frames.size} frames to process")
+
+            // Decode first frame to get dimensions
+            val options = BitmapFactory.Options().apply {
+                inPreferredConfig = Bitmap.Config.ARGB_8888
+            }
+            val firstFrame = BitmapFactory.decodeFile(frames[0].path, options)
+            val width = firstFrame.width
+            val height = firstFrame.height
+            firstFrame.recycle()
+            Log.d("VideoProcessor", "Video dimensions: ${width}x$height")
+
+            // Get all frames as bitmaps
+            val bitmaps = frames.mapNotNull { file ->
+                try {
+                    BitmapFactory.decodeFile(file.path, options)?.also { bitmap ->
+                        Log.d("TestSample", "Loaded bitmap ${file.name} with size: ${bitmap.width}x${bitmap.height}")
+                        if (bitmap.config != Bitmap.Config.ARGB_8888) {
+                            Log.w("VideoProcessor", "Bitmap format is ${bitmap.config}, converting to ARGB_8888")
+                            return@mapNotNull bitmap.copy(Bitmap.Config.ARGB_8888, false) ?: bitmap
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("VideoProcessor", "Error decoding frame ${file.name}", e)
+                    null
                 }
             }
 
-            // Setup output directory
             val outputDir = File(
                 context.getExternalFilesDir(Environment.DIRECTORY_MOVIES),
                 "esp32_videos"
             ).apply {
-                if (!exists() && !mkdirs()) {
-                    callback?.onFailure("Failed to create output directory")
-                    return
+                if (!exists()) {
+                    Log.d("VideoProcessor", "Creating output directory: $absolutePath")
+                    mkdirs()
                 }
             }
 
-            val outputFile = File(outputDir, "output_${System.currentTimeMillis()}.mp4").apply {
-                if (exists() && !delete()) {
-                    callback?.onFailure("Couldn't clear existing output file")
-                    return
-                }
+            val outputFile = File(outputDir, "SafeHer_${System.currentTimeMillis()}.mp4")
+            if (outputFile.exists()) {
+                outputFile.delete()
+                outputFile.createNewFile()
             }
+            Log.d("VideoProcessor", "Output video file: ${outputFile.absolutePath}")
 
-            // Get dimensions from first frame
-            val firstFrame = BitmapFactory.decodeFile(frames[0].path)
-            val width = firstFrame.width
-            val height = firstFrame.height
-            firstFrame.recycle()
-
-            // Start MediaCodec encoding
-            encodeWithMediaCodec(
-                frames = frames.map { BitmapFactory.decodeFile(it.path) },
+            encodeVideoWithMediaCodec(
+                frames = bitmaps,
                 outputFile = outputFile,
                 width = width,
                 height = height,
@@ -106,12 +177,13 @@ class VideoManager(private val context: Context) {
                 callback = callback
             )
         } catch (e: Exception) {
-            Log.e("VideoProcessor", "Conversion setup failed", e)
-            callback?.onFailure("Setup error: ${e.message}")
+            val error = "Conversion setup failed: ${e.message}"
+            Log.e("VideoProcessor", error, e)
+            callback?.onFailure(error)
         }
     }
 
-    private fun encodeWithMediaCodec(
+    private fun encodeVideoWithMediaCodec(
         frames: List<Bitmap>,
         outputFile: File,
         width: Int,
@@ -119,80 +191,114 @@ class VideoManager(private val context: Context) {
         frameRate: Int,
         callback: ConversionCallback?
     ) {
+        if(isEncoding){
+            Log.d("VideoProcessor", "Encoding is already in progress")
+            return
+        }
+        isEncoding = true
         var muxer: MediaMuxer? = null
         var encoder: MediaCodec? = null
-        var trackIndex = -1
         var muxerStarted = false
+        var trackIndex = -1
+        val timeoutUs = 10_000L
+        val bufferInfo = BufferInfo()
 
         try {
-            // Configure MediaCodec encoder
+            Log.d("VideoProcessor", "Initializing MediaMuxer on path: ${outputFile.path}")
             muxer = MediaMuxer(outputFile.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+
+            val codecName = MediaCodecList(MediaCodecList.REGULAR_CODECS)
+                .findEncoderForFormat(MediaFormat.createVideoFormat(MIMETYPE_VIDEO_AVC, width, height))
+
+            val codecInfo = MediaCodecList(MediaCodecList.REGULAR_CODECS)
+                .codecInfos
+                .firstOrNull { it.name == codecName && it.isEncoder }
+
+            val supportedFormats = codecInfo
+                ?.getCapabilitiesForType(MIMETYPE_VIDEO_AVC)
+                ?.colorFormats
+                ?.toList()
+                ?: emptyList()
+            Log.d("VideoProcessor", "Supported color formats: ${supportedFormats.joinToString()}")
+
             val format = MediaFormat.createVideoFormat(MIMETYPE_VIDEO_AVC, width, height).apply {
-                setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
-                setInteger(MediaFormat.KEY_BIT_RATE, 2_000_000) // 2 Mbps
+                val preferredFormat = when {
+                    supportedFormats.contains(21) -> 21  // YUV420 SemiPlanar
+                    supportedFormats.contains(19) -> 19  // YUV420 Planar
+                    else -> MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible
+                }
+
+                setInteger(MediaFormat.KEY_COLOR_FORMAT, preferredFormat)
+                setInteger(MediaFormat.KEY_BIT_RATE, width * height * 3 * frameRate)
                 setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
-                setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1) // Keyframe every 1 second
+                setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
+                setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
+                setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)
+                setInteger(MediaFormat.KEY_COLOR_TRANSFER, 3)
             }
 
+            Log.d("VideoProcessor", "Creating and configuring encoder")
             encoder = MediaCodec.createEncoderByType(MIMETYPE_VIDEO_AVC)
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
             encoder.start()
+            Log.d("VideoProcessor", "Encoder started successfully")
 
-            val bufferInfo = BufferInfo()
-            val timeoutUs = 10_000L // 10ms timeout
-
-            // Process each frame
+            Log.d("VideoProcessor", "Processing ${frames.size} frames")
             frames.forEachIndexed { index, bitmap ->
-                // Convert bitmap to YUV420 format
-                val yuvData = convertBitmapToYUV420(bitmap, width, height)
-                bitmap.recycle()
+                try {
+                    Log.v("VideoProcessor", "Processing frame $index")
+                    val yuvData = convertBitmapToYUV420(bitmap, width, height)
+                    Log.v("VideoProcessor", "Converted frame $index to YUV420")
 
-                // Get input buffer and feed frame data
-                val inputBufferIndex = encoder.dequeueInputBuffer(timeoutUs)
-                if (inputBufferIndex >= 0) {
-                    val inputBuffer = encoder.getInputBuffer(inputBufferIndex)
-                    inputBuffer?.put(yuvData)
+                    val inputBufferIndex = encoder.dequeueInputBuffer(timeoutUs)
+                    if (inputBufferIndex >= 0) {
+                        val inputBuffer = encoder.getInputBuffer(inputBufferIndex)
+                        inputBuffer?.clear()
+                        inputBuffer?.put(yuvData)
+                        encoder.queueInputBuffer(
+                            inputBufferIndex,
+                            0,
+                            yuvData.size,
+                            index * 1_000_000L / frameRate,
+                            0
+                        )
+                        Log.v("VideoProcessor", "Queued frame $index for encoding")
+                    } else {
+                        Log.w("VideoProcessor", "No input buffer available for frame $index")
+                    }
 
-                    val presentationTimeUs = index * 1_000_000L / frameRate
-                    encoder.queueInputBuffer(
-                        inputBufferIndex,
-                        0,
-                        yuvData.size,
-                        presentationTimeUs,
-                        0
-                    )
-                }
-
-                // Process encoder output
-                while (true) {
-                    val encoderStatus = encoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
-                    when {
-                        encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER -> break
-                        encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                            // Format changed - prepare muxer
-                            if (muxerStarted) {
-                                throw RuntimeException("Format changed twice")
+                    while (true) {
+                        val encoderStatus = encoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
+                        when {
+                            encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER -> break
+                            encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                                if (muxerStarted) throw RuntimeException("Format changed after muxer started")
+                                trackIndex = muxer.addTrack(encoder.outputFormat)
+                                muxer.start()
+                                muxerStarted = true
+                                Log.d("VideoProcessor", "Muxer started with track index $trackIndex")
                             }
-                            trackIndex = muxer.addTrack(encoder.outputFormat)
-                            muxer.start()
-                            muxerStarted = true
-                        }
-                        encoderStatus >= 0 -> {
-                            val outputBuffer = encoder.getOutputBuffer(encoderStatus)
-                                ?: throw RuntimeException("No output buffer")
-
-                            if (bufferInfo.size > 0 && muxerStarted) {
-                                outputBuffer.position(bufferInfo.offset)
-                                outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
-                                muxer.writeSampleData(trackIndex, outputBuffer, bufferInfo)
+                            encoderStatus >= 0 -> {
+                                val outputBuffer = encoder.getOutputBuffer(encoderStatus)
+                                if (outputBuffer != null && bufferInfo.size > 0 && muxerStarted) {
+                                    outputBuffer.position(bufferInfo.offset)
+                                    outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
+                                    muxer.writeSampleData(trackIndex, outputBuffer, bufferInfo)
+                                    Log.v("VideoProcessor", "Wrote frame $index (size: ${bufferInfo.size})")
+                                }
+                                encoder.releaseOutputBuffer(encoderStatus, false)
                             }
-                            encoder.releaseOutputBuffer(encoderStatus, false)
                         }
                     }
+                } catch (e: Exception) {
+                    Log.e("VideoProcessor", "Failed processing frame $index", e)
+                    callback?.onFailure("Encoding failed at frame $index: ${e.message}")
+                    return
                 }
             }
 
-            // Signal end of input stream
+            // Signal end of stream
+            Log.d("VideoProcessor", "Signaling end of stream")
             val inputBufferIndex = encoder.dequeueInputBuffer(timeoutUs)
             if (inputBufferIndex >= 0) {
                 encoder.queueInputBuffer(
@@ -204,75 +310,80 @@ class VideoManager(private val context: Context) {
                 )
             }
 
-            // Process remaining output
+            // Drain remaining output
             while (true) {
                 val encoderStatus = encoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
                 when {
                     encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER -> break
+                    encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                        if (muxerStarted) throw RuntimeException("Format changed after muxer started")
+                        trackIndex = muxer.addTrack(encoder.outputFormat)
+                        muxer.start()
+                        muxerStarted = true
+                    }
                     encoderStatus >= 0 -> {
                         val outputBuffer = encoder.getOutputBuffer(encoderStatus)
-                        if (bufferInfo.size > 0 && outputBuffer != null && muxerStarted) {
+                        if (outputBuffer != null && bufferInfo.size > 0 && muxerStarted) {
                             outputBuffer.position(bufferInfo.offset)
                             outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
                             muxer.writeSampleData(trackIndex, outputBuffer, bufferInfo)
                         }
                         encoder.releaseOutputBuffer(encoderStatus, false)
                         if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                            Log.d("VideoProcessor", "End of stream reached")
                             break
                         }
                     }
                 }
             }
 
+            Log.d("VideoProcessor", "Video encoding completed successfully")
             callback?.onSuccess(outputFile)
+
         } catch (e: Exception) {
-            Log.e("VideoProcessor", "MediaCodec encoding failed", e)
+            Log.e("VideoProcessor", "Encoding failed", e)
             outputFile.delete()
             callback?.onFailure("Encoding failed: ${e.message}")
         } finally {
-            frames.forEach { it.recycle() }
             try {
+                isEncoding = false
+                Log.d("VideoProcessor", "Releasing resources, isEncoding: $isEncoding")
                 encoder?.stop()
                 encoder?.release()
-            } catch (e: Exception) {
-                Log.e("VideoProcessor", "Error stopping encoder", e)
-            }
-            try {
-                if (muxerStarted) {
-                    muxer?.stop()
-                }
+                muxer?.stop()
                 muxer?.release()
+                Log.d("VideoProcessor", "Released encoder and muxer resources")
             } catch (e: Exception) {
-                Log.e("VideoProcessor", "Error stopping muxer", e)
+                Log.e("VideoProcessor", "Error releasing resources", e)
             }
         }
     }
+
 
     private fun convertBitmapToYUV420(bitmap: Bitmap, width: Int, height: Int): ByteArray {
         val argb = IntArray(width * height)
         bitmap.getPixels(argb, 0, width, 0, 0, width, height)
 
-        val yuv = ByteArray(width * height * 3 / 2) // YUV420 (1.5 bytes per pixel)
-        val frameSize = width * height
-
+        val yuv = ByteArray(width * height * 3 / 2)
         var yIndex = 0
-        var uIndex = frameSize
-        var vIndex = frameSize + frameSize / 4
+        var uvIndex = width * height
 
         for (j in 0 until height) {
             for (i in 0 until width) {
-                val pixel = argb[j * width + i]
-                val r = (pixel shr 16) and 0xFF
-                val g = (pixel shr 8) and 0xFF
-                val b = pixel and 0xFF
+                val rgb = argb[j * width + i]
 
-                // Y component (luminance)
-                yuv[yIndex++] = ((66 * r + 129 * g + 25 * b + 128) shr 8 + 16).toByte()
+                val r = (rgb shr 16) and 0xff
+                val g = (rgb shr 8) and 0xff
+                val b = rgb and 0xff
 
-                // U and V components (chrominance, subsampled)
+                val y = ((66 * r + 129 * g + 25 * b + 128) shr 8) + 16
+                val u = ((-38 * r - 74 * g + 112 * b + 128) shr 8) + 128
+                val v = ((112 * r - 94 * g - 18 * b + 128) shr 8) + 128
+
+                yuv[yIndex++] = y.coerceIn(0, 255).toByte()
                 if (j % 2 == 0 && i % 2 == 0) {
-                    yuv[uIndex++] = ((-38 * r - 74 * g + 112 * b + 128) shr 8 + 128).toByte()
-                    yuv[vIndex++] = ((112 * r - 94 * g - 18 * b + 128) shr 8 + 128).toByte()
+                    yuv[uvIndex++] = u.coerceIn(0, 255).toByte()
+                    yuv[uvIndex++] = v.coerceIn(0, 255).toByte()
                 }
             }
         }
@@ -286,6 +397,9 @@ class VideoManager(private val context: Context) {
             callback(null)
             return
         }
+        beforeAll = true
+
+        Log.d("VideoProcessor", "Attempting to save video to public storage")
 
         val resolver = context.contentResolver
         val videoCollection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -303,6 +417,7 @@ class VideoManager(private val context: Context) {
             put(MediaStore.Video.Media.IS_PENDING, 1)
         }
 
+        Log.d("VideoProcessor", "Inserting video into MediaStore")
         val uri = resolver.insert(videoCollection, contentValues) ?: run {
             Log.e("VideoProcessor", "Failed to create MediaStore entry")
             callback(null)
@@ -310,48 +425,46 @@ class VideoManager(private val context: Context) {
         }
 
         try {
+            Log.d("VideoProcessor", "Writing video file content")
             resolver.openOutputStream(uri)?.use { outStream ->
                 sourceFile.inputStream().use { inStream ->
                     inStream.copyTo(outStream)
                 }
             }
 
-            // Finalize the media entry
-            contentValues.clear()
+            Log.d("VideoProcessor", "Finalizing MediaStore entry")
             contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
             resolver.update(uri, contentValues, null, null)
 
-            // Trigger media scan
-            MediaScannerConnection.scanFile(
-                context,
-                arrayOf(uri.toString().toUri().path),
-                arrayOf("video/mp4"),
-                null
-            )
-
+            Log.d("VideoProcessor", "Video saved successfully to $uri")
             callback(uri)
         } catch (e: Exception) {
-            Log.e("VideoProcessor", "Error writing video file", e)
+            Log.e("VideoProcessor", "Failed to save video to public storage", e)
             resolver.delete(uri, null, null)
             callback(null)
         }
     }
 
-    internal fun cleanupTempFiles() {
+    /*internal fun cleanupTempFiles() {
+        Log.d("VideoProcessor", "Cleaning up temporary files")
         tempImageDir.listFiles()?.forEach {
             try {
-                if (!it.delete()) {
-                    Log.w("VideoProcessor", "Failed to delete ${it.name}")
+                if (it.delete()) {
+                    Log.d("VideoProcessor", "Deleted temporary file: ${it.name}")
+                } else {
+                    Log.w("VideoProcessor", "Failed to delete temporary file: ${it.name}")
                 }
             } catch (e: Exception) {
-                Log.e("VideoProcessor", "Error deleting ${it.name}", e)
+                Log.e("VideoProcessor", "Error deleting temporary file ${it.name}", e)
             }
         }
-    }
+    }*/
 
     fun getFrameCount(): Int {
-        return tempImageDir.listFiles()?.count {
+        val count = tempImageDir.listFiles()?.count {
             it.name.startsWith("frame_") && it.name.endsWith(".jpg")
         } ?: 0
+        Log.d("VideoProcessor", "Current frame count: $count")
+        return count
     }
 }

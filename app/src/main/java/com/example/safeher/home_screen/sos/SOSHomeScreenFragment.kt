@@ -137,19 +137,16 @@ class SOSHomeScreenFragment : Fragment() {
                 }
             }
         }
-        bluetoothViewModel.isConverting.observe(viewLifecycleOwner) { isConverting ->
-            bluetoothViewModel.imageData.observe(viewLifecycleOwner) { data ->
-                Log.d("PermissionsLog", "Received image data: $data")
+        bluetoothViewModel.imageData.observe(viewLifecycleOwner) { data ->
+            val isConverting = bluetoothViewModel.isConverting.value
 
-                if (isConverting == true) {
-                    // Changed to use the ViewModel's saveImageData which now handles frameIndex internally
-                    val saved = videoViewModel.saveImageData(data)
-                    if (saved) {
-                        if (bluetoothViewModel.imagesReceived >= bluetoothViewModel.totalImagesExpected) {
-                            Log.d("PermissionsLog", "total ${bluetoothViewModel.totalImagesExpected}")
-                            Log.d("PermissionsLog", "received ${bluetoothViewModel.imagesReceived}")
-                            videoViewModel.processVideo()
-                        }
+            if (isConverting == true) {
+                Log.d("TestSample", "Image Recieved: ${bluetoothViewModel.imagesReceived}")
+                Log.d("TestSample", "Image Total: ${bluetoothViewModel.totalImagesExpected}")
+                val saved = videoViewModel.saveImageData(data, bluetoothViewModel.imagesReceived)
+                if (saved) {
+                    if (bluetoothViewModel.imagesReceived >= bluetoothViewModel.totalImagesExpected) {
+                        videoViewModel.processVideo()
                     }
                 }
             }
@@ -218,11 +215,11 @@ class SOSHomeScreenFragment : Fragment() {
         mSosButton.setOnClickListener {
             if(!bSosActiveValue){
                 bluetoothViewModel.sendCommand("START")
-                videoViewModel.cleanUpTempFiles()
                 bSosActiveValue = true
             } else {
                 bluetoothViewModel.sendCommand("STOP")
                 bSosActiveValue = false
+                Log.d("TestSample", "SOS button clicked")
             }
         }
 

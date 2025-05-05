@@ -49,7 +49,7 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initializeViews(view)
+        initializeViews()
         binding?.welcomeAnimation?.playAnimation()
         val authRepository = AuthRepository(RetroFitClient.apiService)
         val factory = AuthViewModelFactory(authRepository)
@@ -60,9 +60,9 @@ class LoginFragment : Fragment() {
 
     private fun setupObservers() {
         viewModelApi.loginResponse.observe(viewLifecycleOwner) { response ->
-            if (response.message == "Success" && response.data != null) {
+            if (response.message == "Successfully logged in" && response.data != null) {
                 val rememberMe = binding?.rememberMeCheckbox?.isChecked
-                Log.d("LoginFragment", "Login successful: ${response.data}")
+                Log.d("LoginFragment", "Logged in successfully: ${response.data}")
 
                 SharedPrefsHelper(requireContext()).save(REMEMBER_MY_LOGIN, rememberMe)
                 startActivity(Intent(requireActivity(), HomeScreenActivity::class.java))
@@ -71,13 +71,13 @@ class LoginFragment : Fragment() {
                 Log.e("LoginFragment", "Error: ${response.error}")
                 ErrorDialog(requireActivity()).show("Oops", response.error, "TRY AGAIN")
             } else {
-                ErrorDialog(requireActivity()).show("Oops", "Unknown error occurred", "TRY AGAIN")
+                ErrorDialog(requireActivity()).show("Oops", "Unknown error", "TRY AGAIN")
             }
         }
     }
 
 
-    private fun initializeViews(view: View) {
+    private fun initializeViews() {
         mEmail = binding?.emailEditText
         mPassword = binding?.passwordEditText
     }
