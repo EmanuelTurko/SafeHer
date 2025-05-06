@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_home_screen"
     app:startDestination="@id/SOSHomeScreenFragment">
 
@@ -33,10 +34,24 @@
         <action
             android:id="@+id/action_sistersFragment_to_SOSHomeScreenFragment"
             app:destination="@id/SOSHomeScreenFragment" />
+        <action
+            android:id="@+id/action_sistersFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/SupportCallAiFragment"
         android:name="com.example.safeher.home_screen.support.SupportCallAiFragment"
-        android:label="SupportCallAIFragment" >
+        android:label="SupportCallAIFragment"/>
+    <!-- New Post Screen -->
+    <fragment
+        android:id="@+id/newPostFragment"
+        android:name="com.example.safeher.home_screen.sisters.NewPostFragment"
+        android:label="NewPostFragment"
+        tools:layout="@layout/fragment_new_post" >
+        <!-- ↩️ חזרה ל-Sisters אחרי שליחה -->
+        <action
+            android:id="@+id/action_newPostFragment_to_sistersFragment"
+            app:destination="@id/sistersFragment" />
+
     </fragment>
 </navigation>
