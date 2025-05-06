@@ -10,7 +10,6 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.safeher.R
 
 class SettingsLobbyFragment : Fragment() {
@@ -19,7 +18,7 @@ class SettingsLobbyFragment : Fragment() {
     lateinit var mLogoutBtn: CardView
     lateinit var mVideoLibraryOption: ConstraintLayout
     lateinit var mPairOption: ConstraintLayout
-
+    lateinit var mProfileOption: ConstraintLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +35,7 @@ class SettingsLobbyFragment : Fragment() {
         mLogoutBtn = view.findViewById(R.id.logoutButton)
         mVideoLibraryOption = view.findViewById(R.id.videoLibraryOption)
         mPairOption = view.findViewById(R.id.pairOption)
+        mProfileOption = view.findViewById(R.id.profileOption)
     }
 
     private fun initListener() {
@@ -58,6 +58,10 @@ class SettingsLobbyFragment : Fragment() {
 
         mPairOption.setOnClickListener {
             findNavController().navigate(R.id.action_settingsLobbyFragment_to_pairFragment)
+        }
+
+        mProfileOption.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_profileFragment)
         }
     }
 }

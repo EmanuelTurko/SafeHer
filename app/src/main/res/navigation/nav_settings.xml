@@ -7,22 +7,26 @@
     <fragment
         android:id="@+id/settingsLobbyFragment"
         android:name="com.example.safeher.settings.lobby.SettingsLobbyFragment"
-        android:label="SettingsLobbyFragment" >
+        android:label="SettingsLobbyFragment">
         <action
             android:id="@+id/action_settingsLobbyFragment_to_videoLibraryFragment2"
-            app:destination="@id/videoLibraryFragment2" >
-        <argument
-            android:name="from_settings"
-            app:argType="boolean" />
+            app:destination="@id/videoLibraryFragment2">
+            <argument
+                android:name="from_settings"
+                app:argType="boolean" />
         </action>
         <action
             android:id="@+id/action_settingsLobbyFragment_to_pairFragment"
             app:destination="@id/pairFragment" />
+        <action
+            android:id="@+id/action_settingsLobbyFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/videoLibraryFragment2"
         android:name="com.example.safeher.home_screen.videoLibrary.VideoLibraryFragment"
-        android:label="VideoLibraryFragment" >
+        android:label="VideoLibraryFragment">
         <action
             android:id="@+id/action_videoLibraryFragment2_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
@@ -30,12 +34,23 @@
             android:name="from_settings"
             app:argType="boolean" />
     </fragment>
+
     <fragment
         android:id="@+id/pairFragment"
         android:name="com.example.safeher.auth.pair.PairFragment"
-        android:label="PairFragment" >
+        android:label="PairFragment">
         <action
             android:id="@+id/action_pairFragment_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.safeher.settings.profile.ProfileFragment"
+        android:label="ProfileFragment">
+        <action
+            android:id="@+id/action_profileFragment_to_settingsLobbyFragment"
+            app:destination="@id/settingsLobbyFragment" />
+    </fragment>
+
 </navigation>

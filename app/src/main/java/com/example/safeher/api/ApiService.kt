@@ -11,6 +11,8 @@ import com.example.safeher.model.LoginRequest
 import com.example.safeher.model.UpdateSafeCircleRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface ApiService {
     @GET("/test")
@@ -26,5 +28,14 @@ interface ApiService {
     @POST("auth/updateUserSafeCircle")
     suspend fun updateUserSafeCircle(@Body data: UpdateSafeCircleRequest): ApiResponse<ContactItem>
 
+    @GET("user/{userId}")
+    suspend fun getUserProfile(
+        @Path("userId") userId: String
+    ): ApiResponse<User>
 
+    @PUT("user/update-profile/{userId}")
+    suspend fun updateUserProfile(
+        @Path("userId") userId: String,
+        @Body user: User
+    ): ApiResponse<Unit>
 }
