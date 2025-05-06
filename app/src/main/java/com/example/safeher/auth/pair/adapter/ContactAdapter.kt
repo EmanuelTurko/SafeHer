@@ -37,10 +37,14 @@ class ContactAdapter(
         holder.checkbox.setOnClickListener {
             if (item.isSelected) {
                 item.isSelected = false
-                selectedItems.remove(item)
+                selectedItems.removeAll { it.phoneNumber == item.phoneNumber }
             } else {
                 if (selectedItems.size >= maxSelection) {
-                    Toast.makeText(holder.itemView.context, "You can only select up to $maxSelection contacts.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        holder.itemView.context,
+                        "You can only select up to $maxSelection contacts.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     holder.checkbox.isChecked = false
                     return@setOnClickListener
                 }
@@ -54,11 +58,23 @@ class ContactAdapter(
     override fun getItemCount(): Int = currentList.size
 
     fun getSelectedContacts(): List<ContactItem> = selectedItems
-}
-class ContactDiffCallback: DiffUtil.ItemCallback<ContactItem>(){
-    override fun areItemsTheSame(oldItem: ContactItem,newItem: ContactItem): Boolean {
-        return oldItem.name == newItem.name
+
+    fun setPreSelectedContacts(preSelected: List<ContactItem>) {
+        selectedItems.clear()
+        selectedItems.addAll(preSelected)
+
+        val updatedList = currentList.map { contact ->
+            contact.copy(isSelected = preSelected.any { it.phoneNumber == contact.phoneNumber })
+        }
+        submitList(updatedList)
     }
+}
+
+class ContactDiffCallback : DiffUtil.ItemCallback<ContactItem>() {
+    override fun areItemsTheSame(oldItem: ContactItem, newItem: ContactItem): Boolean {
+        return oldItem.phoneNumber == newItem.phoneNumber
+    }
+
     override fun areContentsTheSame(oldItem: ContactItem, newItem: ContactItem): Boolean {
         return oldItem == newItem
     }
