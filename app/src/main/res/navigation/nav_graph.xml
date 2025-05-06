@@ -22,9 +22,6 @@
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_homePageFragment"
-            app:destination="@id/homePageFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
@@ -43,8 +40,12 @@
         android:label="PairFragment" >
         <action
             android:id="@+id/action_PairFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/SOSHomeScreenFragment2" />
     </fragment>
+    <fragment
+        android:id="@+id/SOSHomeScreenFragment2"
+        android:name="com.example.safeher.home_screen.sos.SOSHomeScreenFragment"
+        android:label="SOSHomeScreenFragment" />
     <!--<fragment
         android:id="@+id/profileFragment2"
         android:name="com.example.safeher.settings.profile.ProfileFragment"
