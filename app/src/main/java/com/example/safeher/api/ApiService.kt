@@ -8,7 +8,6 @@ import com.example.safeher.model.Test
 import com.example.safeher.model.User
 import com.example.safeher.model.RegisterRequest
 import com.example.safeher.model.LoginRequest
-import com.example.safeher.model.Post
 import com.example.safeher.model.UpdateSafeCircleRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -16,6 +15,7 @@ import retrofit2.http.POST
 interface ApiService {
     @GET("/test")
     fun getTest(): Call<Test>
+
 
     @POST("auth/register")
     suspend fun registerUser(@Body data: RegisterRequest): ApiResponse<Unit>
@@ -26,10 +26,5 @@ interface ApiService {
     @POST("auth/updateUserSafeCircle")
     suspend fun updateUserSafeCircle(@Body data: UpdateSafeCircleRequest): ApiResponse<ContactItem>
 
-    @GET("post/")
-    suspend fun getAllPosts(): List<Post>
-
-    @POST("post/")
-    suspend fun createPost(@Body post: Post): Post
 
 }

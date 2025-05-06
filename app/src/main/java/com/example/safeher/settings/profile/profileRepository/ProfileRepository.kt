@@ -1,58 +1,22 @@
 package com.example.safeher.settings.profile.profileRepository
 
+import com.example.safeher.api.RetroFitClient
+import com.example.safeher.api.ApiService
 import com.example.safeher.model.User
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 class ProfileRepository {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val api = RetroFitClient.apiService
 
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private val userReference = database.getReference("users")
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: throw Exception("User not authenticated")
-
-    suspend fun getUserData(): Result<User?> =
-        withContext(Dispatchers.IO) {
-            kotlin.runCatching {
-                val snapshot = userReference.child(userId).get().await()
-                if (snapshot.exists()) {
-                    val user = snapshot.getValue(User::class.java)
-                    user
-                } else {
-                    null
-                }
-            }
+    suspend fun getUserData(userId: String): Result<User?> = runCatching {
+        val resp = api.getUserProfile(userId)
+        if (resp.error == null) resp.data else throw Exception(resp.error)
     }
 
-    suspend fun saveUserData(user: User): Result<Boolean> =
-        withContext(Dispatchers.IO){
-            kotlin.runCatching {
-                userReference.child(userId).setValue(user)
-                true
-            }
-        }
-
-    suspend fun updateUserEmail(newEmail: String): Result<Boolean> =
-        withContext(Dispatchers.IO) {
-            kotlin.runCatching {
-                auth.currentUser?.updateEmail(newEmail)
-                true
-            }
-        }
-
-    suspend fun updateUserPassword(password: String): Result<Boolean> =
-        withContext(Dispatchers.IO) {
-            kotlin.runCatching {
-                auth.currentUser?.updatePassword(password)
-                true
-            }
-        }
-
-    fun signOut() {
-        auth.signOut()
+    suspend fun saveUserData(userId: String, user: User): Result<Unit> = runCatching {
+        val resp = api.updateUserProfile(userId, user)
+        if (resp.error == null) Unit else throw Exception(resp.error)
     }
 
+    fun signOut() = Unit
 }
+

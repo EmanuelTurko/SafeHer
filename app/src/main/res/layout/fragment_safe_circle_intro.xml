@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background">
+
+    <ImageView
+        android:id="@+id/centerImage"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="60dp"
+        android:src="@drawable/safe_circle_preview"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/introText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Protection starts with connection –\nAdd your loved ones!"
+        android:textAlignment="center"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/poppins_medium"
+        app:layout_constraintTop_toBottomOf="@id/centerImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/addButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="40dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_add"
+            android:layout_gravity="center"
+            android:tint="@android:color/black"/>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

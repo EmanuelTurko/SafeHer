@@ -126,7 +126,8 @@ class RegisterFragment : Fragment() {
                 mRegisterBtn?.isEnabled = true
             } else {
                 showCustomToast("Registration successful")
-                findNavController().navigate(R.id.pairFragment)
+                findNavController().navigate(R.id.action_registerFragment_to_safeCircleIntroFragment)
+
             }
         }
     }

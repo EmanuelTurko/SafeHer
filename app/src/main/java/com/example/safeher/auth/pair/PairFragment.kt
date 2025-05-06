@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.safeher.R
-import com.example.safeher.api.ApiService
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.auth.pair.adapter.ContactAdapter
 import com.example.safeher.databinding.FragmentPairBinding
@@ -34,27 +33,34 @@ class PairFragment : Fragment() {
     private lateinit var adapter: ContactAdapter
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var contactsList = mutableListOf<ContactItem>()
+    private var preSelectedContacts: List<ContactItem>? = null
+
     private val pairViewModel: PairViewModel by lazy {
         val apiService = RetroFitClient.apiService
         val factory = PairViewModelFactory(apiService)
-        ViewModelProvider(this,factory)[PairViewModel::class.java]
+        ViewModelProvider(this, factory)[PairViewModel::class.java]
     }
-    private lateinit var safeCircleContact: List<String>
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-         binding = FragmentPairBinding.inflate(inflater, container, false)
-
-        initView()
-        getContent()
-        return binding?.root
+    ): View {
+        binding = FragmentPairBinding.inflate(inflater, container, false)
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // קבלת אנשי קשר מסומנים אם חזרו מהמסך הבא
+        val returnedSelected = arguments?.getParcelableArrayList<ContactItem>("selected_contacts")
+        returnedSelected?.let {
+            preSelectedContacts = it
+        }
+
+        initView()
+        getContent()
+
         val searchEditText = binding?.pairSearchView?.findViewById<AutoCompleteTextView>(
             androidx.appcompat.R.id.search_src_text
         )
@@ -62,25 +68,18 @@ class PairFragment : Fragment() {
         searchEditText?.setHintTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
 
         binding?.pairSearchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
+            override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterContacts(newText)
                 if (!newText.isNullOrEmpty()) {
                     val isRTL = newText.any { it in '\u0590'..'\u05FF' }
-
                     if (isRTL) {
                         searchEditText?.textDirection = View.TEXT_DIRECTION_RTL
-                        searchEditText?.setPadding(16,
-                            searchEditText.paddingTop, 16, searchEditText.paddingBottom
-                        )
+                        searchEditText?.setPadding(16, searchEditText.paddingTop, 16, searchEditText.paddingBottom)
                     } else {
                         searchEditText?.textDirection = View.TEXT_DIRECTION_LTR
-                        searchEditText?.setPadding(16,
-                            searchEditText.paddingTop, 16, searchEditText.paddingBottom
-                        )
+                        searchEditText?.setPadding(16, searchEditText.paddingTop, 16, searchEditText.paddingBottom)
                     }
                 } else {
                     searchEditText?.textDirection = View.TEXT_DIRECTION_LTR
@@ -88,10 +87,32 @@ class PairFragment : Fragment() {
                 return true
             }
         })
-
-
     }
 
+    private fun initView() {
+        binding?.recyclerViewContacts?.layoutManager = LinearLayoutManager(requireContext())
+        adapter = ContactAdapter()
+        binding?.recyclerViewContacts?.adapter = adapter
+
+        binding?.finishButton?.setOnClickListener {
+            val selected = adapter.getSelectedContacts()
+            val selectedNumbers = selected.map { it.phoneNumber }
+
+            if (selected.isNotEmpty()) {
+                val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
+                val fullName = sharedPref.getString("fullName", null) ?: ""
+                Log.d("PairFragment", "Selected contacts: $selectedNumbers, fullName: $fullName")
+                pairViewModel.updateUserSafeCircle(fullName, selectedNumbers)
+            }
+
+            Toast.makeText(requireActivity(), "Selected: ${selected.joinToString { it.name }}", Toast.LENGTH_LONG).show()
+
+            val bundle = Bundle().apply {
+                putParcelableArrayList("selected_contacts", ArrayList(selected))
+            }
+            findNavController().navigate(R.id.action_PairFragment_to_confirmSafeCircleFragment, bundle)
+        }
+    }
 
     private fun getContent() {
         requestPermissionLauncher = registerForActivityResult(
@@ -106,32 +127,8 @@ class PairFragment : Fragment() {
         checkContactPermission()
     }
 
-    private fun initView() {
-        binding?.recyclerViewContacts?.layoutManager = LinearLayoutManager(requireContext())
-        adapter = ContactAdapter()
-        binding?.recyclerViewContacts?.adapter = adapter
-
-        /*binding?.backButtonCard?.setOnClickListener {
-            findNavController().popBackStack()
-        }*/
-        binding?.finishButton?.setOnClickListener {
-            val selected = adapter.getSelectedContacts()
-            val selectedNumbers = selected.map { it.phoneNumber }
-            if(selected.isNotEmpty()){
-                val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
-                val fullName = sharedPref.getString("fullName", null)?: ""
-                Log.d("PairFragment", "Selected contacts: $selectedNumbers, fullName: $fullName")
-                pairViewModel.updateUserSafeCircle(fullName, selectedNumbers)
-            }
-            Toast.makeText(requireActivity(), "Selected: ${selected.joinToString { it.name }}", Toast.LENGTH_LONG).show()
-            //TODO save contacts in backend - send to server
-            findNavController().navigate(R.id.action_PairFragment_to_loginFragment) //TODO maybe redirect to home?
-
-        }
-
-    }
     private fun loadContacts() {
-        contactsList = mutableListOf<ContactItem>()
+        contactsList = mutableListOf()
         val cursor = context?.contentResolver?.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             null, null, null, null
@@ -144,27 +141,23 @@ class PairFragment : Fragment() {
             while (it.moveToNext()) {
                 val name = it.getString(nameIndex)
                 val number = it.getString(numberIndex)
-                contactsList.add(ContactItem(name,number))
+
+                val isSelected = preSelectedContacts?.any { it.phoneNumber == number } == true
+                contactsList.add(ContactItem(name, number, isSelected))
             }
         }
-        adapter.submitList(contactsList)
 
+        adapter.submitList(contactsList)
     }
 
     private fun checkContactPermission() {
         when {
-            ContextCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_CONTACTS
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_CONTACTS) ==
+                    PackageManager.PERMISSION_GRANTED -> {
                 loadContacts()
             }
 
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(),
-                Manifest.permission.READ_CONTACTS
-            ) -> {
-                // Optional: show rationale
+            ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_CONTACTS) -> {
                 AlertDialog.Builder(requireActivity())
                     .setTitle("Permission Required")
                     .setMessage("We need access to your contacts to display them.")
@@ -176,21 +169,24 @@ class PairFragment : Fragment() {
             }
 
             else -> {
-                // Request permission directly
                 requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
             }
         }
     }
-    private fun filterContacts(query: String?){
-        if(query.isNullOrEmpty()){
+
+    private fun filterContacts(query: String?) {
+        if (query.isNullOrEmpty()) {
             adapter.submitList(contactsList)
-        } else{
-            val filteredList = contactsList.filter { contact ->
-                contact.name.contains(query, ignoreCase = true)
+        } else {
+            val filteredList = contactsList.filter {
+                it.name.contains(query, ignoreCase = true)
             }
             adapter.submitList(filteredList)
         }
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
 }
