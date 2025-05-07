@@ -10,7 +10,7 @@ import com.example.safeher.bluetooth.BluetoothCallback
 import com.example.safeher.bluetooth.BluetoothController
 import com.example.safeher.bluetooth.BluetoothError
 import com.example.safeher.bluetooth.BluetoothState
-import com.example.safeher.util.PermissionManager
+import com.example.safeher.utils.PermissionManager
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

@@ -26,6 +26,7 @@ import com.example.safeher.api.RetroFitClient
 import com.example.safeher.auth.pair.adapter.ContactAdapter
 import com.example.safeher.databinding.FragmentPairBinding
 import com.example.safeher.model.ContactItem
+import com.example.safeher.utils.setupUI
 
 class PairFragment : Fragment() {
 
@@ -44,9 +45,9 @@ class PairFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         binding = FragmentPairBinding.inflate(inflater, container, false)
-        return binding!!.root
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,6 +59,7 @@ class PairFragment : Fragment() {
             preSelectedContacts = it
         }
 
+        requireActivity().setupUI(view)
         initView()
         getContent()
 
