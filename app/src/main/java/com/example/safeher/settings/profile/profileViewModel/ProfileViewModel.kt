@@ -1,5 +1,6 @@
 package com.example.safeher.settings.profile.profileViewModel
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,8 +11,8 @@ import com.example.safeher.settings.profile.profileRepository.ProfileRepository
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
-class ProfileViewModel(context:Context) : ViewModel() {
-    private val repo = ProfileRepository(context)
+class ProfileViewModel(application: Application) : AndroidViewModel(application) {
+    private val repo = ProfileRepository(application)
     private val _profileState = MutableLiveData<ProfileState>()
     val profileState: LiveData<ProfileState> = _profileState
 
