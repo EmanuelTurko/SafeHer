@@ -16,6 +16,7 @@ import android.util.Log
 import com.example.safeher.adapters.PostAdapter
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Post
+import com.example.safeher.utils.setupUI
 import com.google.android.material.button.MaterialButton
 
 
@@ -36,6 +37,11 @@ class SistersFragment :Fragment() {
         initListener()
         setupRecyclerView(view)
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().setupUI(view)
     }
 
     private fun initView(view: View) {

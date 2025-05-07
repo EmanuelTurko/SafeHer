@@ -1,16 +1,11 @@
 package com.example.safeher.home_screen.support
 
 import android.content.Context
-import android.media.AudioDeviceInfo
 import android.media.AudioManager
-import android.os.Bundle
-import android.provider.MediaStore
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.speech.tts.Voice
 import java.util.Locale
 import android.util.Log
-import com.example.safeher.util.SdkVersion
 
 class TextToSpeechManager(context: Context) : TextToSpeech.OnInitListener {
 
