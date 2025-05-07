@@ -75,8 +75,8 @@ class RegisterFragment : Fragment() {
         mRegisterBtn = binding?.registerButton
         mMoveToLoginScreenBtn = binding?.loginText
         mPhone = binding?.phoneEditText
-        mIdPhoto = binding?.idPhotoEditText
-        binding?.idPhotoInputLayout?.setOnClickListener { openGallery() }
+        //mIdPhoto = binding?.idPhotoEditText
+        //binding?.idPhotoInputLayout?.setOnClickListener { openGallery() }
 
     }
 
@@ -102,7 +102,7 @@ class RegisterFragment : Fragment() {
             email = mEmail?.text.toString().trim(),
             password = mPassword?.text.toString(),
             phoneNumber = mPhone?.text.toString().trim(),
-            idPhotoUrl = mIdPhoto?.text.toString().trim()
+            idPhotoUrl =  ""//mIdPhoto?.text.toString().trim()
         )
 
         val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
