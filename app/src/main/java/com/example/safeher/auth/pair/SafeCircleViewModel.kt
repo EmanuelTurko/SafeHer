@@ -3,7 +3,6 @@ package com.example.safeher.auth.pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.safeher.api.ApiService
 import com.example.safeher.model.ContactItem
@@ -12,7 +11,7 @@ import com.example.safeher.model.api.ApiResponse
 import kotlinx.coroutines.launch
 import android.util.Log
 
-class PairViewModel(private val apiService: ApiService): ViewModel() {
+class SafeCircleViewModel(private val apiService: ApiService): ViewModel() {
     private val _updateSafeCircleResponse = MutableLiveData<ApiResponse<ContactItem>>()
     val updateSafeCircleResponse: LiveData<ApiResponse<ContactItem>> get() = _updateSafeCircleResponse
 
