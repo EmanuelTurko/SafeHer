@@ -24,28 +24,28 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.auth.pair.adapter.ContactAdapter
-import com.example.safeher.databinding.FragmentPairBinding
+import com.example.safeher.databinding.FragmentSafeCircleBinding
 import com.example.safeher.model.ContactItem
 
-class PairFragment : Fragment() {
+class SafeCircleFragment : Fragment() {
 
-    private var binding: FragmentPairBinding? = null
+    private var binding: FragmentSafeCircleBinding? = null
     private lateinit var adapter: ContactAdapter
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var contactsList = mutableListOf<ContactItem>()
     private var preSelectedContacts: List<ContactItem>? = null
 
-    private val pairViewModel: PairViewModel by lazy {
+    private val safeCircleViewModel: SafeCircleViewModel by lazy {
         val apiService = RetroFitClient.apiService
-        val factory = PairViewModelFactory(apiService)
-        ViewModelProvider(this, factory)[PairViewModel::class.java]
+        val factory = SafeCircleViewModelFactory(apiService)
+        ViewModelProvider(this, factory)[SafeCircleViewModel::class.java]
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPairBinding.inflate(inflater, container, false)
+        binding = FragmentSafeCircleBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
@@ -102,7 +102,7 @@ class PairFragment : Fragment() {
                 val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
                 val fullName = sharedPref.getString("fullName", null) ?: ""
                 Log.d("PairFragment", "Selected contacts: $selectedNumbers, fullName: $fullName")
-                pairViewModel.updateUserSafeCircle(fullName, selectedNumbers)
+                safeCircleViewModel.updateUserSafeCircle(fullName, selectedNumbers)
             }
 
             Toast.makeText(requireActivity(), "Selected: ${selected.joinToString { it.name }}", Toast.LENGTH_LONG).show()
