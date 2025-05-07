@@ -37,5 +37,8 @@
     <color name="dark_purple">#7B1FA2</color>
     <color name="light_blue">#90CAF9</color>
     <color name="transparent">#00000000</color>
+
+    <color name="sos_card_off">#E53935</color>
+    <color name="sos_card_on">#4CAF50</color>
 </resources>
 

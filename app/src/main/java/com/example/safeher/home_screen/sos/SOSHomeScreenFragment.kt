@@ -4,19 +4,23 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -36,9 +40,7 @@ import kotlinx.coroutines.launch
 class SOSHomeScreenFragment : Fragment() {
 
 
-    private val bluetoothViewModel: BluetoothViewModelBLE by lazy {
-        ViewModelProvider(this)[BluetoothViewModelBLE::class.java]
-    }
+    private lateinit var bluetoothViewModel: BluetoothViewModelBLE
     private lateinit var permissionManager: PermissionManager
     private lateinit var videoViewModel: VideoViewModel
     private var bSosActiveValue : Boolean = false
@@ -46,6 +48,7 @@ class SOSHomeScreenFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
+    lateinit var mSosButtonContainer: MaterialCardView
     lateinit var mSistersButton: LinearLayout
     lateinit var mVideoLibraryButton: LinearLayout
     lateinit var mSupportCallButton: LinearLayout
@@ -108,8 +111,9 @@ class SOSHomeScreenFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        initBluetoothViewModel()
+        //bluetoothViewModel = ViewModelProvider(requireActivity())[BluetoothViewModelBLE::class.java]
+        bluetoothViewModel = initBluetoothViewModel()
+        //initBluetoothViewModel()
         videoViewModel = initVideoViewModel()
         bluetoothViewModel.checkPermissionsAndScan()
 
@@ -147,6 +151,8 @@ class SOSHomeScreenFragment : Fragment() {
                 if (saved) {
                     if (bluetoothViewModel.imagesReceived >= bluetoothViewModel.totalImagesExpected) {
                         videoViewModel.processVideo()
+                        bluetoothViewModel.imagesReceived = 0
+                        bluetoothViewModel.totalImagesExpected = 0
                     }
                 }
             }
@@ -155,7 +161,7 @@ class SOSHomeScreenFragment : Fragment() {
 
     private fun initBluetoothViewModel(): BluetoothViewModelBLE {
         return ViewModelProvider(
-            this,
+            requireActivity(),
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     val bluetoothController = BluetoothController(
@@ -183,6 +189,8 @@ class SOSHomeScreenFragment : Fragment() {
 
 
     private fun initView(view: View) {
+
+        mSosButtonContainer = view.findViewById(R.id.sosButtonContainer)
         mSistersButton = view.findViewById(R.id.sistersButton)
         mVideoLibraryButton = view.findViewById(R.id.videoLibraryButton)
         mSupportCallButton = view.findViewById(R.id.supportCallButton)
@@ -213,13 +221,18 @@ class SOSHomeScreenFragment : Fragment() {
         }
 
         mSosButton.setOnClickListener {
+            val colorOff = ContextCompat.getColor(requireContext(), R.color.sos_card_off)
+            val colorOn = ContextCompat.getColor(requireContext(), R.color.sos_card_on)
             if(!bSosActiveValue){
                 bluetoothViewModel.sendCommand("START")
                 bSosActiveValue = true
+                mSosButtonContainer.setCardBackgroundColor(colorOn)
+
             } else {
                 bluetoothViewModel.sendCommand("STOP")
                 bSosActiveValue = false
                 Log.d("TestSample", "SOS button clicked")
+                mSosButtonContainer.setCardBackgroundColor(colorOff)
             }
         }
 

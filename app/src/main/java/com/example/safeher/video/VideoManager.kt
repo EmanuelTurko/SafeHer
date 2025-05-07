@@ -17,7 +17,9 @@ import android.provider.MediaStore
 import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 @Volatile
 private var isEncoding = false
@@ -160,8 +162,10 @@ class VideoManager(private val context: Context) {
                     mkdirs()
                 }
             }
-
-            val outputFile = File(outputDir, "SafeHer_${System.currentTimeMillis()}.mp4")
+            val dateFormat = SimpleDateFormat("HH:mm a  dd:MM:yyyy", Locale.getDefault())
+            val formattedDate = dateFormat.format(Date())
+            val outputFile = File(outputDir, "$formattedDate.mp4")
+            //val outputFile = File(outputDir, "SafeHer_${System.currentTimeMillis()}.mp4")
             if (outputFile.exists()) {
                 outputFile.delete()
                 outputFile.createNewFile()
@@ -403,7 +407,9 @@ class VideoManager(private val context: Context) {
 
         val resolver = context.contentResolver
         val videoCollection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        val videoName = "SafeHer_${System.currentTimeMillis()}.mp4"
+        val dateFormat = SimpleDateFormat("HH:mm a, dd/MM/yyyy", Locale.getDefault())
+        val formattedDate = dateFormat.format(Date())
+        val videoName = "TEST.mp4"
         val relativeLocation = "${Environment.DIRECTORY_MOVIES}/ESP32_Videos"
 
         Log.d("VideoProcessor", "Saving video to $relativeLocation/$videoName")
@@ -437,6 +443,7 @@ class VideoManager(private val context: Context) {
             resolver.update(uri, contentValues, null, null)
 
             Log.d("VideoProcessor", "Video saved successfully to $uri")
+            resetForNewVideo()
             callback(uri)
         } catch (e: Exception) {
             Log.e("VideoProcessor", "Failed to save video to public storage", e)
@@ -466,5 +473,10 @@ class VideoManager(private val context: Context) {
         } ?: 0
         Log.d("VideoProcessor", "Current frame count: $count")
         return count
+    }
+    fun resetForNewVideo() {
+        prepareTempDir()
+        beforeAll = true
+        isEncoding = false
     }
 }
