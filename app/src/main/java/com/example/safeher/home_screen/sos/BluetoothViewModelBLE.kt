@@ -25,7 +25,7 @@ sealed class BleEvent{
     object ReadyToScan : BleEvent()
 }
 
-class BluetoothViewModelBLE @Inject constructor(
+public class BluetoothViewModelBLE @Inject constructor (
     private val bluetoothController: BluetoothController,
     private val permissionManager: PermissionManager
     ) : ViewModel(), BluetoothCallback {
@@ -95,6 +95,7 @@ class BluetoothViewModelBLE @Inject constructor(
     }
     fun disconnect(){
         bluetoothController.disconnect()
+        Log.d("PermissionsLog", "Bluetooth device disconnected")
     }
 
     override fun onStateChanged(state: BluetoothState) {

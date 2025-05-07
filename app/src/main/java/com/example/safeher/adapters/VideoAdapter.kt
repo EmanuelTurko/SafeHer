@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import com.example.safeher.R
@@ -29,8 +28,20 @@ class VideoAdapter(private val context: Context, private var videoFiles: List<Fi
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val video = videoFiles[position]
-        holder.dateText.text = video.name
-        holder.addressText.text = video.absolutePath
+
+        val displayName = video.name
+            .removeSuffix(".mp4")
+            .replaceAfter(" ", "") +                 // Keeps only the time part as-is
+                video.name
+                    .removeSuffix(".mp4")
+                    .substringAfter(" ")
+                    .replace(":", "/")
+
+        holder.dateText.text = displayName
+
+        val fileSizeInBytes = video.length()
+        val readableSize = getReadableFileSize(fileSizeInBytes)
+        holder.addressText.text = readableSize
 
         holder.playButton.setOnClickListener {
             val uri = FileProvider.getUriForFile(
@@ -61,8 +72,8 @@ class VideoAdapter(private val context: Context, private var videoFiles: List<Fi
     override fun getItemCount(): Int = videoFiles.size
 
     inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val dateText: TextView = itemView.findViewById(R.id.dateText1)
-        val addressText: TextView = itemView.findViewById(R.id.addressText1)
+        val dateText: TextView = itemView.findViewById(R.id.dateText)
+        val addressText: TextView = itemView.findViewById(R.id.addressText)
         val playButton: ImageView = itemView.findViewById(R.id.play_btn)
         val deleteButton: ImageView = itemView.findViewById(R.id.delete_btn)
 
@@ -71,6 +82,18 @@ class VideoAdapter(private val context: Context, private var videoFiles: List<Fi
             playButton.setOnClickListener {
                 //TODO : Implement video playback functionality
             }
+        }
+    }
+    fun getReadableFileSize(size: Long): String {
+        val kb = 1024
+        val mb = kb * 1024
+        val gb = mb * 1024
+
+        return when {
+            size >= gb -> String.format("%.2f GB", size.toFloat() / gb)
+            size >= mb -> String.format("%.2f MB", size.toFloat() / mb)
+            size >= kb -> String.format("%.2f KB", size.toFloat() / kb)
+            else -> "$size B"
         }
     }
 }

@@ -33,9 +33,9 @@ class SupportCallAiViewModel: ViewModel() {
         viewModelScope.launch {
             try{
                 val prompt = """
-                            Speak gently and supportively to the user's request, Use only 1–2 short sentences, speak only in Hebrew as a female to a female.
-                            "$message"
-                            """.trimIndent()
+    Respond directly to the following message as if you're part of a conversation, using 1-2 sentences:
+    "$message"
+    """.trimIndent()
 
                 val request = AiChatRequest(
                     contents = listOf(

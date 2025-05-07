@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
 import com.example.safeher.adapters.VideoAdapter
 import java.io.File
+import android.util.Log
 
 class VideoLibraryFragment :Fragment() {
 
@@ -81,6 +82,12 @@ class VideoLibraryFragment :Fragment() {
         val videoDir = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES), "ESP32_Videos")
         return videoDir.listFiles { file -> file.extension == "mp4" }
             ?.sortedByDescending { it.lastModified() } ?: emptyList()
+        Log.d("TestSample", "Video files: ${videoDir.listFiles()?.joinToString(", ") { it.name }}")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getVideoFiles()
     }
 
 }

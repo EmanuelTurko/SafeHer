@@ -82,6 +82,7 @@ class SupportCallAiFragment :Fragment() {
 
         binding?.hangUpImageBtn?.setOnClickListener{
             viewModel.stopSpeaking()
+            voiceRecognitionManager.destroy()
            findNavController().popBackStack()
         }
     }
