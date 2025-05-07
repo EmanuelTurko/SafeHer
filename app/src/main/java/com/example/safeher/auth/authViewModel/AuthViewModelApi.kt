@@ -24,8 +24,10 @@ class AuthViewModelApi(private val authRepository: AuthRepository) :ViewModel() 
             try{
                 val response = authRepository.registerUser(data)
                 _registerResponse.postValue(response)
+                Log.d("RegisterFragment", "Got register response: $response")
             } catch( e: Exception){
                 _registerResponse.postValue(ApiResponse(error = e.message))
+                Log.e("RegisterFragment", "Error during registration: ${e.message}")
             }
         }
     }

@@ -69,7 +69,7 @@ class SistersFragment :Fragment() {
 
         lifecycleScope.launch {
             try {
-                val posts = RetroFitClient.apiService.getAllPosts()
+                val posts = RetroFitClient.getApiService(requireContext()).getAllPosts()
                 postAdapter = PostAdapter(posts)
                 recyclerView.adapter = postAdapter
             } catch (e: Exception) {

@@ -8,5 +8,6 @@ data class User(
     val phoneNumber: String = "",
     val birthDate: String? = null,
     val idPhotoUrl: String = "",
-    val profilePicture: String = ""
+    val profilePicture: String = "",
+    val accessToken: String? = null
 )

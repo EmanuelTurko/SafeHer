@@ -36,7 +36,7 @@ class SafeCircleFragment : Fragment() {
     private var preSelectedContacts: List<ContactItem>? = null
 
     private val safeCircleViewModel: SafeCircleViewModel by lazy {
-        val apiService = RetroFitClient.apiService
+        val apiService = RetroFitClient.getApiService(requireContext())
         val factory = SafeCircleViewModelFactory(apiService)
         ViewModelProvider(this, factory)[SafeCircleViewModel::class.java]
     }

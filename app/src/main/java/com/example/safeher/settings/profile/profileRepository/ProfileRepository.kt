@@ -1,11 +1,12 @@
 package com.example.safeher.settings.profile.profileRepository
 
+import android.content.Context
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.api.ApiService
 import com.example.safeher.model.User
 
-class ProfileRepository {
-    private val api = RetroFitClient.apiService
+class ProfileRepository(context:Context) {
+    private val api = RetroFitClient.getApiService(context)
 
     suspend fun getUserData(userId: String): Result<User?> = runCatching {
         val resp = api.getUserProfile(userId)

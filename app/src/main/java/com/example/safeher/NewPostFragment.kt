@@ -1,5 +1,6 @@
-package com.example.safeher.home_screen.sisters
+package com.example.safeher
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Post
 import com.google.android.material.button.MaterialButton
@@ -19,6 +19,7 @@ class NewPostFragment : Fragment() {
 
     private lateinit var editTextPostContent: EditText
     private lateinit var buttonSubmitPost: MaterialButton
+    private lateinit var id : String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +28,8 @@ class NewPostFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_new_post, container, false)
         editTextPostContent = view.findViewById(R.id.editTextPostContent)
         buttonSubmitPost   = view.findViewById(R.id.buttonSubmitPost)
+        val idPrefs = context?.getSharedPreferences("auth", Context.MODE_PRIVATE)
+        id = idPrefs?.getString("id", null) ?: ""
 
         buttonSubmitPost.setOnClickListener {
             val postText = editTextPostContent.text.toString().trim()
@@ -41,11 +44,14 @@ class NewPostFragment : Fragment() {
     }
 
     private fun submitPost(text: String) {
-        val newPost = Post(text = text, imageUrl = null)
+        val newPost = Post(
+            id = id,
+            text = text,
+            imageUrl = null)
 
         lifecycleScope.launch {
             try {
-                RetroFitClient.apiService.createPost(newPost)
+                RetroFitClient.getApiService(requireContext()).createPost(newPost)
                 Toast.makeText(requireContext(), "Post submitted!", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_newPostFragment_to_sistersFragment)
             } catch (e: Exception) {

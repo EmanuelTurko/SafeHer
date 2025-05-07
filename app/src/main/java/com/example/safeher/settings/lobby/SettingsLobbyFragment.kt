@@ -1,6 +1,7 @@
 package com.example.safeher.settings.lobby
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +12,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
+import androidx.core.content.edit
+import com.example.safeher.auth.MainActivity
 
 class SettingsLobbyFragment : Fragment() {
 
@@ -44,10 +47,14 @@ class SettingsLobbyFragment : Fragment() {
         }
 
         mLogoutBtn.setOnClickListener {
-            val resultIntent = Intent().apply {
-                putExtra("LOGOUT_SUCCESS", true)
+            val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+            prefs.edit {
+                clear()
+                apply()
             }
-            activity?.setResult(Activity.RESULT_OK, resultIntent)
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
             activity?.finish()
         }
 

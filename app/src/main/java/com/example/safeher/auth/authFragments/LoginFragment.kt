@@ -1,5 +1,6 @@
 package com.example.safeher.auth.authFragments
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -53,7 +54,7 @@ class LoginFragment : Fragment() {
         requireActivity().setupUI(view)
         initializeViews()
         binding?.welcomeAnimation?.playAnimation()
-        val authRepository = AuthRepository(RetroFitClient.apiService)
+        val authRepository = AuthRepository(RetroFitClient.getApiService(requireContext()))
         val factory = AuthViewModelFactory(authRepository)
         viewModelApi = ViewModelProvider(this,factory)[AuthViewModelApi::class.java]
         setupClickListeners()
@@ -65,6 +66,12 @@ class LoginFragment : Fragment() {
             if (response.message == "Successfully logged in" && response.data != null) {
                 val rememberMe = binding?.rememberMeCheckbox?.isChecked
                 Log.d("LoginFragment", "Logged in successfully: ${response.data}")
+                val token = response.data.accessToken
+                val tokenPref = context?.getSharedPreferences("auth", Context.MODE_PRIVATE)
+                tokenPref?.edit()?.putString("token", token)?.apply()
+
+                val idPref = context?.getSharedPreferences("auth", Context.MODE_PRIVATE)
+                idPref?.edit()?.putString("userId", response.data.id)?.apply()
 
                 SharedPrefsHelper(requireContext()).save(REMEMBER_MY_LOGIN, rememberMe)
                 startActivity(Intent(requireActivity(), HomeScreenActivity::class.java))

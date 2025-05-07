@@ -37,8 +37,6 @@ class HomePageFragment : Fragment() {
     private val viewModel: AuthViewModel by viewModels()
 
 
-    private lateinit var mApiTestMessage: TextView
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,9 +55,6 @@ class HomePageFragment : Fragment() {
             activity?.startActivity(Intent(requireActivity(), SettingsMainActivity::class.java))
         }
         setupClickListeners()
-
-        mApiTestMessage = view.findViewById(R.id.api_test_message)
-        callApiTest()
 
         return view
     }
@@ -86,20 +81,4 @@ class HomePageFragment : Fragment() {
         fun newInstance() = HomePageFragment()
     }
 
-    private fun callApiTest() {
-        RetroFitClient.apiService.getTest().enqueue(object : Callback<Test> {
-            override fun onResponse(call: Call<Test>, response: Response<Test>) {
-                if (response.isSuccessful) {
-                    val message = response.body()?.message ?: "No Message"
-                    mApiTestMessage.text = "Api message: $message"
-                } else {
-                    mApiTestMessage.text = "Api Failed ${response.code()}"
-                }
-            }
-
-            override fun onFailure(call: Call<Test>, t: Throwable) {
-                mApiTestMessage.text = "Error ${t.message}"
-            }
-        })
-    }
 }

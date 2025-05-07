@@ -61,7 +61,7 @@ class RegisterFragment : Fragment() {
         initializeViews()
         setupClickListeners()
 
-        val authRepository = AuthRepository(RetroFitClient.apiService)
+        val authRepository = AuthRepository(RetroFitClient.getApiService(requireContext()))
         val factory = AuthViewModelFactory(authRepository)
         viewModelApi = ViewModelProvider(this, factory)[AuthViewModelApi::class.java]
 
