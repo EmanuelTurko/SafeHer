@@ -29,6 +29,7 @@ import com.example.safeher.model.LoginRequest
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import android.util.Log
+import com.example.safeher.utils.setupUI
 
 class LoginFragment : Fragment() {
 
@@ -50,6 +51,7 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().setupUI(view)
         initializeViews()
         binding?.welcomeAnimation?.playAnimation()
         val authRepository = AuthRepository(RetroFitClient.apiService)

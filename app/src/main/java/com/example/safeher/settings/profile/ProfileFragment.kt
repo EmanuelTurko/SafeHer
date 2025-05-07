@@ -1,5 +1,6 @@
 package com.example.safeher.settings.profile
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -27,6 +28,7 @@ import com.example.safeher.settings.profile.profileViewModel.ProfileState
 import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.example.safeher.utils.setupUI
 
 class ProfileFragment : Fragment() {
 
@@ -61,6 +63,11 @@ class ProfileFragment : Fragment() {
         //  Fetch the logged-in user's profile
         viewModel.getUserData(userId)
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().setupUI(view)
     }
 
     private fun initializeViews(view: View) {

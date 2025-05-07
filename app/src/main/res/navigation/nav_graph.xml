@@ -36,7 +36,7 @@
     </fragment>
     <fragment
         android:id="@+id/safeCircleIntroFragment"
-        android:name="com.example.safeher.auth.pair.SafeCircleIntroFragment"
+        android:name="com.example.safeher.auth.safeCircle.SafeCircleIntroFragment"
         android:label="SafeCircleIntroFragment" >
         <action
             android:id="@+id/action_safeCircleIntroFragment_to_pairFragment"
@@ -44,7 +44,7 @@
     </fragment>
     <fragment
         android:id="@+id/pairFragment"
-        android:name="com.example.safeher.auth.pair.PairFragment"
+        android:name="com.example.safeher.auth.safeCircle.SafeCircleFragment"
         android:label="PairFragment" >
         <action
             android:id="@+id/action_PairFragment_to_loginFragment"
@@ -55,7 +55,7 @@
     </fragment>
     <fragment
         android:id="@+id/confirmSafeCircleFragment"
-        android:name="com.example.safeher.auth.pair.ConfirmSafeCircleFragment"
+        android:name="com.example.safeher.auth.safeCircle.ConfirmSafeCircleFragment"
         android:label="ConfirmSafeCircleFragment" >
 
         <action

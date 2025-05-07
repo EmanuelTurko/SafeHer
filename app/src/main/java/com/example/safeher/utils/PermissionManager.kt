@@ -1,4 +1,4 @@
-package com.example.safeher.util
+package com.example.safeher.utils
 
 import android.Manifest
 import android.app.Activity

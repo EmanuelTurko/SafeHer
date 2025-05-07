@@ -9,8 +9,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import com.example.safeher.util.SdkVersion
-import com.example.safeher.util.PermissionManager
+import com.example.safeher.utils.SdkVersion
+import com.example.safeher.utils.PermissionManager
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 

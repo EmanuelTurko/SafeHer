@@ -1,4 +1,4 @@
-package com.example.safeher.auth.pair
+package com.example.safeher.auth.safeCircle
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.safeher.databinding.FragmentConfirmSafeCircleBinding
 import com.example.safeher.model.ContactItem
-import com.example.safeher.auth.pair.adapter.ConfirmContactsAdapter
+import com.example.safeher.auth.safeCircle.adapter.ConfirmContactsAdapter
 import com.example.safeher.R
 
 class ConfirmSafeCircleFragment : Fragment() {

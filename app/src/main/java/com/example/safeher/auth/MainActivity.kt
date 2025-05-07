@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.safeher.R
+import com.example.safeher.utils.setupUI
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         // Get the NavController
         navController = navHostFragment.navController
+        setupUI(findViewById(android.R.id.content))
     }
 
     override fun onSupportNavigateUp(): Boolean {

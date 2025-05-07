@@ -1,4 +1,4 @@
-package com.example.safeher.auth.pair.adapter
+package com.example.safeher.auth.safeCircle.adapter
 
 import android.view.LayoutInflater
 import android.view.View

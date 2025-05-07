@@ -120,11 +120,11 @@
         app:layout_constraintTop_toBottomOf="@id/settingsTitleCard">
 
         <ImageView
-            android:id="@+id/pairIcon"
+            android:id="@+id/safecircleIcon"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="Let's Pair"
-            android:src="@drawable/ic_pair"
+            android:src="@drawable/safe_circle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -134,12 +134,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/poppins_medium"
-            android:text="Let's Pair"
+            android:text="Safe Circle"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pairIcon" />
+            app:layout_constraintTop_toBottomOf="@id/safecircleIcon" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Divider 1 -->
@@ -152,11 +152,13 @@
         app:layout_constraintTop_toBottomOf="@id/profileOption" />
 
     <!-- Video Library Option -->
+
+    <!-- About Us Option -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/videoLibraryOption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toStartOf="@id/aboutOption"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider1">
@@ -167,10 +169,10 @@
             android:layout_height="50dp"
             android:contentDescription="Video Library"
             android:src="@drawable/ic_video_play"
-            android:tint="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black" />
 
         <TextView
             android:id="@+id/videoLibraryText"
@@ -197,12 +199,13 @@
             app:layout_constraintTop_toBottomOf="@id/videoLibraryText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- About Us Option -->
+    <!-- Divider 2 -->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/aboutOption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/videoLibraryOption"
         app:layout_constraintTop_toBottomOf="@id/divider1">
@@ -242,7 +245,6 @@
             app:layout_constraintTop_toBottomOf="@id/aboutText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Divider 2 -->
     <View
         android:id="@+id/divider2"
         android:layout_width="match_parent"
@@ -251,57 +253,62 @@
         android:background="#E0E0E0"
         app:layout_constraintTop_toBottomOf="@id/videoLibraryOption" />
 
-    <!-- Tech Support Option -->
+    <!-- lets pair Option -->
+
+    <!-- Q&A Option -->
+
+    <!-- Divider 3 -->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/techSupportOption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toStartOf="@id/qaOption"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider2">
 
         <ImageView
-            android:id="@+id/techSupportIcon"
+            android:id="@+id/LetsPairIcon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:contentDescription="Tech Support"
-            android:src="@drawable/ic_tech_support"
+            android:layout_marginTop="4dp"
+            android:contentDescription="Lets Pair"
+            android:src="@drawable/ic_pair"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/techSupportText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/letspairText"
+            android:layout_width="42dp"
+            android:layout_height="35dp"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/poppins_medium"
-            android:text="Tech"
+            android:text="Let's"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/techSupportIcon" />
+            app:layout_constraintTop_toBottomOf="@id/LetsPairIcon" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_medium"
-            android:text="Support"
+            android:text="Pair"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/techSupportText" />
+            app:layout_constraintTop_toBottomOf="@id/letspairText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Q&A Option -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/qaOption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/techSupportOption"
         app:layout_constraintTop_toBottomOf="@id/divider2">
@@ -329,7 +336,6 @@
             app:layout_constraintTop_toBottomOf="@id/qaIcon" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Divider 3 -->
     <View
         android:id="@+id/divider3"
         android:layout_width="match_parent"

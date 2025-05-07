@@ -27,7 +27,7 @@ import com.example.safeher.R
 import com.example.safeher.bluetooth.BluetoothController
 import com.example.safeher.home_screen.videoLibrary.VideoViewModel
 import com.example.safeher.settings.SettingsMainActivity
-import com.example.safeher.util.PermissionManager
+import com.example.safeher.utils.PermissionManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
