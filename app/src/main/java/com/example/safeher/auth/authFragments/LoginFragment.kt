@@ -1,5 +1,6 @@
 package com.example.safeher.auth.authFragments
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -60,21 +61,41 @@ class LoginFragment : Fragment() {
 
     private fun setupObservers() {
         viewModelApi.loginResponse.observe(viewLifecycleOwner) { response ->
-            if (response.message == "Successfully logged in" && response.data != null) {
-                val rememberMe = binding?.rememberMeCheckbox?.isChecked
-                Log.d("LoginFragment", "Logged in successfully: ${response.data}")
+            Log.d("LoginFragment", "LoginResponse: $response")
+
+            val jwt = response.token
+            val user = response.data
+            if (jwt != null && user != null) {
+                val rememberMe = binding?.rememberMeCheckbox?.isChecked ?: false
+
+                requireContext()
+                    .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("AUTH_TOKEN", jwt)
+                    .putString("USER_ID", user.id)
+                    .apply()
 
                 SharedPrefsHelper(requireContext()).save(REMEMBER_MY_LOGIN, rememberMe)
+
                 startActivity(Intent(requireActivity(), HomeScreenActivity::class.java))
                 requireActivity().finish()
-            } else if (response.error != null) {
-                Log.e("LoginFragment", "Error: ${response.error}")
-                ErrorDialog(requireActivity()).show("Oops", response.error, "TRY AGAIN")
+
+            } else if (!response.error.isNullOrBlank()) {
+                Log.e("LoginFragment", "API Error: ${response.error}")
+                ErrorDialog(requireActivity())
+                    .show("Oops", response.error, "TRY AGAIN")
+
             } else {
-                ErrorDialog(requireActivity()).show("Oops", "Unknown error", "TRY AGAIN")
+                Log.e("LoginFragment", "Unknown error, message=${response.message}")
+                ErrorDialog(requireActivity())
+                    .show("Oops", response.message ?: "Unknown error", "TRY AGAIN")
             }
         }
     }
+
+
+
+
 
 
     private fun initializeViews() {
