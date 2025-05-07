@@ -47,10 +47,10 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Retrieve userId from SharedPreferences
-        val prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        userId = prefs.getString("userId", "") ?: ""
-        Log.d("ProfileFragment", "Loaded userId=$userId")
+        // Retrieve userId from the same pref where you saved it after login
+        val prefs = requireContext().getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+        userId = prefs.getString("USER_ID", "") ?: ""
+        Log.d("ProfileFragment", "Loaded userId = $userId")
     }
 
     override fun onCreateView(
@@ -60,6 +60,7 @@ class ProfileFragment : Fragment() {
         initializeViews(view)
         setupClickListeners()
         setupObservers()
+        //  Fetch the logged-in user's profile
         viewModel.getUserData(userId)
         return view
     }
@@ -96,6 +97,7 @@ class ProfileFragment : Fragment() {
                     state.user?.let { user ->
                         nameInput.setText(user.fullName)
                         emailInput.setText(user.email)
+                        // If your User includes a Base64 profilePicture:
                         if (user.profilePicture.isNotEmpty()) {
                             val bmp = viewModel.convertBase64ToBitmap(user.profilePicture)
                             profileImage.setImageBitmap(bmp)
@@ -126,23 +128,25 @@ class ProfileFragment : Fragment() {
         val base64 = viewModel.convertBitmapToBase64(bmp)
 
         val user = User(
-            id              = userId,
-            fullName        = newName,
-            email           = newEmail,
-            password        = originalUser?.password ?: "",
-            phoneNumber     = originalUser?.phoneNumber ?: "",
-            birthDate       = originalUser?.birthDate,
-            idPhotoUrl      = originalUser?.idPhotoUrl ?: "",
-            profilePicture  = base64
+            id             = userId,
+            fullName       = newName,
+            email          = newEmail,
+            password       = originalUser?.password ?: "",
+            phoneNumber    = originalUser?.phoneNumber ?: "",
+            birthDate      = originalUser?.birthDate,
+            idPhotoUrl     = originalUser?.idPhotoUrl ?: "",
+            profilePicture = base64
         )
         viewModel.saveUserData(user)
     }
 
     private fun onRemoveAccountClicked() {
         viewModel.signOut()
-        startActivity(Intent(requireContext(), MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
+        startActivity(
+            Intent(requireContext(), MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        )
     }
 
     private val pickImageLauncher =
@@ -157,27 +161,29 @@ class ProfileFragment : Fragment() {
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { perms ->
-            if (perms[android.Manifest.permission.CAMERA] == true)
-                openGallery()
-            else
-                showCustomToast("לא ניתן לבחור תמונה ללא הרשאת מצלמה")
+            if (perms[android.Manifest.permission.CAMERA] == true) openGallery()
+            else showCustomToast("לא ניתן לבחור תמונה ללא הרשאת מצלמה")
         }
 
     private fun openGallery() {
         if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                android.Manifest.permission.CAMERA
+                requireContext(), android.Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             openImageChooser()
         } else {
-            requestPermissionLauncher.launch(arrayOf(android.Manifest.permission.CAMERA))
+            requestPermissionLauncher.launch(
+                arrayOf(android.Manifest.permission.CAMERA)
+            )
         }
     }
 
     private fun openImageChooser() {
         val cameraIntent  = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        val galleryIntent = Intent(
+            Intent.ACTION_PICK,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        )
         val chooser = Intent.createChooser(galleryIntent, "בחר תמונה").apply {
             putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
         }

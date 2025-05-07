@@ -189,7 +189,6 @@
                     android:fontFamily="@font/poppins_regular"
                     android:inputType="textPersonName"
                     android:paddingHorizontal="16dp"
-                    android:text="Shira Levi"
                     android:textColor="#2D2D2D"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -243,7 +242,6 @@
                     android:fontFamily="@font/poppins_regular"
                     android:inputType="textEmailAddress"
                     android:paddingHorizontal="16dp"
-                    android:text="ShiraLevi@gmail.com"
                     android:textColor="#2D2D2D"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -297,7 +295,6 @@
                     android:fontFamily="@font/poppins_regular"
                     android:inputType="textPassword"
                     android:paddingHorizontal="16dp"
-                    android:text="********"
                     android:textColor="#2D2D2D"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -351,7 +348,6 @@
                     android:fontFamily="@font/poppins_regular"
                     android:inputType="phone"
                     android:paddingHorizontal="16dp"
-                    android:text="052-1111111"
                     android:textColor="#2D2D2D"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>

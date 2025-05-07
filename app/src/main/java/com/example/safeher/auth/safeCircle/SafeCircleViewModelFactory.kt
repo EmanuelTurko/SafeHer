@@ -1,4 +1,4 @@
-package com.example.safeher.auth.pair
+package com.example.safeher.auth.safeCircle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -10,6 +10,7 @@ class SafeCircleViewModelFactory(private val apiService: ApiService) : ViewModel
             @Suppress("UNCHECKED_CAST")
             return SafeCircleViewModel(apiService) as T
         }
+        
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

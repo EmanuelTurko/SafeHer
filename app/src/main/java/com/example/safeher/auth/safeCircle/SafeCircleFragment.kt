@@ -1,4 +1,4 @@
-package com.example.safeher.auth.pair
+package com.example.safeher.auth.safeCircle
 
 import android.Manifest
 import android.app.AlertDialog
@@ -23,7 +23,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
-import com.example.safeher.auth.pair.adapter.ContactAdapter
+import com.example.safeher.auth.safeCircle.adapter.ContactAdapter
 import com.example.safeher.databinding.FragmentSafeCircleBinding
 import com.example.safeher.model.ContactItem
 
@@ -52,7 +52,6 @@ class SafeCircleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // קבלת אנשי קשר מסומנים אם חזרו מהמסך הבא
         val returnedSelected = arguments?.getParcelableArrayList<ContactItem>("selected_contacts")
         returnedSelected?.let {
             preSelectedContacts = it

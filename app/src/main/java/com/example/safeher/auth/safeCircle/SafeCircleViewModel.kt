@@ -1,6 +1,5 @@
-package com.example.safeher.auth.pair
+package com.example.safeher.auth.safeCircle
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +12,6 @@ import android.util.Log
 
 class SafeCircleViewModel(private val apiService: ApiService): ViewModel() {
     private val _updateSafeCircleResponse = MutableLiveData<ApiResponse<ContactItem>>()
-    val updateSafeCircleResponse: LiveData<ApiResponse<ContactItem>> get() = _updateSafeCircleResponse
 
     fun updateUserSafeCircle(fullName:String, safeCircle: List<String>){
         viewModelScope.launch{

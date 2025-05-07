@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/pairFragment"
-        android:name="com.example.safeher.auth.pair.SafeCircleFragment"
+        android:name="com.example.safeher.auth.safeCircle.SafeCircleFragment"
         android:label="PairFragment">
         <action
             android:id="@+id/action_pairFragment_to_settingsLobbyFragment"
