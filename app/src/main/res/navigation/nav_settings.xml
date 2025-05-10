@@ -16,11 +16,14 @@
                 app:argType="boolean" />
         </action>
         <action
-            android:id="@+id/action_settingsLobbyFragment_to_pairFragment"
-            app:destination="@id/pairFragment" />
+            android:id="@+id/action_settingsLobbyFragment_to_settingsSafeCircleFragment"
+            app:destination="@id/SafeCircleFragment" />
         <action
             android:id="@+id/action_settingsLobbyFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_settingsLobbyFragment_to_aboutAppFragment"
+            app:destination="@id/aboutAppFragment" />
     </fragment>
 
     <fragment
@@ -36,11 +39,11 @@
     </fragment>
 
     <fragment
-        android:id="@+id/pairFragment"
-        android:name="com.example.safeher.auth.safeCircle.SafeCircleFragment"
-        android:label="PairFragment">
+        android:id="@+id/SafeCircleFragment"
+        android:name="com.example.safeher.settings.SafeCircleFragment"
+        android:label="setingsSafeCircleFragment">
         <action
-            android:id="@+id/action_pairFragment_to_settingsLobbyFragment"
+            android:id="@+id/action_settingsSafeCircleFragment_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
     </fragment>
 
@@ -50,6 +53,15 @@
         android:label="ProfileFragment">
         <action
             android:id="@+id/action_profileFragment_to_settingsLobbyFragment"
+            app:destination="@id/settingsLobbyFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aboutAppFragment"
+        android:name="com.example.safeher.settings.AboutAppFragment"
+        android:label="AboutAppFragment">
+        <action
+            android:id="@+id/action_aboutAppFragment_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
     </fragment>
 

@@ -39,11 +39,11 @@
         android:name="com.example.safeher.auth.safeCircle.SafeCircleIntroFragment"
         android:label="SafeCircleIntroFragment" >
         <action
-            android:id="@+id/action_safeCircleIntroFragment_to_pairFragment"
-            app:destination="@id/pairFragment" />
+            android:id="@+id/action_safeCircleIntroFragment_to_safeCircleFragment"
+            app:destination="@id/safeCircleFragment" />
     </fragment>
     <fragment
-        android:id="@+id/pairFragment"
+        android:id="@+id/safeCircleFragment"
         android:name="com.example.safeher.auth.safeCircle.SafeCircleFragment"
         android:label="PairFragment" >
         <action
@@ -62,9 +62,6 @@
             android:id="@+id/action_confirmSafeCircleFragment_to_SOS"
             app:destination="@id/SOSHomeScreenFragment2" />
 
-        <action
-            android:id="@+id/action_confirmSafeCircleFragment_to_pairFragment"
-            app:destination="@id/pairFragment" />
     </fragment>
 
 

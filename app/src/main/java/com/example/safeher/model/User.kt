@@ -8,5 +8,6 @@ data class User(
     val phoneNumber: String = "",
     val idPhotoUrl: String = "",
     val profilePicture: String = "",
-    val accessToken: String? = null
+    val accessToken: String? = null,
+    val safeCircleContacts: List<String> = emptyList<String>()
 )
