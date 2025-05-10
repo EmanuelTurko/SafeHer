@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
 import com.example.safeher.model.Post
 
-class PostAdapter(private val posts: List<Post>) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+class PostAdapter(
+    private val posts: List<Post>,
+    private val onItemClick: (Post) -> Unit
+) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.textViewPost)
@@ -21,6 +24,9 @@ class PostAdapter(private val posts: List<Post>) : RecyclerView.Adapter<PostAdap
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         holder.textView.text = posts[position].body
+        holder.itemView.setOnClickListener {
+            onItemClick(posts[position])
+        }
     }
 
     override fun getItemCount() = posts.size

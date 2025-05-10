@@ -11,9 +11,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
 import com.example.safeher.model.ContactItem
+import com.example.safeher.utils.getStringListShareRef
+import android.content.Context
+import android.util.Log
 
 class ContactAdapter(
-    private val maxSelection: Int = 5
+    private val maxSelection: Int = 5,
+    private val context: Context
 ) : ListAdapter<ContactItem, ContactAdapter.ContactViewHolder>(ContactDiffCallback()) {
 
     private val selectedItems = mutableListOf<ContactItem>()
@@ -33,6 +37,16 @@ class ContactAdapter(
         val item = getItem(position)
         holder.name.text = item.name
         holder.checkbox.isChecked = item.isSelected
+        val Contacts= context.getStringListShareRef("safeCircle", "or")
+
+        for (Contact in Contacts){
+            if (item.phoneNumber == Contact){
+                Log.d("contact", "item:${item.phoneNumber}, contact:${Contact}")
+                holder.checkbox.isChecked= true
+                item.isSelected = true
+                break
+            }
+        }
 
         holder.checkbox.setOnClickListener {
             if (item.isSelected) {

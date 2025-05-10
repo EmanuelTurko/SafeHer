@@ -1,5 +1,6 @@
 package com.example.safeher.home_screen.sisters
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -70,12 +71,23 @@ class SistersFragment :Fragment() {
         lifecycleScope.launch {
             try {
                 val posts = RetroFitClient.getApiService(requireContext()).getAllPosts()
-                postAdapter = PostAdapter(posts)
+                postAdapter = PostAdapter(posts) { post ->
+                    showPostDialog(post)
+                }
                 recyclerView.adapter = postAdapter
             } catch (e: Exception) {
                 Log.e("SistersFragment", "שגיאה בטעינת פוסטים: ${e.message}")
             }
         }
+    }
+    private fun showPostDialog(post: Post) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Post")
+            .setMessage(post.body)
+            .setPositiveButton("Close") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
 }
