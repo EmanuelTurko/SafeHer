@@ -1,6 +1,5 @@
 package com.example.safeher.settings.profile
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -26,6 +25,7 @@ import com.example.safeher.general.showCustomToast
 import com.example.safeher.model.User
 import com.example.safeher.settings.profile.profileViewModel.ProfileState
 import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
+import com.example.safeher.utils.getStringShareRef
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.example.safeher.utils.setupUI
@@ -35,8 +35,8 @@ class ProfileFragment : Fragment() {
     private lateinit var saveButton: MaterialButton
     private lateinit var removeAccountButton: MaterialButton
     private lateinit var nameInput: TextInputEditText
+    private lateinit var phoneInput: TextInputEditText
     private lateinit var emailInput: TextInputEditText
-    private lateinit var passwordInput: TextInputEditText
     private lateinit var addImage: AppCompatImageButton
     private lateinit var profileImage: AppCompatImageView
     private lateinit var loadingDialog: LoadingDialog
@@ -74,11 +74,20 @@ class ProfileFragment : Fragment() {
         saveButton          = view.findViewById(R.id.saveButton)
         removeAccountButton = view.findViewById(R.id.removeAccountButton)
         nameInput           = view.findViewById(R.id.nameEditText)
+        val fullName = requireContext().getStringShareRef("fullName" , "userInfo")
+        nameInput.setText("$fullName")
+        phoneInput           = view.findViewById(R.id.phoneEditText)
+        val phoneNumber = requireContext().getStringShareRef("phoneNumber" , "userInfo")
+        phoneInput.setText("$phoneNumber")
         emailInput          = view.findViewById(R.id.emailEditText)
-        passwordInput       = view.findViewById(R.id.passwordEditText)
+        val email = requireContext().getStringShareRef("email" , "userInfo")
+       emailInput.setText("$email")
         profileImage        = view.findViewById(R.id.ivProfile)
+//        val profilePic = requireContext().getStringShareRef("profilePic" , "userInfo")
+//        profileImage.setText("$profilePic")
         addImage            = view.findViewById(R.id.btnAddPhoto)
         loadingDialog       = LoadingDialog(requireContext())
+
     }
 
     private fun setupClickListeners() {
@@ -133,7 +142,6 @@ class ProfileFragment : Fragment() {
             email          = newEmail,
             password       = originalUser?.password ?: "",
             phoneNumber    = originalUser?.phoneNumber ?: "",
-            birthDate      = originalUser?.birthDate,
             idPhotoUrl     = originalUser?.idPhotoUrl ?: "",
             profilePicture = base64
         )

@@ -6,10 +6,62 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp">
-    <TextView android:id="@+id/textViewPost"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="16sp"
-        android:textColor="@color/button_pink"/>
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/textViewPost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/button_pink"
+            android:text="כאן יופיע תוכן הפוסט" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <ImageButton
+                android:id="@+id/buttonEdit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_edit"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="?attr/colorOnSurface" />
+
+            <ImageButton
+                android:id="@+id/buttonComment"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_comment"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <ImageButton
+                android:id="@+id/buttonLike"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_heart"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <ImageButton
+                android:id="@+id/buttonDelete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_delete"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+        </LinearLayout>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -253,51 +253,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginBottom="16dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_lock"
-                    app:tint="#2D2D2D" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:fontFamily="@font/poppins_medium"
-                    android:text="Password"
-                    android:textColor="#2D2D2D"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passwordInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_edittext_bg"
-                app:boxBackgroundMode="none"
-                app:endIconDrawable="@drawable/ic_edit"
-                app:endIconMode="password_toggle"
-                app:endIconTint="#2D2D2D">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/passwordEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@null"
-                    android:fontFamily="@font/poppins_regular"
-                    android:inputType="textPassword"
-                    android:paddingHorizontal="16dp"
-                    android:textColor="#2D2D2D"
-                    android:textSize="14sp" />
-            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
         <!-- Phone Number Input -->

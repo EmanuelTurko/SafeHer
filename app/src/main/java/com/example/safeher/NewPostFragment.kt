@@ -46,8 +46,7 @@ class NewPostFragment : Fragment() {
     private fun submitPost(text: String) {
         val newPost = Post(
             id = id,
-            body = text,
-            image = null)
+            body = text)
 
         lifecycleScope.launch {
             try {
