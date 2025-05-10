@@ -21,7 +21,7 @@ class SafeCircleIntroFragment : Fragment() {
         _binding = FragmentSafeCircleIntroBinding.inflate(inflater, container, false)
 
         binding.addButton.setOnClickListener {
-            findNavController().navigate(R.id.action_safeCircleIntroFragment_to_pairFragment)
+            findNavController().navigate(R.id.action_safeCircleIntroFragment_to_safeCircleFragment)
         }
 
         return binding.root

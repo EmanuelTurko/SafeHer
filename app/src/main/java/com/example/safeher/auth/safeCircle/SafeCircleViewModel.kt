@@ -27,4 +27,6 @@ class SafeCircleViewModel(private val apiService: ApiService): ViewModel() {
             }
         }
     }
+
+
 }

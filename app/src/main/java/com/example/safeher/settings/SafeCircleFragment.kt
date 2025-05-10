@@ -1,4 +1,4 @@
-package com.example.safeher.auth.safeCircle
+package com.example.safeher.settings
 
 import android.Manifest
 import android.app.AlertDialog
@@ -7,7 +7,9 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -21,15 +23,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
+import com.example.safeher.auth.safeCircle.SafeCircleViewModel
+import com.example.safeher.auth.safeCircle.SafeCircleViewModelFactory
 import com.example.safeher.auth.safeCircle.adapter.ContactAdapter
-import com.example.safeher.databinding.FragmentSafeCircleBinding
+import com.example.safeher.databinding.FragmentSettingsSafeCircleBinding
 import com.example.safeher.model.ContactItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class SafeCircleFragment : Fragment() {
 
-    private var binding: FragmentSafeCircleBinding? = null
+    private var binding: FragmentSettingsSafeCircleBinding? = null
     private lateinit var adapter: ContactAdapter
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var contactsList = mutableListOf<ContactItem>()
@@ -45,12 +49,16 @@ class SafeCircleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSafeCircleBinding.inflate(inflater, container, false)
+        binding = FragmentSettingsSafeCircleBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding?.backButtonCard?.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_settingsLobbyFragment)
+        }
 
         val returnedSelected = arguments?.getParcelableArrayList<ContactItem>("selected_contacts")
         returnedSelected?.let {
@@ -72,7 +80,7 @@ class SafeCircleFragment : Fragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterContacts(newText)
                 if (!newText.isNullOrEmpty()) {
-                    val isRTL = newText.any { it in '\u0590'..'\u05FF' }
+                    val isRTL = newText.any { it in '֐'..'׿' }
                     searchEditText?.textDirection =
                         if (isRTL) View.TEXT_DIRECTION_RTL else View.TEXT_DIRECTION_LTR
                 } else {
@@ -97,10 +105,8 @@ class SafeCircleFragment : Fragment() {
                 val fullName = sharedPref.getString("fullName", null) ?: ""
                 Log.d("PairFragment", "Selected contacts: $selectedNumbers, fullName: $fullName")
 
-                // 1. שמירה ל-MongoDB דרך ה-API
                 safeCircleViewModel.updateUserSafeCircle(fullName, selectedNumbers)
 
-                // 2. שמירה ל-Firestore
                 val userId = FirebaseAuth.getInstance().currentUser?.uid
                 if (userId != null) {
                     val contactMaps = selected.map {

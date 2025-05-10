@@ -52,13 +52,6 @@ class ConfirmSafeCircleFragment : Fragment() {
             findNavController().navigate(R.id.action_confirmSafeCircleFragment_to_SOS)
         }
 
-        binding.backButtonCard.setOnClickListener {
-            val bundle = Bundle().apply {
-                putParcelableArrayList("selected_contacts", ArrayList(contactList))
-            }
-            findNavController().navigate(R.id.action_confirmSafeCircleFragment_to_pairFragment, bundle)
-        }
-
     }
 
     override fun onDestroyView() {

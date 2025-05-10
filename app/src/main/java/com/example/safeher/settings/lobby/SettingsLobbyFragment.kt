@@ -22,6 +22,7 @@ class SettingsLobbyFragment : Fragment() {
     lateinit var mVideoLibraryOption: ConstraintLayout
     lateinit var mPairOption: ConstraintLayout
     lateinit var mProfileOption: ConstraintLayout
+    lateinit var mAboutOption: ConstraintLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +40,7 @@ class SettingsLobbyFragment : Fragment() {
         mVideoLibraryOption = view.findViewById(R.id.videoLibraryOption)
         mPairOption = view.findViewById(R.id.pairOption)
         mProfileOption = view.findViewById(R.id.profileOption)
+        mAboutOption = view.findViewById(R.id.aboutOption)
     }
 
     private fun initListener() {
@@ -46,12 +48,24 @@ class SettingsLobbyFragment : Fragment() {
             activity?.finish()
         }
 
+        mAboutOption.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_aboutAppFragment)
+        }
+
         mLogoutBtn.setOnClickListener {
             val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val clearContacts = requireContext().getSharedPreferences("or", Context.MODE_PRIVATE)
+
             prefs.edit {
                 clear()
                 apply()
             }
+
+            clearContacts.edit {
+                clear()
+                apply()
+            }
+
             val intent = Intent(requireContext(), MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -64,7 +78,7 @@ class SettingsLobbyFragment : Fragment() {
         }
 
         mPairOption.setOnClickListener {
-            findNavController().navigate(R.id.action_settingsLobbyFragment_to_pairFragment)
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_settingsSafeCircleFragment)
         }
 
         mProfileOption.setOnClickListener {
