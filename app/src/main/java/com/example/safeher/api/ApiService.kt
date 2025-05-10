@@ -9,6 +9,7 @@ import com.example.safeher.model.Test
 import com.example.safeher.model.User
 import com.example.safeher.model.api.ApiResponse
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
@@ -42,3 +43,4 @@ interface ApiService {
     @POST("post/")
     suspend fun createPost(@Body post: Post)
 }
+

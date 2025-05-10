@@ -32,6 +32,7 @@ import com.example.safeher.bluetooth.BluetoothController
 import com.example.safeher.home_screen.videoLibrary.VideoViewModel
 import com.example.safeher.settings.SettingsMainActivity
 import com.example.safeher.utils.PermissionManager
+import com.example.safeher.utils.getStringShareRef
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -198,6 +199,8 @@ class SOSHomeScreenFragment : Fragment() {
         mHelperSwitch = view.findViewById(R.id.helperSwitch)
         mHelperStatusText = view.findViewById(R.id.helperStatusText)
         mWelcomeText = view.findViewById(R.id.welcomeText)
+        val fullName = requireContext().getStringShareRef("fullName" , "userInfo")
+        mWelcomeText.text = "Welcome $fullName!"
         mSettingsButtonCard = view.findViewById(R.id.settingsButtonCard)
     }
 
