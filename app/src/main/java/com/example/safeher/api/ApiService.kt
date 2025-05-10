@@ -9,6 +9,7 @@ import com.example.safeher.model.UpdateSafeCircleRequest
 import com.example.safeher.model.Test
 import com.example.safeher.model.User
 import com.example.safeher.model.api.ApiResponse
+import com.example.safeher.model.api.CommentRequest
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
@@ -44,11 +45,11 @@ interface ApiService {
     @POST("post/")
     suspend fun createPost(@Body post: Post)
 
-    @GET("comment/{postId}")
-    suspend fun getComments(@Path("postId") postId: String): List<Comment>
-
-    @POST("comment")
-    suspend fun createComment(@Body comment: Comment): Comment
-
+    @POST("post/{postId}/comment")
+    suspend fun createComment(
+        @Path("postId") postId: String,
+        @Body request: CommentRequest
+    ): ApiResponse<Comment>
 }
+
 

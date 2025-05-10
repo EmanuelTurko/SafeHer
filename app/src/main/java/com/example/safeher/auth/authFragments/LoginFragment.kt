@@ -78,7 +78,8 @@ class LoginFragment : Fragment() {
                 requireContext().setStringShareRef("email" , response.data.email , "userInfo")
                 requireContext().setStringShareRef("password" , response.data.password , "userInfo")
                 requireContext().setStringShareRef("phoneNumber" , response.data.phoneNumber , "userInfo")
-                requireContext().setStringShareRef("profilePic" , response.data.profilePicture , "userInfo")
+                requireContext().setStringShareRef("profilePic" ,
+                    response.data.profilePicture.toString(), "userInfo")
 
                 SharedPrefsHelper(requireContext()).save(REMEMBER_MY_LOGIN, rememberMe)
                 startActivity(Intent(requireActivity(), HomeScreenActivity::class.java))
