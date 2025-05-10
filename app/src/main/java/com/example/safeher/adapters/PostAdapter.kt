@@ -20,7 +20,7 @@ class PostAdapter(private val posts: List<Post>) : RecyclerView.Adapter<PostAdap
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        holder.textView.text = posts[position].text
+        holder.textView.text = posts[position].body
     }
 
     override fun getItemCount() = posts.size
