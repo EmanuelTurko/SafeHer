@@ -78,7 +78,7 @@ class SettingsLobbyFragment : Fragment() {
         }
 
         mPairOption.setOnClickListener {
-            findNavController().navigate(R.id.action_settingsLobbyFragment_to_settingsSafeCircleFragment)
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_mySafeCircleFragment)
         }
 
         mProfileOption.setOnClickListener {

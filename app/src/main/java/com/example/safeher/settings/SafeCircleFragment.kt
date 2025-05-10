@@ -57,7 +57,7 @@ class SafeCircleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.backButtonCard?.setOnClickListener {
-            findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_settingsLobbyFragment)
+            findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment)
         }
 
         val returnedSelected = arguments?.getParcelableArrayList<ContactItem>("selected_contacts")
