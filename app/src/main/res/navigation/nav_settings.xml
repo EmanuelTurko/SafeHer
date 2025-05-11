@@ -44,14 +44,13 @@
     <fragment
         android:id="@+id/SafeCircleFragment"
         android:name="com.example.safeher.settings.SafeCircleFragment"
-        android:label="setingsSafeCircleFragment">
+        android:label="SettingsSafeCircleFragment">
         <action
             android:id="@+id/action_settingsSafeCircleFragment_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
         <action
             android:id="@+id/action_settingsSafeCircleFragment_to_mySafeCircleFragment"
             app:destination="@id/mySafeCircleFragment" />
-
     </fragment>
 
     <fragment
@@ -83,6 +82,4 @@
             android:id="@+id/action_mySafeCircleFragment_to_settingsSafeCircleFragment"
             app:destination="@id/SafeCircleFragment" />
     </fragment>
-
-
 </navigation>

@@ -130,7 +130,7 @@ class SafeCircleFragment : Fragment() {
             val bundle = Bundle().apply {
                 putParcelableArrayList("selected_contacts", ArrayList(selected))
             }
-            findNavController().navigate(R.id.action_PairFragment_to_confirmSafeCircleFragment, bundle)
+            findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment, bundle)
         }
     }
 
