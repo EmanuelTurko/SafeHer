@@ -47,9 +47,9 @@ class NewPostFragment : Fragment() {
         val newPost = Post(
             id = id,
             body = text,
-//            user = TODO(),
+//            user = string,
 //            likes = TODO(),
-//            comments = TODO()
+            comments = arrayListOf()
         )
 
         lifecycleScope.launch {
