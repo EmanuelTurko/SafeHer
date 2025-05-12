@@ -74,14 +74,19 @@ class ProfileFragment : Fragment() {
         saveButton          = view.findViewById(R.id.saveButton)
         removeAccountButton = view.findViewById(R.id.removeAccountButton)
         nameInput           = view.findViewById(R.id.nameEditText)
-        val fullName = requireContext().getStringShareRef("fullName" , "userInfo")
-        nameInput.setText("$fullName")
-        phoneInput           = view.findViewById(R.id.phoneEditText)
-        val phoneNumber = requireContext().getStringShareRef("phoneNumber" , "userInfo")
-        phoneInput.setText("$phoneNumber")
+        val fullName = requireContext()
+            .getStringShareRef("fullName", "userInfo") ?: ""
+        nameInput.setText(fullName)
+
+        phoneInput          = view.findViewById(R.id.phoneEditText)
+        val phoneNumber = requireContext()
+            .getStringShareRef("phoneNumber", "userInfo") ?: ""
+        phoneInput.setText(phoneNumber)
+
         emailInput          = view.findViewById(R.id.emailEditText)
-        val email = requireContext().getStringShareRef("email" , "userInfo")
-       emailInput.setText("$email")
+        val email = requireContext()
+            .getStringShareRef("email", "userInfo") ?: ""
+        emailInput.setText(email)
         profileImage        = view.findViewById(R.id.ivProfile)
 //        val profilePic = requireContext().getStringShareRef("profilePic" , "userInfo")
 //        profileImage.setText("$profilePic")
@@ -106,9 +111,8 @@ class ProfileFragment : Fragment() {
                     state.user?.let { user ->
                         nameInput.setText(user.fullName)
                         emailInput.setText(user.email)
-                        // If your User includes a Base64 profilePicture:
-                        if (user.profilePicture.isNotEmpty()) {
-                            val bmp = viewModel.convertBase64ToBitmap(user.profilePicture)
+                        if (user.profilePicture.isNullOrEmpty()) {
+                            val bmp = viewModel.convertBase64ToBitmap(user.profilePicture.toString())
                             profileImage.setImageBitmap(bmp)
                         }
                     }
