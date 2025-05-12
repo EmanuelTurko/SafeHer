@@ -24,6 +24,7 @@ import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Comment
 import com.example.safeher.model.Post
 import com.example.safeher.model.api.CommentRequest
+import com.example.safeher.utils.DateUtils
 import com.example.safeher.utils.setupUI
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
@@ -81,52 +82,83 @@ class SistersFragment :Fragment() {
 
         lifecycleScope.launch {
             try {
-                val posts = RetroFitClient.getApiService(requireContext()).getAllPosts()
-                postAdapter = PostAdapter(posts) { post ->
+                val postsList: List<Post> = RetroFitClient
+                    .getApiService(requireContext())
+                    .getAllPosts()
+
+                postAdapter = PostAdapter(
+                    requireContext(),
+                    postsList.toMutableList()
+                ) { post ->
                     showPostDialog(post)
                 }
+
                 recyclerView.adapter = postAdapter
             } catch (e: Exception) {
-                Log.e("SistersFragment", "שגיאה בטעינת פוסטים: ${e.message}")
+                Log.e("SistersFragment", "Error loading posts: ${e.message}")
             }
         }
     }
 
+
     private fun showPostDialog(post: Post) {
+        // 1. Inflate custom dialog layout
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_post, null)
 
-        val tvBody = dialogView.findViewById<TextView>(R.id.tvPostBody)
-        val rvComments = dialogView.findViewById<RecyclerView>(R.id.rvComments)
-        val etNewComment = dialogView.findViewById<EditText>(R.id.etNewComment)
+        // 2. Bind views (including author + time)
+        val tvDialogPostAuthor = dialogView.findViewById<TextView>(R.id.tvDialogPostAuthor)
+        val tvDialogPostTime   = dialogView.findViewById<TextView>(R.id.tvDialogPostTime)
+        val tvBody             = dialogView.findViewById<TextView>(R.id.tvPostBody)
+        val rvComments         = dialogView.findViewById<RecyclerView>(R.id.rvComments)
+        val etNewComment       = dialogView.findViewById<EditText>(R.id.etNewComment)
 
-        tvBody.text = post.body
+        // 3. Populate post data
+        tvDialogPostAuthor.text = post.user.fullName
+        tvDialogPostTime.text   = DateUtils.formatDateTime(post.createdAt)
+        tvBody.text             = post.body
 
+        // 4. Setup comments RecyclerView
+        val commentsList    = post.comments.toMutableList()
+        val commentsAdapter = CommentsAdapter(commentsList)
         rvComments.layoutManager = LinearLayoutManager(requireContext())
-        val commentsAdapter = CommentsAdapter(post.comments.toMutableList())
-        rvComments.adapter = commentsAdapter
+        rvComments.adapter        = commentsAdapter
 
-        AlertDialog.Builder(requireContext())
+        // 5. Build dialog without auto-dismiss on “Send”
+        val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
-            .setPositiveButton("Send") { dialog, _ ->
-                val text = etNewComment.text.toString().trim()
-                if (text.isNotEmpty()) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val resp = RetroFitClient.getApiService(requireContext()).createComment(post.id, CommentRequest(text))
-                        withContext(Dispatchers.Main) {
-                            if (resp.data != null) {
-                                commentsAdapter.createComment(resp.data)
-                                etNewComment.text.clear()
-                                rvComments.scrollToPosition(commentsAdapter.itemCount - 1)
-                            } else {
-                                Toast.makeText(requireContext(),
-                                    "שגיאה בשליחת תגובה", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
+            .setNegativeButton("Close", null)
+            .setPositiveButton("Send", null)
+            .create()
+        dialog.show()
+
+        // 6. Handle Send manually so dialog stays open
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val text = etNewComment.text.toString().trim()
+            if (text.isEmpty()) {
+                etNewComment.error = "Write a comment"
+                return@setOnClickListener
+            }
+
+            // 7. Send to server
+            lifecycleScope.launch(Dispatchers.IO) {
+                val resp = RetroFitClient
+                    .getApiService(requireContext())
+                    .createComment(post.id, CommentRequest(text))
+
+                withContext(Dispatchers.Main) {
+                    resp.data?.let { newComment ->
+                        // 8. Add to adapter and scroll
+                        commentsAdapter.addComment(newComment)
+                        etNewComment.text.clear()
+                        rvComments.scrollToPosition(commentsAdapter.itemCount - 1)
+                    } ?: Toast.makeText(
+                        requireContext(),
+                        "Error sending comment",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-            .setNegativeButton("Close") { dialog, _ -> dialog.dismiss() }
-            .show()
+        }
     }
-    }
+}

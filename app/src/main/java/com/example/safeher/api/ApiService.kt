@@ -45,6 +45,11 @@ interface ApiService {
     @POST("post/")
     suspend fun createPost(@Body post: Post)
 
+    @DELETE("post/{postId}")
+    suspend fun deletePost(
+        @Path("postId") postId: String
+    ): Response<Void>
+
     @POST("post/{postId}/comment")
     suspend fun createComment(
         @Path("postId") postId: String,
