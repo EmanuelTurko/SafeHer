@@ -103,9 +103,11 @@ class SafeCircleFragment : Fragment() {
             if (selected.isNotEmpty()) {
                 val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
                 val fullName = sharedPref.getString("fullName", null) ?: ""
-                Log.d("PairFragment", "Selected contacts: $selectedNumbers, fullName: $fullName")
 
-                safeCircleViewModel.updateUserSafeCircle(fullName, selectedNumbers)
+                Log.d("SafeCircleFragment", " Selected contacts: $selected")
+                Log.d("SafeCircleFragment", " Full name from shared preferences: $fullName")
+
+                safeCircleViewModel.updateUserSafeCircle(fullName, selected)
 
                 val userId = FirebaseAuth.getInstance().currentUser?.uid
                 if (userId != null) {

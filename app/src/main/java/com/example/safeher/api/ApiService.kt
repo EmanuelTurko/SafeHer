@@ -27,8 +27,8 @@ interface ApiService {
 
     @POST("auth/updateUserSafeCircle")
     suspend fun updateUserSafeCircle(
-        @Body data: UpdateSafeCircleRequest
-    ): ApiResponse<ContactItem>
+        @Body request: UpdateSafeCircleRequest
+    ): ApiResponse<Unit>
 
     @GET("user/{userId}")
     suspend fun getUserProfile(@Path("userId") userId: String): ApiResponse<User>

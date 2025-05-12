@@ -24,8 +24,6 @@ import com.example.safeher.api.RetroFitClient
 import com.example.safeher.auth.safeCircle.adapter.ContactAdapter
 import com.example.safeher.databinding.FragmentSafeCircleBinding
 import com.example.safeher.model.ContactItem
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 class SafeCircleFragment : Fragment() {
 
@@ -90,41 +88,23 @@ class SafeCircleFragment : Fragment() {
 
         binding?.finishButton?.setOnClickListener {
             val selected = adapter.getSelectedContacts()
-            val selectedNumbers = selected.map { it.phoneNumber }
 
             if (selected.isNotEmpty()) {
                 val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
                 val fullName = sharedPref.getString("fullName", null) ?: ""
-                Log.d("PairFragment", "Selected contacts: $selectedNumbers, fullName: $fullName")
+                Log.d("SafeCircleFragment", "Selected contacts: $selected, fullName: $fullName")
 
-                // 1. שמירה ל-MongoDB דרך ה-API
-                safeCircleViewModel.updateUserSafeCircle(fullName, selectedNumbers)
+                safeCircleViewModel.updateUserSafeCircle(fullName, selected)
 
-                // 2. שמירה ל-Firestore
-                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                if (userId != null) {
-                    val contactMaps = selected.map {
-                        mapOf("name" to it.name, "phone" to normalizePhone(it.phoneNumber))
-                    }
-                    FirebaseFirestore.getInstance()
-                        .collection("safe_circle")
-                        .document(userId)
-                        .set(mapOf("contacts" to contactMaps))
-                        .addOnSuccessListener {
-                            Log.d("SafeCircle", "Contacts saved to Firestore")
-                        }
-                        .addOnFailureListener {
-                            Log.e("SafeCircle", "Failed to save contacts to Firestore", it)
-                        }
+                Toast.makeText(requireActivity(), "Selected: ${selected.joinToString { it.name }}", Toast.LENGTH_LONG).show()
+
+                val bundle = Bundle().apply {
+                    putParcelableArrayList("selected_contacts", ArrayList(selected))
                 }
+                findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment, bundle)
+            } else {
+                Toast.makeText(requireActivity(), "בחרי לפחות איש קשר אחד", Toast.LENGTH_SHORT).show()
             }
-
-            Toast.makeText(requireActivity(), "Selected: ${selected.joinToString { it.name }}", Toast.LENGTH_LONG).show()
-
-            val bundle = Bundle().apply {
-                putParcelableArrayList("selected_contacts", ArrayList(selected))
-            }
-            findNavController().navigate(R.id.action_PairFragment_to_confirmSafeCircleFragment, bundle)
         }
     }
 

@@ -9,24 +9,37 @@ import com.example.safeher.model.UpdateSafeCircleRequest
 import com.example.safeher.model.api.ApiResponse
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.example.safeher.model.ContactPayload
 
 class SafeCircleViewModel(private val apiService: ApiService): ViewModel() {
-    private val _updateSafeCircleResponse = MutableLiveData<ApiResponse<ContactItem>>()
+    private val _updateSafeCircleResponse = MutableLiveData<ApiResponse<Unit>>()
+    val updateSafeCircleResponse = _updateSafeCircleResponse
 
-    fun updateUserSafeCircle(fullName:String, safeCircle: List<String>){
-        viewModelScope.launch{
-            try{
-                val request = UpdateSafeCircleRequest(fullName,safeCircle)
-                Log.d("PairFragment", "Request to update safe circle: $request")
+    fun updateUserSafeCircle(fullName: String, contacts: List<ContactItem>) {
+        viewModelScope.launch {
+            try {
+                Log.d("SafeCircleVM", " Sending request to update safe circle")
+
+                // ממפה רק name ו־phoneNumber – בלי isSelected
+                val contactPayloadList = contacts.map {
+                    ContactPayload(name = it.name, phoneNumber = it.phoneNumber)
+                }
+
+                val request = UpdateSafeCircleRequest(fullName, contactPayloadList)
+                Log.d("SafeCircleVM", "Sending request: $request")
+
                 val response = apiService.updateUserSafeCircle(request)
-                Log.d("PairFragment", "Got update response: $response")
+                Log.d("SafeCircleVM", "Response: $response")
+
                 _updateSafeCircleResponse.postValue(response)
-            } catch(e: Exception){
-                Log.e("PairFragment", "Error updating safe circle: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("SafeCircleVM", "Error updating safe circle", e)
                 _updateSafeCircleResponse.postValue(ApiResponse(error = e.message))
             }
         }
     }
+
+
 
 
 }
