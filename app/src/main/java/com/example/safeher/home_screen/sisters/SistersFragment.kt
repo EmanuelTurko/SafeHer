@@ -30,7 +30,6 @@ import kotlinx.coroutines.withContext
 
 class SistersFragment : Fragment() {
     private lateinit var mBackBtn: CardView
-    private lateinit var mHome: CardView
     private lateinit var recyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
 
@@ -52,7 +51,6 @@ class SistersFragment : Fragment() {
 
     private fun initView(view: View) {
         mBackBtn = view.findViewById(R.id.backButtonCard)
-        mHome = view.findViewById(R.id.homeButtonCard)
         val writePostBtn = view.findViewById<MaterialButton>(R.id.write_new_post_button)
         writePostBtn.setOnClickListener {
             findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
@@ -60,7 +58,7 @@ class SistersFragment : Fragment() {
     }
 
     private fun initListener() {
-        mHome.setOnClickListener {
+        mBackBtn.setOnClickListener {
             findNavController().navigate(R.id.action_sistersFragment_to_SOSHomeScreenFragment)
         }
     }
