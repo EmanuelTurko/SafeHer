@@ -96,24 +96,29 @@ class SistersFragment : Fragment() {
     }
 
     private fun showPostDialog(post: Post) {
+        // 1. Inflate the custom dialog layout
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_post, null)
 
+        // 2. Bind views
         val tvDialogPostAuthor = dialogView.findViewById<TextView>(R.id.tvDialogPostAuthor)
         val tvDialogPostTime   = dialogView.findViewById<TextView>(R.id.tvDialogPostTime)
         val tvBody             = dialogView.findViewById<TextView>(R.id.tvPostBody)
         val rvComments         = dialogView.findViewById<RecyclerView>(R.id.rvComments)
         val etNewComment       = dialogView.findViewById<EditText>(R.id.etNewComment)
 
-        tvDialogPostAuthor.text = post.user?.fullName ?: "Anonymous"
+        // 3. Populate post data
+        tvDialogPostAuthor.text = post.user.fullName
         tvDialogPostTime.text   = DateUtils.formatDateTime(post.createdAt)
         tvBody.text             = post.body
 
-        val commentsList    = post.comments.toMutableList()
-        val commentsAdapter = CommentsAdapter(commentsList)
+        // 4. Use the original mutable list so updates persist
+        val commentsList = post.comments
+        val commentsAdapter = CommentsAdapter(requireContext(), commentsList)
         rvComments.layoutManager = LinearLayoutManager(requireContext())
-        rvComments.adapter        = commentsAdapter
+        rvComments.adapter       = commentsAdapter
 
+        // 5. Build and show the dialog
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setNegativeButton("Close", null)
@@ -126,6 +131,7 @@ class SistersFragment : Fragment() {
             .create()
         dialog.show()
 
+        // 6. Handle the Send button manually so dialog stays open
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val text = etNewComment.text.toString().trim()
             if (text.isEmpty()) {
@@ -133,23 +139,29 @@ class SistersFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // 7. Send the new comment to the server
             lifecycleScope.launch(Dispatchers.IO) {
                 val resp = RetroFitClient
                     .getApiService(requireContext())
                     .createComment(post.id, CommentRequest(text))
 
                 withContext(Dispatchers.Main) {
-                    resp.data?.let { newComment ->
-                        commentsAdapter.addComment(newComment)
+                    if (resp.data != null) {
+                        // 8. Add to the same list and notify adapter
+                        commentsList.add(resp.data)
+                        commentsAdapter.notifyItemInserted(commentsList.size - 1)
                         etNewComment.text.clear()
-                        rvComments.scrollToPosition(commentsAdapter.itemCount - 1)
-                    } ?: Toast.makeText(
-                        requireContext(),
-                        "Error sending comment",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        rvComments.scrollToPosition(commentsList.size - 1)
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Error sending comment",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
     }
+
 }
