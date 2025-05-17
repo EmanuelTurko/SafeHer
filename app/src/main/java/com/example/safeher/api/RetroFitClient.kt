@@ -19,19 +19,6 @@ object RetroFitClient {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(LOCAL_URL)
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        return retrofit.create(ApiService::class.java)
-    }
-
-
-    fun getApiServicePublic(): ApiService {
-        val client = OkHttpClient.Builder().build()
-
-        val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
@@ -39,4 +26,17 @@ object RetroFitClient {
 
         return retrofit.create(ApiService::class.java)
     }
+
+
+//    fun getApiServicePublic(): ApiService {
+//        val client = OkHttpClient.Builder().build()
+//
+//        val retrofit = Retrofit.Builder()
+//            .baseUrl(BASE_URL)
+//            .client(client)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+//
+//        return retrofit.create(ApiService::class.java)
+//    }
 }

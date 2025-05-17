@@ -1,11 +1,14 @@
 package com.example.safeher.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
@@ -20,7 +23,8 @@ import retrofit2.Response
 class PostAdapter(
     private val context: Context,
     private val posts: MutableList<Post>,
-    private val showPostDialog: (Post) -> Unit
+    private val showPostDialog: (Post) -> Unit,
+    private val onEditPost: (Post) -> Unit
 ) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,6 +33,7 @@ class PostAdapter(
         val tvBody: TextView     = itemView.findViewById(R.id.textViewPost)
         val ivDelete: ImageView  = itemView.findViewById(R.id.buttonDelete)
         val ivComment: ImageView = itemView.findViewById(R.id.buttonComment)
+        val ivEdit: ImageButton  = itemView.findViewById(R.id.buttonEdit)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -40,7 +45,7 @@ class PostAdapter(
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = posts[position]
 
-        holder.tvAuthor.text = post.user.fullName
+        holder.tvAuthor.text = post.user?.fullName ?: "Anonymous"
         holder.tvTime.text   = DateUtils.formatDateTime(post.createdAt)
         holder.tvBody.text   = post.body
 
@@ -54,7 +59,11 @@ class PostAdapter(
                         posts.removeAt(position)
                         notifyItemRemoved(position)
                     } else {
-                        // אפשר להציג Toast לשגיאה
+                        Log.e("PostAdapter", "deletePost failed: ${response.code()} / ${response.errorBody()?.string()}")
+                        Toast.makeText(context,
+                            "Failed to delete post: ${response.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -62,6 +71,10 @@ class PostAdapter(
 
         holder.ivComment.setOnClickListener {
             showPostDialog(post)
+        }
+
+        holder.ivEdit.setOnClickListener {
+            onEditPost(post)
         }
     }
 

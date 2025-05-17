@@ -10,6 +10,9 @@ import com.example.safeher.model.Test
 import com.example.safeher.model.User
 import com.example.safeher.model.api.ApiResponse
 import com.example.safeher.model.api.CommentRequest
+import com.example.safeher.model.api.CreatePostRequest
+import com.example.safeher.model.api.CreatePostResponse
+import com.example.safeher.model.api.GenericResponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
@@ -39,11 +42,18 @@ interface ApiService {
         @Body user: User
     ): ApiResponse<Unit>
 
+    @POST("post/")
+    suspend fun createPost(@Body request: CreatePostRequest
+    ): Response<CreatePostResponse>
+
     @GET("post/")
     suspend fun getAllPosts(): List<Post>
 
-    @POST("post/")
-    suspend fun createPost(@Body post: Post)
+    @PUT("post/{postId}")
+    suspend fun editPost(
+        @Path("postId") postId: String,
+        @Body request: CreatePostRequest
+    ): Response<GenericResponse>
 
     @DELETE("post/{postId}")
     suspend fun deletePost(

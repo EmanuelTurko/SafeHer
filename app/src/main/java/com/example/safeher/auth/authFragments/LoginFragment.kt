@@ -76,7 +76,7 @@ class LoginFragment : Fragment() {
 
                 requireContext().setStringShareRef("fullName" , response.data.fullName , "userInfo")
                 requireContext().setStringShareRef("email" , response.data.email , "userInfo")
-                requireContext().setStringShareRef("password" , response.data.password , "userInfo")
+//                requireContext().setStringShareRef("password" , response.data.password , "userInfo")
                 requireContext().setStringShareRef("phoneNumber" , response.data.phoneNumber , "userInfo")
                 requireContext().setStringShareRef("profilePic" ,
                     response.data.profilePicture.toString(), "userInfo")
