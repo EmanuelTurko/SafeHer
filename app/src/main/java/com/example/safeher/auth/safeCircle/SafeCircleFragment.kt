@@ -101,7 +101,7 @@ class SafeCircleFragment : Fragment() {
                 val bundle = Bundle().apply {
                     putParcelableArrayList("selected_contacts", ArrayList(selected))
                 }
-                findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment, bundle)
+                findNavController().navigate(R.id.action_safeCircleFragment_to_confirmSafeCircleFragment)
             } else {
                 Toast.makeText(requireActivity(), "בחרי לפחות איש קשר אחד", Toast.LENGTH_SHORT).show()
             }

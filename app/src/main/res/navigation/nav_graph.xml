@@ -15,6 +15,7 @@
             android:id="@+id/action_homePageFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.safeher.auth.authFragments.LoginFragment"
@@ -23,6 +24,7 @@
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.safeher.auth.authFragments.RegisterFragment"
@@ -34,6 +36,7 @@
             android:id="@+id/action_registerFragment_to_safeCircleIntroFragment"
             app:destination="@id/safeCircleIntroFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/safeCircleIntroFragment"
         android:name="com.example.safeher.auth.safeCircle.SafeCircleIntroFragment"
@@ -42,6 +45,7 @@
             android:id="@+id/action_safeCircleIntroFragment_to_safeCircleFragment"
             app:destination="@id/safeCircleFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/safeCircleFragment"
         android:name="com.example.safeher.auth.safeCircle.SafeCircleFragment"
@@ -52,30 +56,24 @@
         <action
             android:id="@+id/action_PairFragment_to_confirmSafeCircleFragment"
             app:destination="@id/confirmSafeCircleFragment" />
+        <action
+            android:id="@+id/action_safeCircleFragment_to_confirmSafeCircleFragment"
+            app:destination="@id/confirmSafeCircleFragment" />
+
     </fragment>
+
     <fragment
         android:id="@+id/confirmSafeCircleFragment"
         android:name="com.example.safeher.auth.safeCircle.ConfirmSafeCircleFragment"
         android:label="ConfirmSafeCircleFragment" >
-
         <action
             android:id="@+id/action_confirmSafeCircleFragment_to_SOS"
             app:destination="@id/SOSHomeScreenFragment2" />
-
     </fragment>
-
 
     <fragment
         android:id="@+id/SOSHomeScreenFragment2"
         android:name="com.example.safeher.home_screen.sos.SOSHomeScreenFragment"
         android:label="SOSHomeScreenFragment" />
-    <!--<fragment
-        android:id="@+id/profileFragment2"
-        android:name="com.example.safeher.settings.profile.ProfileFragment"
-        android:label="ProfileFragment">
-    <argument
-        android:name="isAfterRegistrationScreen"
-        app:argType="boolean" />
-    </fragment> -->
 
 </navigation>

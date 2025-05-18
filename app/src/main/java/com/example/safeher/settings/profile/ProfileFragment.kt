@@ -140,6 +140,13 @@ class ProfileFragment : Fragment() {
         val bmp    = profileImage.drawable.toBitmap()
         val base64 = viewModel.convertBitmapToBase64(bmp)
 
+        val jsonContacts = requireContext().getStringShareRef("safeCircle", "userInfo")
+        val contactList = if (jsonContacts.isNotEmpty()) {
+            com.google.gson.Gson().fromJson(jsonContacts, Array<com.example.safeher.model.ContactItem>::class.java).toList()
+        } else {
+            emptyList()
+        }
+
         val user = User(
             id             = userId,
             fullName       = newName,
@@ -147,9 +154,11 @@ class ProfileFragment : Fragment() {
             password       = originalUser?.password ?: "",
             phoneNumber    = originalUser?.phoneNumber ?: "",
             idPhotoUrl     = originalUser?.idPhotoUrl ?: "",
-            profilePicture = base64
+            profilePicture = base64,
+            safeCircleContacts = contactList
         )
         viewModel.saveUserData(user)
+
     }
 
     private fun onRemoveAccountClicked() {
