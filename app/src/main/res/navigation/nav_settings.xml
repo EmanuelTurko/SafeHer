@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_settingsLobbyFragment_to_mySafeCircleFragment"
             app:destination="@id/mySafeCircleFragment" />
+        <action
+            android:id="@+id/action_settingsLobbyFragment_to_questionsAndAnswersFragment"
+            app:destination="@id/questionsAndAnswersFragment" />
     </fragment>
 
     <fragment
@@ -43,7 +46,6 @@
         android:id="@+id/SafeCircleFragment"
         android:name="com.example.safeher.settings.SafeCircleFragment"
         android:label="SettingsSafeCircleFragment">
-
         <action
             android:id="@+id/action_settingsSafeCircleFragment_to_mySafeCircleFragment"
             app:destination="@id/mySafeCircleFragment" />
@@ -77,5 +79,14 @@
         <action
             android:id="@+id/action_mySafeCircleFragment_to_settingsSafeCircleFragment"
             app:destination="@id/SafeCircleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/questionsAndAnswersFragment"
+        android:name="com.example.safeher.settings.QuestionsAndAnswersFragment"
+        android:label="QuestionsAndAnswersFragment">
+        <action
+            android:id="@+id/action_questionsAndAnswersFragment_to_settingsLobbyFragment"
+            app:destination="@id/settingsLobbyFragment" />
     </fragment>
 </navigation>

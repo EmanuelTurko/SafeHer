@@ -1,6 +1,5 @@
 package com.example.safeher.settings.lobby
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,25 +8,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
-import androidx.core.content.edit
 import com.example.safeher.auth.MainActivity
 
 class SettingsLobbyFragment : Fragment() {
 
-    lateinit var mBackBtn: CardView
-    lateinit var mLogoutBtn: CardView
-    lateinit var mVideoLibraryOption: ConstraintLayout
-    lateinit var mPairOption: ConstraintLayout
-    lateinit var mProfileOption: ConstraintLayout
-    lateinit var mAboutOption: ConstraintLayout
+    private lateinit var mBackBtn: CardView
+    private lateinit var mLogoutBtn: CardView
+    private lateinit var mVideoLibraryOption: ConstraintLayout
+    private lateinit var mPairOption: ConstraintLayout
+    private lateinit var mProfileOption: ConstraintLayout
+    private lateinit var mAboutOption: ConstraintLayout
+    private lateinit var mQuestionsOption: ConstraintLayout  // ← זה תואם ל־qaOption ב־XML
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
         initView(view)
         initListener()
@@ -41,6 +41,7 @@ class SettingsLobbyFragment : Fragment() {
         mPairOption = view.findViewById(R.id.pairOption)
         mProfileOption = view.findViewById(R.id.profileOption)
         mAboutOption = view.findViewById(R.id.aboutOption)
+        mQuestionsOption = view.findViewById(R.id.qaOption)  // ← תואם ל־XML
     }
 
     private fun initListener() {
@@ -50,6 +51,10 @@ class SettingsLobbyFragment : Fragment() {
 
         mAboutOption.setOnClickListener {
             findNavController().navigate(R.id.action_settingsLobbyFragment_to_aboutAppFragment)
+        }
+
+        mQuestionsOption.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_questionsAndAnswersFragment)
         }
 
         mLogoutBtn.setOnClickListener {
