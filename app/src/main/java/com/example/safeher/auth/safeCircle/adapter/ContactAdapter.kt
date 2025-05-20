@@ -13,14 +13,11 @@ import com.example.safeher.R
 import com.example.safeher.model.ContactItem
 import com.example.safeher.utils.getStringListShareRef
 import android.content.Context
-import android.util.Log
 
 class ContactAdapter(
     private val maxSelection: Int = 5,
     private val context: Context
 ) : ListAdapter<ContactItem, ContactAdapter.ContactViewHolder>(ContactDiffCallback()) {
-
-    private val selectedItems = mutableListOf<ContactItem>()
 
     inner class ContactViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val checkbox: CheckBox = view.findViewById(R.id.checkbox)
@@ -36,47 +33,42 @@ class ContactAdapter(
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val item = getItem(position)
         holder.name.text = item.name
-        holder.checkbox.isChecked = item.isSelected
-        val Contacts= context.getStringListShareRef("safeCircle", "or")
 
-        for (Contact in Contacts){
-            if (item.phoneNumber == Contact){
-                Log.d("contact", "item:${item.phoneNumber}, contact:${Contact}")
-                holder.checkbox.isChecked= true
-                item.isSelected = true
-                break
-            }
+        // מסמן אנשי קשר שהיו שמורים בעבר (מ־SharedPreferences)
+        val savedNumbers = context.getStringListShareRef("safeCircle", "or")
+        if (savedNumbers.contains(item.phoneNumber)) {
+            item.isSelected = true
         }
 
+        holder.checkbox.isChecked = item.isSelected
+
         holder.checkbox.setOnClickListener {
-            if (item.isSelected) {
+            item.isSelected = !item.isSelected
+
+            if (item.isSelected && getSelectedContacts().size > maxSelection) {
                 item.isSelected = false
-                selectedItems.removeAll { it.phoneNumber == item.phoneNumber }
-            } else {
-                if (selectedItems.size >= maxSelection) {
-                    Toast.makeText(
-                        holder.itemView.context,
-                        "You can only select up to $maxSelection contacts.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    holder.checkbox.isChecked = false
-                    return@setOnClickListener
-                }
-                item.isSelected = true
-                selectedItems.add(item)
+                holder.checkbox.isChecked = false
+                Toast.makeText(
+                    context,
+                    "You can only select up to $maxSelection contacts.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
             }
+
             notifyItemChanged(position)
         }
     }
 
     override fun getItemCount(): Int = currentList.size
 
-    fun getSelectedContacts(): List<ContactItem> = selectedItems
+    // מחזיר את כל אנשי הקשר שסומנו בפועל
+    fun getSelectedContacts(): List<ContactItem> {
+        return currentList.filter { it.isSelected }
+    }
 
+    // מסמן אנשי קשר שהיו נבחרים במסך קודם
     fun setPreSelectedContacts(preSelected: List<ContactItem>) {
-        selectedItems.clear()
-        selectedItems.addAll(preSelected)
-
         val updatedList = currentList.map { contact ->
             contact.copy(isSelected = preSelected.any { it.phoneNumber == contact.phoneNumber })
         }

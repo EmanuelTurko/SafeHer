@@ -10,7 +10,7 @@ import com.example.safeher.R
 import com.example.safeher.model.ContactItem
 
 class ConfirmContactsAdapter(
-    private val contacts: List<ContactItem>,
+    private val contacts: MutableList<ContactItem>,
     private val onDeleteClick: (ContactItem) -> Unit
 ) : RecyclerView.Adapter<ConfirmContactsAdapter.ConfirmViewHolder>() {
 
@@ -38,5 +38,19 @@ class ConfirmContactsAdapter(
         holder.bind(contacts[position])
     }
 
-    override fun getItemCount() = contacts.size
+    override fun getItemCount(): Int = contacts.size
+
+    fun removeContact(contact: ContactItem) {
+        val position = contacts.indexOf(contact)
+        if (position != -1) {
+            contacts.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    fun updateContacts(newList: List<ContactItem>) {
+        contacts.clear()
+        contacts.addAll(newList)
+        notifyDataSetChanged()
+    }
 }

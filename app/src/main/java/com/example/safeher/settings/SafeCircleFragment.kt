@@ -28,8 +28,8 @@ import com.example.safeher.auth.safeCircle.SafeCircleViewModelFactory
 import com.example.safeher.auth.safeCircle.adapter.ContactAdapter
 import com.example.safeher.databinding.FragmentSettingsSafeCircleBinding
 import com.example.safeher.model.ContactItem
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.safeher.utils.setStringShareRef
+import com.google.gson.Gson
 
 class SafeCircleFragment : Fragment() {
 
@@ -75,17 +75,11 @@ class SafeCircleFragment : Fragment() {
         searchEditText?.setHintTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
 
         binding?.pairSearchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-
+            override fun onQueryTextSubmit(query: String?) = false
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterContacts(newText)
-                if (!newText.isNullOrEmpty()) {
-                    val isRTL = newText.any { it in '֐'..'׿' }
-                    searchEditText?.textDirection =
-                        if (isRTL) View.TEXT_DIRECTION_RTL else View.TEXT_DIRECTION_LTR
-                } else {
-                    searchEditText?.textDirection = View.TEXT_DIRECTION_LTR
-                }
+                val isRTL = newText?.any { it in '֐'..'׿' } == true
+                searchEditText?.textDirection = if (isRTL) View.TEXT_DIRECTION_RTL else View.TEXT_DIRECTION_LTR
                 return true
             }
         })
@@ -98,34 +92,17 @@ class SafeCircleFragment : Fragment() {
 
         binding?.finishButton?.setOnClickListener {
             val selected = adapter.getSelectedContacts()
-            val selectedNumbers = selected.map { it.phoneNumber }
 
-            if (selected.isNotEmpty()) {
-                val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
-                val fullName = sharedPref.getString("fullName", null) ?: ""
+            // שמירה ל־SharedPreferences
+            val json = Gson().toJson(selected)
+            requireContext().setStringShareRef("safe_circle_contacts", json, "safeher_prefs")
 
-                Log.d("SafeCircleFragment", " Selected contacts: $selected")
-                Log.d("SafeCircleFragment", " Full name from shared preferences: $fullName")
+            // שליפת שם מלא מה־SharedPreferences
+            val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
+            val fullName = sharedPref.getString("fullName", null) ?: ""
 
-                safeCircleViewModel.updateUserSafeCircle(fullName, selected)
-
-                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                if (userId != null) {
-                    val contactMaps = selected.map {
-                        mapOf("name" to it.name, "phone" to normalizePhone(it.phoneNumber))
-                    }
-                    FirebaseFirestore.getInstance()
-                        .collection("safe_circle")
-                        .document(userId)
-                        .set(mapOf("contacts" to contactMaps))
-                        .addOnSuccessListener {
-                            Log.d("SafeCircle", "Contacts saved to Firestore")
-                        }
-                        .addOnFailureListener {
-                            Log.e("SafeCircle", "Failed to save contacts to Firestore", it)
-                        }
-                }
-            }
+            // עדכון ל־MongoDB דרך ViewModel
+            safeCircleViewModel.updateUserSafeCircle(fullName, selected)
 
             Toast.makeText(requireActivity(), "Selected: ${selected.joinToString { it.name }}", Toast.LENGTH_LONG).show()
 
@@ -140,23 +117,21 @@ class SafeCircleFragment : Fragment() {
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            if (isGranted) {
-                loadContacts()
-            } else {
-                Toast.makeText(requireActivity(), "Permission denied", Toast.LENGTH_SHORT).show()
-            }
+            if (isGranted) loadContacts()
+            else Toast.makeText(requireActivity(), "Permission denied", Toast.LENGTH_SHORT).show()
         }
         checkContactPermission()
     }
 
     private fun checkContactPermission() {
         when {
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_CONTACTS) ==
-                    PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_CONTACTS)
+                    == PackageManager.PERMISSION_GRANTED -> {
                 loadContacts()
             }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_CONTACTS) -> {
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.READ_CONTACTS
+            ) -> {
                 AlertDialog.Builder(requireActivity())
                     .setTitle("Permission Required")
                     .setMessage("We need access to your contacts to display them.")
@@ -166,7 +141,6 @@ class SafeCircleFragment : Fragment() {
                     .setNegativeButton("Deny", null)
                     .show()
             }
-
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
             }
