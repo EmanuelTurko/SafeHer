@@ -1,7 +1,7 @@
 package com.example.safeher.settings
 
-import android.os.Bundle
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +20,7 @@ import com.example.safeher.utils.getStringShareRef
 import com.example.safeher.utils.setStringShareRef
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.google.android.material.button.MaterialButton
 
 class MySafeCircleFragment : Fragment() {
 
@@ -48,18 +49,29 @@ class MySafeCircleFragment : Fragment() {
 
         initRecycler()
 
+        // האם המשתמש הגיע אחרי הרשמה או מעגל ריק?
+        val showDone = arguments?.getBoolean("showDone", false) ?: false
+
         binding.backButtonCard.setOnClickListener {
             findNavController().navigate(R.id.action_mySafeCircleFragment_to_settingsLobbyFragment)
         }
 
-        binding.editButton.setOnClickListener {
-            val bundle = Bundle().apply {
-                putParcelableArrayList("selected_contacts", ArrayList(contactList))
+        if (showDone) {
+            binding.editText.text = "DONE"
+            binding.editButton.setOnClickListener {
+                findNavController().navigate(R.id.action_mySafeCircleFragment_to_settingsLobbyFragment)
             }
-            findNavController().navigate(
-                R.id.action_mySafeCircleFragment_to_settingsSafeCircleFragment,
-                bundle
-            )
+        } else {
+            binding.editText.text = "EDIT"
+            binding.editButton.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putParcelableArrayList("selected_contacts", ArrayList(contactList))
+                }
+                findNavController().navigate(
+                    R.id.action_mySafeCircleFragment_to_settingsSafeCircleFragment,
+                    bundle
+                )
+            }
         }
     }
 
@@ -99,11 +111,6 @@ class MySafeCircleFragment : Fragment() {
             .getString("fullName", "") ?: return
 
         safeCircleViewModel.updateUserSafeCircle(fullName, contactList)
-    }
-
-    private fun normalizePhone(phone: String): String {
-        return phone.replace(Regex("[^\\d+]"), "")
-            .replace("^0".toRegex(), "+972")
     }
 
     override fun onDestroyView() {

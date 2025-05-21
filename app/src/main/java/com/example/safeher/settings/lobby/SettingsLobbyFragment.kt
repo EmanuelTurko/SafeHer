@@ -3,6 +3,7 @@ package com.example.safeher.settings.lobby
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +23,7 @@ class SettingsLobbyFragment : Fragment() {
     private lateinit var mPairOption: ConstraintLayout
     private lateinit var mProfileOption: ConstraintLayout
     private lateinit var mAboutOption: ConstraintLayout
-    private lateinit var mQuestionsOption: ConstraintLayout  // ← זה תואם ל־qaOption ב־XML
+    private lateinit var mQuestionsOption: ConstraintLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +42,7 @@ class SettingsLobbyFragment : Fragment() {
         mPairOption = view.findViewById(R.id.pairOption)
         mProfileOption = view.findViewById(R.id.profileOption)
         mAboutOption = view.findViewById(R.id.aboutOption)
-        mQuestionsOption = view.findViewById(R.id.qaOption)  // ← תואם ל־XML
+        mQuestionsOption = view.findViewById(R.id.qaOption)
     }
 
     private fun initListener() {
@@ -83,11 +84,26 @@ class SettingsLobbyFragment : Fragment() {
         }
 
         mPairOption.setOnClickListener {
-            findNavController().navigate(R.id.action_settingsLobbyFragment_to_mySafeCircleFragment)
+            handleSafeCircleNavigation()
         }
 
         mProfileOption.setOnClickListener {
             findNavController().navigate(R.id.action_settingsLobbyFragment_to_profileFragment)
+        }
+    }
+
+    private fun handleSafeCircleNavigation() {
+        val sharedPref = requireContext().getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+        val json = sharedPref.getString("safe_circle_contacts", null)
+
+        Log.d("SafeCircleCheck", "SharedPref JSON: $json") // לשם בדיקה בלוג
+
+        val isEmptyList = json.isNullOrEmpty() || json == "[]"
+
+        if (isEmptyList) {
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_safeCircleIntroFragment)
+        } else {
+            findNavController().navigate(R.id.action_settingsLobbyFragment_to_mySafeCircleFragment)
         }
     }
 }

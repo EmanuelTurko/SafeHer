@@ -1,4 +1,4 @@
-package com.example.safeher.auth.safeCircle
+package com.example.safeher.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
