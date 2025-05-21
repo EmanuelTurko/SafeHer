@@ -33,7 +33,6 @@
             android:id="@+id/action_settingsLobbyFragment_to_questionsAndAnswersFragment"
             app:destination="@id/questionsAndAnswersFragment" />
 
-        <!-- נוספה הפעולה החסרה כאן -->
         <action
             android:id="@+id/action_settingsLobbyFragment_to_safeCircleIntroFragment"
             app:destination="@id/safeCircleIntroFragment" />

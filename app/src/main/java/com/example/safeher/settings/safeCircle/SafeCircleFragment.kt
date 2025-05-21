@@ -1,3 +1,4 @@
+// SafeCircleFragment.kt
 package com.example.safeher.settings.safeCircle
 
 import android.Manifest
@@ -27,7 +28,6 @@ import com.example.safeher.auth.safeCircle.SafeCircleViewModelFactory
 import com.example.safeher.auth.safeCircle.adapter.ContactAdapter
 import com.example.safeher.databinding.FragmentSettingsSafeCircleBinding
 import com.example.safeher.model.ContactItem
-import com.example.safeher.utils.setStringShareRef
 import com.google.gson.Gson
 
 class SafeCircleFragment : Fragment() {
@@ -55,134 +55,158 @@ class SafeCircleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Back nav
         binding?.backButtonCard?.setOnClickListener {
             findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment)
         }
 
-        val returnedSelected = arguments?.getParcelableArrayList<ContactItem>("selected_contacts")
-        returnedSelected?.let {
-            preSelectedContacts = it
-        }
+        // If coming back with edited contacts
+        preSelectedContacts = arguments
+            ?.getParcelableArrayList<ContactItem>("selected_contacts")
 
         initView()
-        getContent()
-
-        val searchEditText = binding?.pairSearchView?.findViewById<AutoCompleteTextView>(
-            androidx.appcompat.R.id.search_src_text
-        )
-        searchEditText?.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-        searchEditText?.setHintTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-
-        binding?.pairSearchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?) = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterContacts(newText)
-                val isRTL = newText?.any { it in '֐'..'׿' } == true
-                searchEditText?.textDirection = if (isRTL) View.TEXT_DIRECTION_RTL else View.TEXT_DIRECTION_LTR
-                return true
-            }
-        })
+        requestContactsPermission()
+        setupSearch()
     }
 
     private fun initView() {
-        binding?.recyclerViewContacts?.layoutManager = LinearLayoutManager(requireContext())
+        binding?.recyclerViewContacts?.layoutManager =
+            LinearLayoutManager(requireContext())
         adapter = ContactAdapter(5, requireContext())
         binding?.recyclerViewContacts?.adapter = adapter
 
         binding?.finishButton?.setOnClickListener {
             val selected = adapter.getSelectedContacts()
 
-            // שמירה ל־SharedPreferences
+            // 1. Pull currentUserId
+            val authPrefs = requireContext()
+                .getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val currentUserId = authPrefs.getString("userId", "") ?: ""
+
+            // 2. Save under per-user key
+            val prefs = requireContext()
+                .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+            val key = "safe_circle_contacts_$currentUserId"
             val json = Gson().toJson(selected)
-            requireContext().setStringShareRef("safe_circle_contacts", json, "safeher_prefs")
+            prefs.edit().putString(key, json).apply()
 
-            // שליפת שם מלא מה־SharedPreferences
-            val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
-            val fullName = sharedPref.getString("fullName", null) ?: ""
-
-            // עדכון ל־MongoDB דרך ViewModel
+            // 3. Update backend
+            val fullName = requireContext()
+                .getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
+                .getString("fullName", "") ?: ""
             safeCircleViewModel.updateUserSafeCircle(fullName, selected)
 
-            Toast.makeText(requireActivity(), "Selected: ${selected.joinToString { it.name }}", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                requireActivity(),
+                "Selected: ${selected.joinToString { it.name }}",
+                Toast.LENGTH_LONG
+            ).show()
 
+            // 4. Navigate back with flag
             val bundle = Bundle().apply {
                 putParcelableArrayList("selected_contacts", ArrayList(selected))
                 putBoolean("showDone", true)
             }
-            findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment, bundle)
+            findNavController().navigate(
+                R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment,
+                bundle
+            )
         }
     }
 
-    private fun getContent() {
+    private fun setupSearch() {
+        val searchEditText = binding?.pairSearchView
+            ?.findViewById<AutoCompleteTextView>(
+                androidx.appcompat.R.id.search_src_text
+            )
+        searchEditText?.setTextColor(
+            ContextCompat.getColor(requireContext(), android.R.color.black)
+        )
+        searchEditText?.setHintTextColor(
+            ContextCompat.getColor(requireContext(), android.R.color.black)
+        )
+        binding?.pairSearchView?.setOnQueryTextListener(object :
+            SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?) = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterContacts(newText)
+                val isRTL = newText?.any { it in '֐'..'׿' } == true
+                searchEditText?.textDirection = if (isRTL)
+                    View.TEXT_DIRECTION_RTL
+                else
+                    View.TEXT_DIRECTION_LTR
+                return true
+            }
+        })
+    }
+
+    private fun requestContactsPermission() {
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) loadContacts()
-            else Toast.makeText(requireActivity(), "Permission denied", Toast.LENGTH_SHORT).show()
+        ) { granted ->
+            if (granted) loadContacts()
+            else Toast.makeText(
+                requireActivity(),
+                "Permission denied",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-        checkContactPermission()
-    }
-
-    private fun checkContactPermission() {
         when {
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_CONTACTS)
-                    == PackageManager.PERMISSION_GRANTED -> {
-                loadContacts()
-            }
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.READ_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED -> loadContacts()
+
             ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(), Manifest.permission.READ_CONTACTS
-            ) -> {
-                AlertDialog.Builder(requireActivity())
-                    .setTitle("Permission Required")
-                    .setMessage("We need access to your contacts to display them.")
-                    .setPositiveButton("Allow") { _, _ ->
-                        requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-                    }
-                    .setNegativeButton("Deny", null)
-                    .show()
-            }
-            else -> {
-                requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-            }
+                requireActivity(),
+                Manifest.permission.READ_CONTACTS
+            ) -> AlertDialog.Builder(requireActivity())
+                .setTitle("Permission Required")
+                .setMessage("We need access to your contacts to display them.")
+                .setPositiveButton("Allow") { _, _ ->
+                    requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                }
+                .setNegativeButton("Deny", null)
+                .show()
+
+            else -> requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
     }
 
     private fun loadContacts() {
         contactsList = mutableListOf()
-        val cursor = context?.contentResolver?.query(
+        val cursor = requireContext().contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             null, null, null, null
         )
-
         cursor?.use {
-            val nameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-            val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-
+            val nameIdx = it.getColumnIndex(
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+            )
+            val numIdx = it.getColumnIndex(
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+            )
             while (it.moveToNext()) {
-                val name = it.getString(nameIndex)
-                val number = it.getString(numberIndex)
-                val isSelected = preSelectedContacts?.any { it.phoneNumber == number } == true
-                contactsList.add(ContactItem(name, number, isSelected))
+                val name = it.getString(nameIdx)
+                val num = it.getString(numIdx)
+                val isSel = preSelectedContacts
+                    ?.any { it.phoneNumber == num } == true
+                contactsList.add(ContactItem(name, num, isSel))
             }
         }
-
         adapter.submitList(contactsList)
     }
 
     private fun filterContacts(query: String?) {
-        if (query.isNullOrEmpty()) {
-            adapter.submitList(contactsList)
+        val filtered = if (query.isNullOrBlank()) {
+            contactsList
         } else {
-            val filteredList = contactsList.filter {
-                it.name.contains(query, ignoreCase = true)
+            contactsList.filter {
+                it.name.contains(query, true) ||
+                        it.phoneNumber.contains(query)
             }
-            adapter.submitList(filteredList)
         }
-    }
-
-    private fun normalizePhone(phone: String): String {
-        return phone.replace(Regex("[^\\d+]"), "")
-            .replace("^0".toRegex(), "+972")
+        adapter.submitList(filtered)
     }
 
     override fun onDestroyView() {

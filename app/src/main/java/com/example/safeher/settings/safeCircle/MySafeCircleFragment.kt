@@ -1,3 +1,4 @@
+// MySafeCircleFragment.kt
 package com.example.safeher.settings.safeCircle
 
 import android.content.Context
@@ -5,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -16,8 +18,6 @@ import com.example.safeher.auth.safeCircle.SafeCircleViewModelFactory
 import com.example.safeher.auth.safeCircle.adapter.ConfirmContactsAdapter
 import com.example.safeher.databinding.FragmentMySafeCircleBinding
 import com.example.safeher.model.ContactItem
-import com.example.safeher.utils.getStringShareRef
-import com.example.safeher.utils.setStringShareRef
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -46,25 +46,27 @@ class MySafeCircleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initRecycler()
-
-        // האם המשתמש הגיע אחרי הרשמה או מעגל ריק?
-        val showDone = arguments?.getBoolean("showDone", false) ?: false
-
+        // Back button
         binding.backButtonCard.setOnClickListener {
-            findNavController().navigate(R.id.action_mySafeCircleFragment_to_settingsLobbyFragment)
+            findNavController().navigate(
+                R.id.action_mySafeCircleFragment_to_settingsLobbyFragment
+            )
         }
 
-        if (showDone) {
-            binding.editText.text = "DONE"
-            binding.editButton.setOnClickListener {
-                findNavController().navigate(R.id.action_mySafeCircleFragment_to_settingsLobbyFragment)
-            }
-        } else {
-            binding.editText.text = "EDIT"
-            binding.editButton.setOnClickListener {
+        // DONE vs EDIT based on navigation flag
+        val showDone = arguments?.getBoolean("showDone", false) ?: false
+        binding.editText.text = if (showDone) "DONE" else "EDIT"
+        binding.editButton.setOnClickListener {
+            if (showDone) {
+                findNavController().navigate(
+                    R.id.action_mySafeCircleFragment_to_settingsLobbyFragment
+                )
+            } else {
                 val bundle = Bundle().apply {
-                    putParcelableArrayList("selected_contacts", ArrayList(contactList))
+                    putParcelableArrayList(
+                        "selected_contacts",
+                        ArrayList(contactList)
+                    )
                 }
                 findNavController().navigate(
                     R.id.action_mySafeCircleFragment_to_settingsSafeCircleFragment,
@@ -72,6 +74,8 @@ class MySafeCircleFragment : Fragment() {
                 )
             }
         }
+
+        initRecycler()
     }
 
     override fun onResume() {
@@ -87,28 +91,47 @@ class MySafeCircleFragment : Fragment() {
             updateMongo()
             adapter.updateContacts(contactList)
         }
-        binding.recyclerViewConfirm.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewConfirm.layoutManager =
+            LinearLayoutManager(requireContext())
         binding.recyclerViewConfirm.adapter = adapter
     }
 
     private fun loadContactsFromPrefs() {
-        val json = requireContext().getStringShareRef("safe_circle_contacts", "safeher_prefs")
-        if (json.isNotEmpty()) {
+        // 1. currentUserId
+        val authPrefs = requireContext()
+            .getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val currentUserId = authPrefs.getString("userId", "") ?: ""
+
+        // 2. load JSON under per-user key
+        val prefs = requireContext()
+            .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+        val key = "safe_circle_contacts_$currentUserId"
+        val json = prefs.getString(key, "") ?: ""
+
+        contactList = if (json.isNotEmpty()) {
             val type = object : TypeToken<List<ContactItem>>() {}.type
-            contactList = Gson().fromJson(json, type)
+            Gson().fromJson<List<ContactItem>>(json, type).toMutableList()
+        } else {
+            mutableListOf()
         }
     }
 
     private fun updateSharedPrefs() {
+        val authPrefs = requireContext()
+            .getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val currentUserId = authPrefs.getString("userId", "") ?: ""
+
+        val prefs = requireContext()
+            .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+        val key = "safe_circle_contacts_$currentUserId"
         val updatedJson = Gson().toJson(contactList)
-        requireContext().setStringShareRef("safe_circle_contacts", updatedJson, "safeher_prefs")
+        prefs.edit().putString(key, updatedJson).apply()
     }
 
     private fun updateMongo() {
         val fullName = requireContext()
             .getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
             .getString("fullName", "") ?: return
-
         safeCircleViewModel.updateUserSafeCircle(fullName, contactList)
     }
 

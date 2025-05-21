@@ -14,6 +14,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
 import com.example.safeher.auth.MainActivity
+import com.example.safeher.model.ContactItem
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class SettingsLobbyFragment : Fragment() {
 
@@ -79,7 +82,10 @@ class SettingsLobbyFragment : Fragment() {
         }
 
         mVideoLibraryOption.setOnClickListener {
-            val action = SettingsLobbyFragmentDirections.actionSettingsLobbyFragmentToVideoLibraryFragment2(true)
+            val action =
+                SettingsLobbyFragmentDirections.actionSettingsLobbyFragmentToVideoLibraryFragment2(
+                    true
+                )
             findNavController().navigate(action)
         }
 
@@ -93,17 +99,37 @@ class SettingsLobbyFragment : Fragment() {
     }
 
     private fun handleSafeCircleNavigation() {
-        val sharedPref = requireContext().getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
-        val json = sharedPref.getString("safe_circle_contacts", null)
+        val authPrefs = requireContext()
+            .getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val currentUserId = authPrefs.getString("userId", "") ?: ""
 
-        Log.d("SafeCircleCheck", "SharedPref JSON: $json") // לשם בדיקה בלוג
+        val sharedPref = requireContext()
+            .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+        val key = "safe_circle_contacts_${currentUserId}"
+        val json = sharedPref.getString(key, null)
+
+        Log.d("SafeCircleCheck", "Saved contacts for user $currentUserId: $json")
 
         val isEmptyList = json.isNullOrEmpty() || json == "[]"
 
         if (isEmptyList) {
-            findNavController().navigate(R.id.action_settingsLobbyFragment_to_safeCircleIntroFragment)
+            findNavController().navigate(
+                R.id.action_settingsLobbyFragment_to_safeCircleIntroFragment
+            )
         } else {
-            findNavController().navigate(R.id.action_settingsLobbyFragment_to_mySafeCircleFragment)
+            val type = object : TypeToken<List<ContactItem>>() {}.type
+            val selectedList: ArrayList<ContactItem> =
+                Gson().fromJson(json, type) as ArrayList<ContactItem>
+
+//            val bundle = Bundle().apply {
+//                putParcelableArrayList("selected_contacts", selectedList)
+//                putBoolean("showDone", true)
+//            }
+            findNavController().navigate(
+                R.id.action_settingsLobbyFragment_to_mySafeCircleFragment,
+//                bundle
+            )
         }
     }
 }
+
