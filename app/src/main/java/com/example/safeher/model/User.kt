@@ -3,7 +3,8 @@ package com.example.safeher.model
 import com.google.gson.annotations.SerializedName
 
 data class User(
-    @SerializedName("_id") val id: String,
+    @SerializedName(value = "id", alternate = ["_id"])
+    val id: String,
     @SerializedName("fullName") val fullName: String,
     @SerializedName("profilePicture") val profilePicture: String?,
     val email: String = "",
