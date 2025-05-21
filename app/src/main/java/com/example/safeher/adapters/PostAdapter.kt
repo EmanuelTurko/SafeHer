@@ -14,11 +14,15 @@ import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Post
 import com.example.safeher.utils.DateUtils
+import com.example.safeher.utils.getStringShareRef
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import com.example.safeher.utils.getStringShareRef
+
+
 
 class PostAdapter(
     private val context: Context,
@@ -44,12 +48,26 @@ class PostAdapter(
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = posts[position]
+        Log.d("PostAdapter", "post JSON = $post")
+
 
         holder.tvAuthor.text = post.user?.fullName ?: "Anonymous"
         holder.tvTime.text   = DateUtils.formatDateTime(post.createdAt)
         holder.tvBody.text   = post.body
 
+        val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val currentUserId = prefs?.getString("userId", "") ?: ""
+
+        val isOwner = post.user.id == currentUserId
+
+        Log.d("PostAdapter", "currentUserId=$currentUserId, postOwnerId=${post.user.id}")
+
+
+        holder.ivEdit.visibility   = if (isOwner) View.VISIBLE else View.GONE
+        holder.ivDelete.visibility = if (isOwner) View.VISIBLE else View.GONE
+
         holder.ivDelete.setOnClickListener {
+            if (!isOwner) return@setOnClickListener
             CoroutineScope(Dispatchers.IO).launch {
                 val response: Response<Void> = RetroFitClient
                     .getApiService(context)
@@ -74,7 +92,7 @@ class PostAdapter(
         }
 
         holder.ivEdit.setOnClickListener {
-            onEditPost(post)
+            if (isOwner) onEditPost(post)
         }
     }
 

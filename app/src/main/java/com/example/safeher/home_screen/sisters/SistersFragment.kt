@@ -1,6 +1,7 @@
 package com.example.safeher.home_screen.sisters
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -110,23 +111,34 @@ class SistersFragment : Fragment() {
         tvDialogPostTime.text   = DateUtils.formatDateTime(post.createdAt)
         tvBody.text             = post.body
 
-        // 4. Use the original mutable list so updates persist
-        val commentsList = post.comments
+        // 4. Load comments
+        val commentsList = post.comments.toMutableList()
         val commentsAdapter = CommentsAdapter(requireContext(), commentsList)
         rvComments.layoutManager = LinearLayoutManager(requireContext())
         rvComments.adapter       = commentsAdapter
 
-        // 5. Build and show the dialog
-        val dialog = AlertDialog.Builder(requireContext())
+        // 4.5 Retrieve currentUserId and check ownership
+        val prefs = requireContext()
+            .getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val currentUserId = prefs.getString("userId", "") ?: ""
+        val isOwner = post.user.id == currentUserId
+
+        // 5. Build the dialog
+        val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setNegativeButton("Close", null)
-            .setNeutralButton("Edit") { _, _ ->
+
+        // 5.5 Only add Edit button if the current user is the post owner
+        if (isOwner) {
+            builder.setNeutralButton("Edit") { _, _ ->
                 val action = SistersFragmentDirections
                     .actionSistersFragmentToEditPostFragment(post.id, post.body)
                 findNavController().navigate(action)
             }
-            .setPositiveButton("Send", null)
-            .create()
+        }
+
+        builder.setPositiveButton("Send", null)
+        val dialog = builder.create()
         dialog.show()
 
         // 6. Handle the Send button manually so dialog stays open
@@ -138,7 +150,7 @@ class SistersFragment : Fragment() {
             }
 
             // 7. Send the new comment to the server
-            lifecycleScope.launch(Dispatchers.IO) {
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val resp = RetroFitClient
                     .getApiService(requireContext())
                     .createComment(post.id, CommentRequest(text))
@@ -161,5 +173,6 @@ class SistersFragment : Fragment() {
             }
         }
     }
+
 
 }

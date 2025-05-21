@@ -32,7 +32,6 @@ class EditPostFragment : Fragment() {
         editTextPostContent = view.findViewById(R.id.editTextPostContent)
         buttonSavePost     = view.findViewById(R.id.buttonSavePost)
 
-        // ממלאים את הטקסט הקיים
         editTextPostContent.setText(args.currentBody)
 
         buttonSavePost.setOnClickListener {
