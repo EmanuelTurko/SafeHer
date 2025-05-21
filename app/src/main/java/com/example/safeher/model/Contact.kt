@@ -1,4 +1,4 @@
-package com.example.safeher.settings
+package com.example.safeher.model
 
 data class Contact(
     var name: String = "",
@@ -15,8 +15,8 @@ data class Contact(
     companion object {
         fun normalizePhone(phone: String): String {
             return phone
-                .replace(Regex("[^\\d+]"), "")       // מסיר רווחים, מקפים, סוגריים וכו'
-                .replace("^0".toRegex(), "+972")     // המרה מ־050 ל־+97250
+                .replace(Regex("[^\\d+]"), "")
+                .replace("^0".toRegex(), "+972")
         }
     }
 }

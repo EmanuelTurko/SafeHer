@@ -1,9 +1,10 @@
-package com.example.safeher.settings
+package com.example.safeher.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.databinding.ItemContactBinding
+import com.example.safeher.model.Contact
 
 class ContactsAdapter(
     private val contacts: List<Contact>,

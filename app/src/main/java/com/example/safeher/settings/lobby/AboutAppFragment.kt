@@ -1,13 +1,13 @@
-package com.example.safeher.settings
+package com.example.safeher.settings.lobby
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.safeher.databinding.FragmentAboutAppBinding
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
+import com.example.safeher.databinding.FragmentAboutAppBinding
 
 class AboutAppFragment : Fragment() {
 

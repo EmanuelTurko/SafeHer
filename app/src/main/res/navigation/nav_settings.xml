@@ -53,7 +53,7 @@
 
     <fragment
         android:id="@+id/SafeCircleFragment"
-        android:name="com.example.safeher.settings.SafeCircleFragment"
+        android:name="com.example.safeher.settings.safeCircle.SafeCircleFragment"
         android:label="SettingsSafeCircleFragment">
         <action
             android:id="@+id/action_settingsSafeCircleFragment_to_mySafeCircleFragment"
@@ -71,7 +71,7 @@
 
     <fragment
         android:id="@+id/aboutAppFragment"
-        android:name="com.example.safeher.settings.AboutAppFragment"
+        android:name="com.example.safeher.settings.lobby.AboutAppFragment"
         android:label="AboutAppFragment">
         <action
             android:id="@+id/action_aboutAppFragment_to_settingsLobbyFragment"
@@ -80,7 +80,7 @@
 
     <fragment
         android:id="@+id/mySafeCircleFragment"
-        android:name="com.example.safeher.settings.MySafeCircleFragment"
+        android:name="com.example.safeher.settings.safeCircle.MySafeCircleFragment"
         android:label="MySafeCircleFragment">
         <action
             android:id="@+id/action_mySafeCircleFragment_to_settingsLobbyFragment"
@@ -92,7 +92,7 @@
 
     <fragment
         android:id="@+id/questionsAndAnswersFragment"
-        android:name="com.example.safeher.settings.QuestionsAndAnswersFragment"
+        android:name="com.example.safeher.settings.lobby.QuestionsAndAnswersFragment"
         android:label="QuestionsAndAnswersFragment">
         <action
             android:id="@+id/action_questionsAndAnswersFragment_to_settingsLobbyFragment"
@@ -101,7 +101,7 @@
 
     <fragment
         android:id="@+id/safeCircleIntroFragment"
-        android:name="com.example.safeher.settings.SafeCircleIntroFragment"
+        android:name="com.example.safeher.settings.safeCircle.SafeCircleIntroFragment"
         android:label="SafeCircleIntroFragment">
         <action
             android:id="@+id/action_safeCircleIntroFragment_to_safeCircleFragment"

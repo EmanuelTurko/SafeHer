@@ -23,9 +23,6 @@
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_SOSHomeScreenFragment2"
-            app:destination="@id/SOSHomeScreenFragment2" />
     </fragment>
 
     <fragment
@@ -35,33 +32,33 @@
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
-<!--        <action-->
-<!--            android:id="@+id/action_registerFragment_to_safeCircleIntroFragment"-->
-<!--            app:destination="@id/safeCircleIntroFragment" />-->
+        <action
+            android:id="@+id/action_registerFragment_to_safeCircleIntroFragment"
+            app:destination="@id/safeCircleIntroFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/safeCircleIntroFragment"
         android:name="com.example.safeher.auth.safeCircle.SafeCircleIntroFragment"
         android:label="SafeCircleIntroFragment" >
-<!--        <action-->
-<!--            android:id="@+id/action_safeCircleIntroFragment_to_safeCircleFragment"-->
-<!--            app:destination="@id/safeCircleFragment" />-->
+        <action
+            android:id="@+id/action_safeCircleIntroFragment_to_safeCircleFragment"
+            app:destination="@id/safeCircleFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/safeCircleFragment"
         android:name="com.example.safeher.auth.safeCircle.SafeCircleFragment"
         android:label="PairFragment" >
-<!--        <action-->
-<!--            android:id="@+id/action_PairFragment_to_loginFragment"-->
-<!--            app:destination="@id/SOSHomeScreenFragment2" />-->
-<!--        <action-->
-<!--            android:id="@+id/action_PairFragment_to_confirmSafeCircleFragment"-->
-<!--            app:destination="@id/confirmSafeCircleFragment" />-->
-<!--        <action-->
-<!--            android:id="@+id/action_safeCircleFragment_to_confirmSafeCircleFragment"-->
-<!--            app:destination="@id/confirmSafeCircleFragment" />-->
+        <action
+            android:id="@+id/action_PairFragment_to_loginFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
+        <action
+            android:id="@+id/action_PairFragment_to_confirmSafeCircleFragment"
+            app:destination="@id/confirmSafeCircleFragment" />
+        <action
+            android:id="@+id/action_safeCircleFragment_to_confirmSafeCircleFragment"
+            app:destination="@id/confirmSafeCircleFragment" />
 
     </fragment>
 
@@ -69,13 +66,13 @@
         android:id="@+id/confirmSafeCircleFragment"
         android:name="com.example.safeher.auth.safeCircle.ConfirmSafeCircleFragment"
         android:label="ConfirmSafeCircleFragment" >
-<!--        <action-->
-<!--            android:id="@+id/action_confirmSafeCircleFragment_to_SOS"-->
-<!--            app:destination="@id/SOSHomeScreenFragment2" />-->
+        <action
+            android:id="@+id/action_confirmSafeCircleFragment_to_SOS"
+            app:destination="@id/SOSHomeScreenFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/SOSHomeScreenFragment2"
+        android:id="@+id/SOSHomeScreenFragment"
         android:name="com.example.safeher.home_screen.sos.SOSHomeScreenFragment"
         android:label="SOSHomeScreenFragment" />
 

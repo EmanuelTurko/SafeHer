@@ -1,4 +1,4 @@
-package com.example.safeher.settings
+package com.example.safeher.settings.safeCircle
 
 import android.content.Context
 import android.os.Bundle
@@ -20,7 +20,6 @@ import com.example.safeher.utils.getStringShareRef
 import com.example.safeher.utils.setStringShareRef
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.google.android.material.button.MaterialButton
 
 class MySafeCircleFragment : Fragment() {
 
