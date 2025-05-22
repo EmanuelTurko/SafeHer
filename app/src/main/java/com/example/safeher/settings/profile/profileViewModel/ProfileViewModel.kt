@@ -1,13 +1,14 @@
 package com.example.safeher.settings.profile.profileViewModel
 
+import ProfileState
 import android.app.Application
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.lifecycle.*
 import com.example.safeher.model.User
 import com.example.safeher.settings.profile.profileRepository.ProfileRepository
+import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
@@ -24,23 +25,33 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     _profileState.value = ProfileState.GetUserDataSuccess(user)
                 }
                 .onFailure { ex ->
-                    _profileState.value = ProfileState.ProfileError(ex.message
-                        ?: "Error loading profile")
+                    _profileState.value = ProfileState.ProfileError(ex.message ?: "Error loading profile")
                 }
         }
     }
 
     fun saveUserData(user: User) {
-        val uid = user.id ?: return
         _profileState.value = ProfileState.Loading
         viewModelScope.launch {
-            repo.saveUserData(uid, user)
+            repo.saveUserData(user.id ?: return@launch, user)
                 .onSuccess {
                     _profileState.value = ProfileState.SaveUserDataSuccess
                 }
                 .onFailure { ex ->
-                    _profileState.value = ProfileState.ProfileError(ex.message
-                        ?: "Error saving profile")
+                    _profileState.value = ProfileState.ProfileError(ex.message ?: "Error saving profile")
+                }
+        }
+    }
+
+    fun deleteAccount(userId: String) {
+        _profileState.value = ProfileState.Loading
+        viewModelScope.launch {
+            repo.deleteAccount(userId)
+                .onSuccess {
+                    _profileState.value = ProfileState.DeleteAccountSuccess
+                }
+                .onFailure { ex ->
+                    _profileState.value = ProfileState.ProfileError(ex.message ?: "Error deleting account")
                 }
         }
     }

@@ -70,6 +70,11 @@ interface ApiService {
     suspend fun deleteComment(
         @Path("commentId") commentId: String
     ): Response<Void>
+
+    @DELETE("users/{id}")
+    suspend fun deleteUserAccount(
+        @Path("id") userId: String
+    ): ApiResponse<Unit>
 }
 
 
