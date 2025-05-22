@@ -65,11 +65,12 @@ class VideoLibraryFragment :Fragment() {
 
         mHome.setOnClickListener {
             if (isFromSettings) {
-                findNavController().navigate(R.id.action_videoLibraryFragment2_to_settingsLobbyFragment)
+                findNavController().navigate(R.id.action_videoLibraryFragment2_to_SOSHomeScreenFragment)
             } else {
                 findNavController().navigate(R.id.action_videoLibraryFragment_to_SOSHomeScreenFragment)
             }
         }
+
     }
         private fun setupRecyclerView(){
             recyclerView.layoutManager = LinearLayoutManager(requireContext())

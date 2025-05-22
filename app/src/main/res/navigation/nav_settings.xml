@@ -40,11 +40,15 @@
 
     <fragment
         android:id="@+id/videoLibraryFragment2"
+
         android:name="com.example.safeher.home_screen.videoLibrary.VideoLibraryFragment"
         android:label="VideoLibraryFragment">
         <action
             android:id="@+id/action_videoLibraryFragment2_to_settingsLobbyFragment"
-            app:destination="@id/settingsLobbyFragment" />
+            app:destination="@id/settingsLobbyFragment"/>
+        <action
+            android:id="@+id/action_videoLibraryFragment2_to_SOSHomeScreenFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
         <argument
             android:name="from_settings"
             app:argType="boolean" />
@@ -106,4 +110,11 @@
             android:id="@+id/action_safeCircleIntroFragment_to_safeCircleFragment"
             app:destination="@id/SafeCircleFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/SOSHomeScreenFragment"
+        android:name="com.example.safeher.home_screen.sos.SOSHomeScreenFragment"
+        android:label="SOSHomeScreenFragment" />
+
+
 </navigation>
