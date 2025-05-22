@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream
 class ProfileFragment : Fragment() {
 
     private lateinit var saveButton: MaterialButton
+    private lateinit var mHome: CardView
 
     private lateinit var mBackBtn: CardView
     private lateinit var removeAccountButton: MaterialButton
@@ -78,9 +79,15 @@ class ProfileFragment : Fragment() {
         mBackBtn.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsLobbyFragment)
         }
+        mHome.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_SOSHomeScreenFragment)
+        }
     }
 
+
     private fun initializeViews(view: View) {
+        mHome = view.findViewById(R.id.homeButtonCard)
+
         mBackBtn = view.findViewById(R.id.backButtonCard)
         saveButton          = view.findViewById(R.id.saveButton)
         removeAccountButton = view.findViewById(R.id.removeAccountButton)
@@ -93,6 +100,7 @@ class ProfileFragment : Fragment() {
         loadingDialog       = LoadingDialog(requireContext())
 
     }
+
 
     private fun seedLocalFields() {
         val local = requireContext()
