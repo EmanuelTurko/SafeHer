@@ -29,6 +29,7 @@ import com.example.safeher.model.LoginRequest
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import android.util.Log
+import androidx.core.os.requestProfiling
 import com.example.safeher.utils.setStringShareRef
 import com.example.safeher.utils.setupUI
 
@@ -73,6 +74,9 @@ class LoginFragment : Fragment() {
 
                 val idPref = context?.getSharedPreferences("auth", Context.MODE_PRIVATE)
                 idPref?.edit()?.putString("userId", response.data.id)?.apply()
+
+
+
 
                 requireContext().setStringShareRef("fullName" , response.data.fullName , "userInfo")
                 requireContext().setStringShareRef("email" , response.data.email , "userInfo")

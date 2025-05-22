@@ -16,10 +16,12 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
 import com.example.safeher.auth.MainActivity
 import com.example.safeher.general.LoadingDialog
@@ -36,6 +38,8 @@ import java.io.ByteArrayOutputStream
 class ProfileFragment : Fragment() {
 
     private lateinit var saveButton: MaterialButton
+
+    private lateinit var mBackBtn: CardView
     private lateinit var removeAccountButton: MaterialButton
     private lateinit var nameInput: TextInputEditText
     private lateinit var phoneInput: TextInputEditText
@@ -63,14 +67,21 @@ class ProfileFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         initializeViews(view)
+        initListener()
         setupClickListeners()
         setupObservers()
         seedLocalFields()
         viewModel.getUserData(userId)
         return view
     }
+    private fun initListener() {
+        mBackBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_settingsLobbyFragment)
+        }
+    }
 
     private fun initializeViews(view: View) {
+        mBackBtn = view.findViewById(R.id.backButtonCard)
         saveButton          = view.findViewById(R.id.saveButton)
         removeAccountButton = view.findViewById(R.id.removeAccountButton)
         nameInput           = view.findViewById(R.id.nameEditText)
@@ -80,6 +91,7 @@ class ProfileFragment : Fragment() {
         profileImage.setImageResource(R.drawable.profile)
         addImage            = view.findViewById(R.id.btnAddPhoto)
         loadingDialog       = LoadingDialog(requireContext())
+
     }
 
     private fun seedLocalFields() {
