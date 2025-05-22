@@ -4,20 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
+<<<<<<< HEAD
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+=======
+>>>>>>> 30578be17cb2c7fcf1c45a3d4ceb9561c11d61dd
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -29,11 +27,13 @@ import com.example.safeher.general.showCustomToast
 import com.example.safeher.model.ContactItem
 import com.example.safeher.model.User
 import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
-import com.example.safeher.utils.setupUI
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import java.io.ByteArrayOutputStream
+import androidx.core.content.edit
+import androidx.core.graphics.scale
 
 class ProfileFragment : Fragment() {
 
@@ -41,10 +41,15 @@ class ProfileFragment : Fragment() {
 
     private lateinit var mBackBtn: CardView
     private lateinit var removeAccountButton: MaterialButton
+
+    private lateinit var nameLayout: TextInputLayout
+    private lateinit var emailLayout: TextInputLayout
+    private lateinit var phoneLayout: TextInputLayout
+
     private lateinit var nameInput: TextInputEditText
-    private lateinit var phoneInput: TextInputEditText
     private lateinit var emailInput: TextInputEditText
-    private lateinit var addImage: AppCompatImageButton
+    private lateinit var phoneInput: TextInputEditText
+
     private lateinit var profileImage: AppCompatImageView
     private lateinit var loadingDialog: LoadingDialog
 
@@ -54,10 +59,10 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val authPrefs = requireContext()
+        userId = requireContext()
             .getSharedPreferences("auth", Context.MODE_PRIVATE)
-        userId = authPrefs.getString("userId", "") ?: ""
-        Log.d("ProfileFragment", "Loaded userId = '$userId'")
+            .getString("userId", "") ?: ""
+        Log.d("ProfileFragment", "Loaded userId='$userId'")
     }
 
     override fun onCreateView(
@@ -66,12 +71,37 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
+<<<<<<< HEAD
         initializeViews(view)
         initListener()
+=======
+
+        saveButton          = view.findViewById(R.id.saveButton)
+        removeAccountButton = view.findViewById(R.id.removeAccountButton)
+
+        nameLayout  = view.findViewById(R.id.nameInputLayout)
+        emailLayout = view.findViewById(R.id.emailInputLayout)
+        phoneLayout = view.findViewById(R.id.phoneInputLayout)
+
+        nameInput  = view.findViewById(R.id.nameEditText)
+        emailInput = view.findViewById(R.id.emailEditText)
+        phoneInput = view.findViewById(R.id.phoneEditText)
+
+        profileImage = view.findViewById(R.id.ivProfile)
+        loadingDialog = LoadingDialog(requireContext())
+
+        setupEndIconListeners()
+>>>>>>> 30578be17cb2c7fcf1c45a3d4ceb9561c11d61dd
         setupClickListeners()
         setupObservers()
         seedLocalFields()
-        viewModel.getUserData(userId)
+
+        // Only fetch from server if we have no local cache yet
+        val prefs = requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        if (prefs.getString("fullName", null).isNullOrEmpty()) {
+            viewModel.getUserData(userId)
+        }
+
         return view
     }
     private fun initListener() {
@@ -80,6 +110,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
+<<<<<<< HEAD
     private fun initializeViews(view: View) {
         mBackBtn = view.findViewById(R.id.backButtonCard)
         saveButton          = view.findViewById(R.id.saveButton)
@@ -107,13 +138,29 @@ class ProfileFragment : Fragment() {
                     BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 )
             }
+=======
+    private fun setupEndIconListeners() {
+        nameLayout.setEndIconOnClickListener {
+            nameInput.isEnabled = true
+            nameInput.isFocusableInTouchMode = true
+            nameInput.requestFocus()
+        }
+        emailLayout.setEndIconOnClickListener {
+            emailInput.isEnabled = true
+            emailInput.isFocusableInTouchMode = true
+            emailInput.requestFocus()
+        }
+        phoneLayout.setEndIconOnClickListener {
+            phoneInput.isEnabled = true
+            phoneInput.isFocusableInTouchMode = true
+            phoneInput.requestFocus()
+>>>>>>> 30578be17cb2c7fcf1c45a3d4ceb9561c11d61dd
         }
     }
 
     private fun setupClickListeners() {
         saveButton.setOnClickListener { onSaveClicked() }
         removeAccountButton.setOnClickListener { onRemoveAccountClicked() }
-        addImage.setOnClickListener { openGallery() }
     }
 
     private fun setupObservers() {
@@ -124,42 +171,50 @@ class ProfileFragment : Fragment() {
 
                 is ProfileState.GetUserDataSuccess -> {
                     originalUser = state.user
-                    state.user?.let { user ->
-                        nameInput.setText(user.fullName)
-                        phoneInput.setText(user.phoneNumber)
-                        emailInput.setText(user.email)
-                        if (!user.profilePicture.isNullOrEmpty()) {
-                            val bmp = viewModel.convertBase64ToBitmap(user.profilePicture)
-                            profileImage.setImageBitmap(bmp)
-                        }
+                    state.user?.let { u ->
+                        nameInput.setText(u.fullName)
+                        emailInput.setText(u.email)
+                        phoneInput.setText(u.phoneNumber)
+                        u.profilePicture
+                            ?.takeIf { it.isNotEmpty() }
+                            ?.let { b64 ->
+                                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                profileImage.setImageBitmap(
+                                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                                )
+                            }
                     }
+                    lockAllFields()
+                    // also seed local so next entry uses cache
+                    saveToLocalPrefs(
+                        nameInput.text.toString(),
+                        emailInput.text.toString(),
+                        phoneInput.text.toString(),
+                        originalUser?.profilePicture.orEmpty()
+                    )
                 }
 
                 ProfileState.SaveUserDataSuccess -> {
                     showCustomToast("פרטי המשתמש נשמרו בהצלחה")
-                    // Update local cache
-                    val prefs = requireContext()
-                        .getSharedPreferences("userInfo", Context.MODE_PRIVATE)
-                    prefs.edit().apply {
-                        putString("fullName", nameInput.text.toString().trim())
-                        putString("email",   emailInput.text.toString().trim())
-                        putString("phoneNumber", phoneInput.text.toString().trim())
-                        profileImage.drawable?.toBitmap()?.let {
-                            val out = ByteArrayOutputStream()
-                            it.compress(Bitmap.CompressFormat.PNG, 100, out)
-                            putString("profilePic", Base64.encodeToString(out.toByteArray(), Base64.DEFAULT))
-                        }
-                        apply()
-                    }
-                    // Re-fetch to refresh UI from server if desired
-                    viewModel.getUserData(userId)
+                    // update cache
+                    saveToLocalPrefs(
+                        nameInput.text.toString(),
+                        emailInput.text.toString(),
+                        phoneInput.text.toString(),
+                        // picture already updated in prefs by our code below
+                        requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+                            .getString("profilePic", "") ?: ""
+                    )
+                    lockAllFields()
                 }
 
                 ProfileState.DeleteAccountSuccess -> {
+                    requireContext()
+                        .getSharedPreferences("auth", Context.MODE_PRIVATE)
+                        .edit { clear() }
                     startActivity(
-                        Intent(requireContext(), MainActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
+                        Intent(requireContext(), MainActivity::class.java)
+                            .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
                     )
                 }
 
@@ -171,85 +226,80 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun onSaveClicked() {
-        val newName  = nameInput.text.toString().trim()
-        val newEmail = emailInput.text.toString().trim()
-        val newPhone = phoneInput.text.toString().trim()
-        if (newName.isEmpty() || newEmail.isEmpty()) {
-            showCustomToast("אנא מלא/י שם ודוא\"ל")
-            return
-        }
+    private fun seedLocalFields() {
+        val prefs = requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        nameInput.setText(prefs.getString("fullName", ""))
+        emailInput.setText(prefs.getString("email", ""))
+        phoneInput.setText(prefs.getString("phoneNumber", ""))
 
-        // Prepare profile picture
+        prefs.getString("profilePic", null)
+            ?.takeIf { it.length > 100 }
+            ?.let { b64 ->
+                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                profileImage.setImageBitmap(
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                )
+            }
+
+        lockAllFields()
+    }
+
+    private fun saveToLocalPrefs(name: String, email: String, phone: String, picBase64: String) {
+        val prefs = requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putString("fullName", name)
+            putString("email", email)
+            putString("phoneNumber", phone)
+            putString("profilePic", picBase64)
+            apply()
+        }
+    }
+
+    private fun lockAllFields() {
+        nameInput.isEnabled = false
+        emailInput.isEnabled = false
+        phoneInput.isEnabled = false
+    }
+
+    private fun onSaveClicked() {
         val bmp = profileImage.drawable?.toBitmap()
         val base64 = bmp?.let {
-            val resized = Bitmap.createScaledBitmap(it, 500, (500f / it.width * it.height).toInt(), true)
+            val maxDim = 500
+            val ratio = it.width.toFloat() / it.height
+            val newW = if (it.width >= it.height) maxDim else (maxDim * ratio).toInt()
+            val newH = if (it.width >= it.height) (maxDim / ratio).toInt() else maxDim
+            val resized = it.scale(newW, newH)
             val out = ByteArrayOutputStream()
             resized.compress(Bitmap.CompressFormat.JPEG, 80, out)
-            Base64.encodeToString(out.toByteArray(), Base64.DEFAULT)
-        } ?: originalUser?.profilePicture.orEmpty()
+            val b64 = Base64.encodeToString(out.toByteArray(), Base64.DEFAULT)
+            // also cache the new picture locally
+            requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+                .edit {
+                    putString("profilePic", b64)
+                }
+            b64
+        } ?: ""
 
-        // Load per-user safe circle
-        val prefs        = requireContext()
+        val contactsJson = requireContext()
             .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
-        val jsonContacts = prefs.getString("safe_circle_contacts_$userId", "") ?: ""
-        val contacts = if (jsonContacts.isNotEmpty()) {
-            Gson().fromJson(jsonContacts, Array<ContactItem>::class.java).toList()
-        } else emptyList()
+            .getString("safe_circle_contacts_$userId", "[]")
+            .orEmpty()
+        val contacts = Gson().fromJson(contactsJson, Array<ContactItem>::class.java).toList()
 
-        val user = User(
+        val updatedUser = User(
             id                 = userId,
-            fullName           = newName,
-            email              = newEmail,
+            fullName           = nameInput.text.toString().trim(),
+            email              = emailInput.text.toString().trim(),
             password           = originalUser?.password.orEmpty(),
-            phoneNumber        = if (newPhone.isNotEmpty()) newPhone else originalUser?.phoneNumber.orEmpty(),
+            phoneNumber        = phoneInput.text.toString().trim(),
             idPhotoUrl         = originalUser?.idPhotoUrl.orEmpty(),
             profilePicture     = base64,
             safeCircleContacts = contacts
         )
-        viewModel.saveUserData(user)
+        viewModel.saveUserData(updatedUser)
     }
 
     private fun onRemoveAccountClicked() {
         viewModel.deleteAccount(userId)
     }
-
-    private fun openGallery() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                android.Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            openImageChooser()
-        } else {
-            requestPermissionLauncher.launch(arrayOf(android.Manifest.permission.CAMERA))
-        }
-    }
-
-    private fun openImageChooser() {
-        val cameraIntent  = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val galleryIntent = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-        val chooser = Intent.createChooser(galleryIntent, "בחר תמונה")
-            .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent)) }
-        pickImageLauncher.launch(chooser)
-    }
-
-    private val pickImageLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == android.app.Activity.RESULT_OK) {
-                val uri: Uri? = result.data?.data
-                if (uri != null) profileImage.setImageURI(uri)
-                else (result.data?.extras?.get("data") as? Bitmap)
-                    ?.let { profileImage.setImageBitmap(it) }
-            }
-        }
-
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { perms ->
-            if (perms[android.Manifest.permission.CAMERA] == true) openGallery()
-            else showCustomToast("לא ניתן לבחור תמונה ללא הרשאת מצלמה")
-        }
 }

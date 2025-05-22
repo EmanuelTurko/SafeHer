@@ -185,6 +185,8 @@
                     android:id="@+id/nameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:enabled="false"
+                    android:focusable="false"
                     android:background="@null"
                     android:fontFamily="@font/poppins_regular"
                     android:inputType="textPersonName"
@@ -238,6 +240,8 @@
                     android:id="@+id/emailEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:enabled="false"
+                    android:focusable="false"
                     android:background="@null"
                     android:fontFamily="@font/poppins_regular"
                     android:inputType="textEmailAddress"
@@ -245,14 +249,6 @@
                     android:textColor="#2D2D2D"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-
-        <!-- Password Input -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="16dp">
         </LinearLayout>
 
         <!-- Phone Number Input -->
@@ -299,6 +295,8 @@
                     android:id="@+id/phoneEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:enabled="false"
+                    android:focusable="false"
                     android:background="@null"
                     android:fontFamily="@font/poppins_regular"
                     android:inputType="phone"
