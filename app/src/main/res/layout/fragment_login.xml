@@ -274,7 +274,7 @@
     <!-- Login Button - Preserving original ID -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/loginButton"
-        style="@style/BloomsButton"
+        style="@style/SafeHerButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="100dp"

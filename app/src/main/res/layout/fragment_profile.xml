@@ -336,7 +336,7 @@
         android:layout_marginBottom="10dp"
         app:cornerRadius="24dp"
         android:textColor="#FFFFFF"
-        app:backgroundTint="@color/button_pink"
+        app:backgroundTint="@color/button_gold"
         android:fontFamily="@font/poppins_medium"
         android:text="Save"
         app:icon="@drawable/ic_heart"

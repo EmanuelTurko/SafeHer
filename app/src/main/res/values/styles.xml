@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="BloomsButton" parent="Widget.MaterialComponents.Button">
+    <style name="SafeHerButton" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginHorizontal">50dp</item>
@@ -11,7 +11,7 @@
         <item name="android:textColor">@color/second_white</item>
         <item name="android:textSize" tools:ignore="SpUsage">18dp</item>
         <item name="cornerRadius">30dp</item>
-        <item name="backgroundTint">@color/button_pink</item>
+        <item name="backgroundTint">@color/button_gold</item>
     </style>
 
     <style name="BloomsInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">

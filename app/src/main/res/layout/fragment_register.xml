@@ -367,7 +367,7 @@
     <!-- Join Now Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/registerButton"
-        style="@style/BloomsButton"
+        style="@style/SafeHerButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="100dp"
