@@ -40,6 +40,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.concurrent.thread
+import kotlin.text.compareTo
 
 class SOSHomeScreenFragment : Fragment() {
 
@@ -54,7 +55,7 @@ class SOSHomeScreenFragment : Fragment() {
     private lateinit var mSistersButton: LinearLayout
     private lateinit var mVideoLibraryButton: LinearLayout
     private lateinit var mSupportCallButton: LinearLayout
-    private lateinit var mSosButton: ConstraintLayout
+    private lateinit var mSosButton: LinearLayout
     private lateinit var mHelperSwitch: SwitchMaterial
     private lateinit var mHelperStatusText: TextView
     private lateinit var mWelcomeText: TextView
@@ -318,3 +319,5 @@ class SOSHomeScreenFragment : Fragment() {
         )[VideoViewModel::class.java]
     }
 }
+
+

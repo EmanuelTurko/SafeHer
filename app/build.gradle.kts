@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.firebase.auth)
+    implementation(libs.androidx.gridlayout)
     testImplementation(libs.junit)
     implementation(libs.lottie)
     implementation(libs.androidx.cardview)
