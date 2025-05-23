@@ -282,7 +282,7 @@
         android:fontFamily="@font/poppins_medium"
         android:paddingHorizontal="30dp"
         android:text="LOGIN"
-        android:backgroundTint="#F9C4B5"
+        android:backgroundTint="@color/button_gold"
         android:textColor="#FFFFFF"
         app:cornerRadius="24dp"
         app:icon="@drawable/ic_arrow_forward"

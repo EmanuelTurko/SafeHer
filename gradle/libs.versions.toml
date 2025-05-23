@@ -28,6 +28,7 @@ lifecycleViewmodelKtx = "2.8.7"
 firebaseFirestore = "25.1.1"
 firebaseDatabase = "21.0.0"
 picasso = "2.8"
+gridlayout = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -58,6 +59,7 @@ androidx-cardview = { group = "androidx.cardview", name = "cardview", version.re
 firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabase" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestore" }
 picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
+androidx-gridlayout = { group = "androidx.gridlayout", name = "gridlayout", version.ref = "gridlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
