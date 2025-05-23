@@ -44,7 +44,7 @@ class HomePageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home_page, container, false)
-        mMainLottieImage = view.findViewById(R.id.main_activity_mainpage_lottie)
+        mMainLottieImage = view.findViewById(R.id.main_activity_mainpage_logo)
         mMainTitle = view.findViewById(R.id.main_activity_title)
         mMainSubtitle = view.findViewById(R.id.main_activity_subtitle)
         mLoginButton = view.findViewById(R.id.main_activity_login_button)

@@ -32,6 +32,7 @@ import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
 import com.example.safeher.utils.setupUI
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import java.io.ByteArrayOutputStream
 
@@ -39,12 +40,18 @@ class ProfileFragment : Fragment() {
 
     private lateinit var saveButton: MaterialButton
     private lateinit var mHome: CardView
-
     private lateinit var mBackBtn: CardView
     private lateinit var removeAccountButton: MaterialButton
+
+    // layouts for end‐icon
+    private lateinit var nameLayout: TextInputLayout
+    private lateinit var emailLayout: TextInputLayout
+    private lateinit var phoneLayout: TextInputLayout
+
     private lateinit var nameInput: TextInputEditText
     private lateinit var phoneInput: TextInputEditText
     private lateinit var emailInput: TextInputEditText
+
     private lateinit var addImage: AppCompatImageButton
     private lateinit var profileImage: AppCompatImageView
     private lateinit var loadingDialog: LoadingDialog
@@ -62,19 +69,20 @@ class ProfileFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         initializeViews(view)
         initListener()
+        setupEndIconListeners()
         setupClickListeners()
         setupObservers()
         seedLocalFields()
         viewModel.getUserData(userId)
         return view
     }
+
     private fun initListener() {
         mBackBtn.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsLobbyFragment)
@@ -84,37 +92,49 @@ class ProfileFragment : Fragment() {
         }
     }
 
-
     private fun initializeViews(view: View) {
         mHome = view.findViewById(R.id.homeButtonCard)
-
         mBackBtn = view.findViewById(R.id.backButtonCard)
+
         saveButton          = view.findViewById(R.id.saveButton)
         removeAccountButton = view.findViewById(R.id.removeAccountButton)
-        nameInput           = view.findViewById(R.id.nameEditText)
-        phoneInput          = view.findViewById(R.id.phoneEditText)
-        emailInput          = view.findViewById(R.id.emailEditText)
+
+        // bind layouts
+        nameLayout  = view.findViewById(R.id.nameInputLayout)
+        emailLayout = view.findViewById(R.id.emailInputLayout)
+        phoneLayout = view.findViewById(R.id.phoneInputLayout)
+
+        // bind inputs
+        nameInput   = view.findViewById(R.id.nameEditText)
+        phoneInput  = view.findViewById(R.id.phoneEditText)
+        emailInput  = view.findViewById(R.id.emailEditText)
+
         profileImage        = view.findViewById(R.id.ivProfile)
         profileImage.setImageResource(R.drawable.profile)
         addImage            = view.findViewById(R.id.btnAddPhoto)
         loadingDialog       = LoadingDialog(requireContext())
 
+        // disable inputs initially
+        nameInput.isEnabled = false
+        emailInput.isEnabled = false
+        phoneInput.isEnabled = false
     }
 
-
-    private fun seedLocalFields() {
-        val local = requireContext()
-            .getSharedPreferences("userInfo", Context.MODE_PRIVATE)
-        nameInput.setText(local.getString("fullName",""))
-        phoneInput.setText(local.getString("phoneNumber",""))
-        emailInput.setText(local.getString("email",""))
-        local.getString("profilePic","")?.let { b64 ->
-            if (b64.length > 100) {
-                val bytes = Base64.decode(b64, Base64.DEFAULT)
-                profileImage.setImageBitmap(
-                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                )
-            }
+    private fun setupEndIconListeners() {
+        nameLayout.setEndIconOnClickListener {
+            nameInput.isEnabled = true
+            nameInput.isFocusableInTouchMode = true
+            nameInput.requestFocus()
+        }
+        emailLayout.setEndIconOnClickListener {
+            emailInput.isEnabled = true
+            emailInput.isFocusableInTouchMode = true
+            emailInput.requestFocus()
+        }
+        phoneLayout.setEndIconOnClickListener {
+            phoneInput.isEnabled = true
+            phoneInput.isFocusableInTouchMode = true
+            phoneInput.requestFocus()
         }
     }
 
@@ -136,16 +156,24 @@ class ProfileFragment : Fragment() {
                         nameInput.setText(user.fullName)
                         phoneInput.setText(user.phoneNumber)
                         emailInput.setText(user.email)
-                        if (!user.profilePicture.isNullOrEmpty()) {
-                            val bmp = viewModel.convertBase64ToBitmap(user.profilePicture)
-                            profileImage.setImageBitmap(bmp)
-                        }
+                        user.profilePicture
+                            ?.takeIf { it.isNotEmpty() }
+                            ?.let { b64 ->
+                                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                profileImage.setImageBitmap(
+                                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                                )
+                            }
                     }
+                    // lock after loading
+                    nameInput.isEnabled = false
+                    emailInput.isEnabled = false
+                    phoneInput.isEnabled = false
                 }
 
                 ProfileState.SaveUserDataSuccess -> {
                     showCustomToast("פרטי המשתמש נשמרו בהצלחה")
-                    // Update local cache
+                    // update local prefs
                     val prefs = requireContext()
                         .getSharedPreferences("userInfo", Context.MODE_PRIVATE)
                     prefs.edit().apply {
@@ -159,8 +187,12 @@ class ProfileFragment : Fragment() {
                         }
                         apply()
                     }
-                    // Re-fetch to refresh UI from server if desired
-                    viewModel.getUserData(userId)
+                    // lock fields again
+                    nameInput.isEnabled = false
+                    emailInput.isEnabled = false
+                    phoneInput.isEnabled = false
+
+                    // optionally re-fetch or not...
                 }
 
                 ProfileState.DeleteAccountSuccess -> {
@@ -179,6 +211,20 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    private fun seedLocalFields() {
+        val local = requireContext()
+            .getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        nameInput.setText(local.getString("fullName",""))
+        phoneInput.setText(local.getString("phoneNumber",""))
+        emailInput.setText(local.getString("email",""))
+        local.getString("profilePic","")?.takeIf { it.length > 100 }?.let { b64 ->
+            val bytes = Base64.decode(b64, Base64.DEFAULT)
+            profileImage.setImageBitmap(
+                BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            )
+        }
+    }
+
     private fun onSaveClicked() {
         val newName  = nameInput.text.toString().trim()
         val newEmail = emailInput.text.toString().trim()
@@ -188,7 +234,6 @@ class ProfileFragment : Fragment() {
             return
         }
 
-        // Prepare profile picture
         val bmp = profileImage.drawable?.toBitmap()
         val base64 = bmp?.let {
             val resized = Bitmap.createScaledBitmap(it, 500, (500f / it.width * it.height).toInt(), true)
@@ -197,9 +242,7 @@ class ProfileFragment : Fragment() {
             Base64.encodeToString(out.toByteArray(), Base64.DEFAULT)
         } ?: originalUser?.profilePicture.orEmpty()
 
-        // Load per-user safe circle
-        val prefs        = requireContext()
-            .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+        val prefs        = requireContext().getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
         val jsonContacts = prefs.getString("safe_circle_contacts_$userId", "") ?: ""
         val contacts = if (jsonContacts.isNotEmpty()) {
             Gson().fromJson(jsonContacts, Array<ContactItem>::class.java).toList()

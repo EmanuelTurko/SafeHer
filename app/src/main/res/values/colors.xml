@@ -7,6 +7,8 @@
     <color name="icons_blue">#2a5da4</color>
     <color name="alert_red">#ef888c</color>
     <color name="alert_green">#BE4CAF50</color>
+    <color name="red_background">#9c4544</color>
+    <color name="cream_background">#d4bb9e</color>
 
     <!-- Progress bar colors -->
     <color name="progress_red">#E05A5A</color>
