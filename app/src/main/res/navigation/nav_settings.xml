@@ -106,6 +106,10 @@
         <action
             android:id="@+id/action_questionsAndAnswersFragment_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
+        <action
+            android:id="@+id/action_questionsAndAnswersFragment_to_SOSHomeScreenFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
+
     </fragment>
 
     <fragment
