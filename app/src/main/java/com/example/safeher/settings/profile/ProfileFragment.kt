@@ -72,7 +72,6 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // חץ חזרה והבית
         binding.backButtonCard.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsLobbyFragment)
         }

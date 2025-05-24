@@ -40,7 +40,6 @@
 
     <fragment
         android:id="@+id/videoLibraryFragment2"
-
         android:name="com.example.safeher.home_screen.videoLibrary.VideoLibraryFragment"
         android:label="VideoLibraryFragment">
         <action
@@ -79,6 +78,10 @@
         android:id="@+id/aboutAppFragment"
         android:name="com.example.safeher.settings.lobby.AboutAppFragment"
         android:label="AboutAppFragment">
+        <!-- Home icon click: navigate to SOS screen -->
+        <action
+            android:id="@+id/action_aboutAppFragment_to_SOSHomeScreenFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
         <action
             android:id="@+id/action_aboutAppFragment_to_settingsLobbyFragment"
             app:destination="@id/settingsLobbyFragment" />
@@ -118,6 +121,5 @@
         android:id="@+id/SOSHomeScreenFragment"
         android:name="com.example.safeher.home_screen.sos.SOSHomeScreenFragment"
         android:label="SOSHomeScreenFragment" />
-
 
 </navigation>

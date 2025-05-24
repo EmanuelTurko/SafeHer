@@ -29,6 +29,28 @@
             app:tint="@android:color/white" />
     </com.google.android.material.card.MaterialCardView>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/homeButtonCard"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="#d4bb9e"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/homeButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:contentDescription="Home"
+            android:src="@drawable/ic_home"
+            app:tint="#FFFFFF" />
+    </androidx.cardview.widget.CardView>
+
     <!-- Title Card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/aboutUsTitleCard"
