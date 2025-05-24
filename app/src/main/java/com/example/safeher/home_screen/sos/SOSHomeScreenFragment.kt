@@ -28,11 +28,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
+import com.example.safeher.api.RetroFitClient
 import com.example.safeher.bluetooth.BluetoothController
 import com.example.safeher.general.showCustomToast
 import com.example.safeher.home_screen.videoLibrary.VideoViewModel
+import com.example.safeher.model.api.TwilioEmergencyMessageRequest
 import com.example.safeher.settings.SettingsMainActivity
 import com.example.safeher.utils.PermissionManager
+import com.example.safeher.utils.getStringShareRef
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.card.MaterialCardView
@@ -49,6 +52,7 @@ class SOSHomeScreenFragment : Fragment() {
     private lateinit var permissionManager: PermissionManager
     private lateinit var videoViewModel: VideoViewModel
 
+    private lateinit var userPhoneNumber:String
     private var bSosActiveValue: Boolean = false
 
     private lateinit var mSosButtonContainer: MaterialCardView
@@ -158,6 +162,7 @@ class SOSHomeScreenFragment : Fragment() {
         mHelperStatusText      = view.findViewById(R.id.helperStatusText)
         mWelcomeText           = view.findViewById(R.id.welcomeText)
         mSettingsButtonCard    = view.findViewById(R.id.settingsButtonCard)
+        userPhoneNumber        =  requireContext().getStringShareRef("phoneNumber", "userInfo")
     }
 
     private fun initListener() {
@@ -190,38 +195,7 @@ class SOSHomeScreenFragment : Fragment() {
         mWelcomeText.text = "Welcome $fullName!"
     }
 
-    private fun toggleSos() {
-        val colorOff = ContextCompat.getColor(requireContext(), R.color.sos_card_off)
-        val colorOn  = ContextCompat.getColor(requireContext(), R.color.sos_card_on)
-        if (!bSosActiveValue) {
-            checkAndRequestLocationPermission()
-            bluetoothViewModel.sendCommand("START")
-            bSosActiveValue = true
-            mSosButtonContainer.setCardBackgroundColor(colorOn)
-        } else {
-            bluetoothViewModel.sendCommand("STOP")
-            bSosActiveValue = false
-            mSosButtonContainer.setCardBackgroundColor(colorOff)
-        }
-    }
 
-    private fun checkAndRequestLocationPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED -> getLastLocation()
-            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> AlertDialog.Builder(requireContext())
-                .setTitle("Location Permission Needed")
-                .setMessage("Location is needed to use this feature.")
-                .setPositiveButton("OK") { _, _ ->
-                    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
-            else -> requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
 
     private fun showPermissionRationale() {
         AlertDialog.Builder(requireContext())
@@ -248,39 +222,6 @@ class SOSHomeScreenFragment : Fragment() {
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         enableBluetoothLauncher.launch(intent)
     }
-
-    @SuppressLint("MissingPermission")
-    private fun getLastLocation() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Toast.makeText(requireContext(), "Permission not granted", Toast.LENGTH_SHORT).show()
-            return
-        }
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location ->
-                location?.let {
-                    Toast.makeText(
-                        requireContext(),
-                        "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    thread {
-                        val address = Geocoder(requireContext(), Locale.getDefault())
-                            .getFromLocation(it.latitude, it.longitude, 1)
-                            ?.firstOrNull()?.getAddressLine(0) ?: "No address"
-                        activity?.runOnUiThread {
-                            Toast.makeText(requireContext(), "Address: $address", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                } ?: Toast.makeText(requireContext(), "Location is null", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed to get location", Toast.LENGTH_SHORT).show()
-            }
-    }
-
     private fun supportCallAlertBuilder() {
         AlertDialog.Builder(requireContext())
             .setTitle("Support Call")
@@ -317,6 +258,91 @@ class SOSHomeScreenFragment : Fragment() {
                 }
             }
         )[VideoViewModel::class.java]
+    }
+
+    private fun toggleSos() {
+        val colorOff = ContextCompat.getColor(requireContext(), R.color.sos_card_off)
+        val colorOn  = ContextCompat.getColor(requireContext(), R.color.sos_card_on)
+        if (!bSosActiveValue) {
+            checkAndRequestLocationPermission()
+            bluetoothViewModel.sendCommand("START")
+            bSosActiveValue = true
+            mSosButtonContainer.setCardBackgroundColor(colorOn)
+        } else {
+            bluetoothViewModel.sendCommand("STOP")
+            bSosActiveValue = false
+            mSosButtonContainer.setCardBackgroundColor(colorOff)
+        }
+    }
+    private fun checkAndRequestLocationPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> getLastLocation()
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> AlertDialog.Builder(requireContext())
+                .setTitle("Location Permission Needed")
+                .setMessage("Location is needed to use this feature.")
+                .setPositiveButton("OK") { _, _ ->
+                    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+            else -> requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+    @SuppressLint("MissingPermission")
+    private fun getLastLocation() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d("LocationDebug", "Permission not granted")
+            return
+        }
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                location?.let {
+                    Log.d("LocationDebug", "Lat: ${it.latitude}, Lon: ${it.longitude}")
+                    thread {
+                        val address = Geocoder(requireContext(), Locale.getDefault())
+                            .getFromLocation(it.latitude, it.longitude, 1)
+                            ?.firstOrNull()?.getAddressLine(0) ?: "No address"
+                        activity?.runOnUiThread {
+                            Log.d("LocationDebug", "Address: $address")
+                            sendEmergencyMessage(userPhoneNumber,address, it.latitude, it.longitude)
+                        }
+                    }
+                } ?: Log.d("LocationDebug", "Location is null")
+            }
+            .addOnFailureListener {
+                Log.d("LocationDebug", "Failed to get location")
+            }
+    }
+    private fun sendEmergencyMessage(
+        userPhoneNumber: String,
+        address: String,
+        latitude: Double,
+        longitude: Double
+    ){
+        val request = TwilioEmergencyMessageRequest(
+            userPhoneNumber,
+            address,
+            latitude,
+            longitude
+        )
+        lifecycleScope.launch{
+            try{
+                val response = RetroFitClient.getApiService(requireContext()).sendEmergencyMessage(request)
+                if (response.error.isNullOrEmpty()) {
+                    Log.d("LocationDebug", "Emergency message sent successfully: ${response.message}")
+                } else {
+                    Log.e("LocationDebug", "Error sending emergency message: ${response.error}")
+                }
+            } catch (e: Exception) {
+                Log.e("LocationDebug", "Exception: ${e.message}", e)
+            }
+        }
     }
 }
 

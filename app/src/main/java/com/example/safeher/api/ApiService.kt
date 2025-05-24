@@ -13,6 +13,7 @@ import com.example.safeher.model.api.CommentRequest
 import com.example.safeher.model.api.CreatePostRequest
 import com.example.safeher.model.api.CreatePostResponse
 import com.example.safeher.model.api.GenericResponse
+import com.example.safeher.model.api.TwilioEmergencyMessageRequest
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
@@ -75,6 +76,9 @@ interface ApiService {
     suspend fun deleteUserAccount(
         @Path("id") userId: String
     ): ApiResponse<Unit>
+
+    @POST("twilio/send-emergency-message")
+    suspend fun sendEmergencyMessage(@Body request: TwilioEmergencyMessageRequest): ApiResponse<Unit>
 }
 
 
