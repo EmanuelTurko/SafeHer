@@ -30,6 +30,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.bluetooth.BluetoothController
+import com.example.safeher.bluetooth.BluetoothState
 import com.example.safeher.general.showCustomToast
 import com.example.safeher.home_screen.videoLibrary.VideoViewModel
 import com.example.safeher.model.api.TwilioEmergencyMessageRequest
@@ -51,6 +52,7 @@ class SOSHomeScreenFragment : Fragment() {
     private lateinit var videoViewModel: VideoViewModel
 
     private lateinit var userPhoneNumber: String
+    private var ignoreListener = false
     private var sosActive = false
 
     // UI
@@ -163,13 +165,34 @@ class SOSHomeScreenFragment : Fragment() {
         mSupportCallButton.setOnClickListener {
             supportCallAlertBuilder()
         }
-        mHelperSwitch.setOnCheckedChangeListener { _, isChecked ->
-            mHelperStatusText.text = if (isChecked) "ON" else "OFF"
-        }
         mSettingsButtonCard.setOnClickListener {
             launcher.launch(Intent(requireContext(), SettingsMainActivity::class.java))
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                bluetoothViewModel.bluetoothState.collect { state ->
+                    val isConnected = (state == BluetoothState.CONNECTED)
+                    if (mHelperSwitch.isChecked != isConnected) {
+                        ignoreListener = true
+                        mHelperSwitch.isChecked = isConnected
+                        ignoreListener = false
+                    }
+                }
+            }
+        }
+        mHelperSwitch.setOnCheckedChangeListener { _, isChecked ->
+            mHelperStatusText.text = if (isChecked) "ON" else "OFF"
+            if (ignoreListener) return@setOnCheckedChangeListener
+            if (isChecked) {
+                if (bluetoothViewModel.bluetoothState.value != BluetoothState.CONNECTED) {
+                    bluetoothViewModel.startScan()
+                }
+            } else {
+                bluetoothViewModel.disconnect()
+            }
+        }
     }
+
 
     private fun updateWelcomeText() {
         val name = requireContext()
