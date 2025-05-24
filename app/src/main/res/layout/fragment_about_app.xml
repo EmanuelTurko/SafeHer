@@ -26,7 +26,7 @@
             android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_back"
-            app:tint="@android:color/white" />
+            app:tint="@color/black" />
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.cardview.widget.CardView
@@ -48,7 +48,7 @@
             android:layout_gravity="center"
             android:contentDescription="Home"
             android:src="@drawable/ic_home"
-            app:tint="#FFFFFF" />
+            app:tint="@color/black" />
     </androidx.cardview.widget.CardView>
 
     <!-- Title Card -->
@@ -78,7 +78,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@android:color/white" />
+                app:tint="@color/black" />
 
             <TextView
                 android:id="@+id/aboutUsTitle"
@@ -87,7 +87,7 @@
                 android:layout_marginStart="8dp"
                 android:fontFamily="@font/poppins"
                 android:text="ABOUT US"
-                android:textColor="@android:color/white"
+                android:textColor="@color/black"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
