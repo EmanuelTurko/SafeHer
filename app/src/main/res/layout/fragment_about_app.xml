@@ -2,20 +2,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/aboutAppRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/red_background">
+    android:background="#f0ebe8">
 
     <!-- Back Button -->
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/backButtonCard"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#000000"
+        app:cardBackgroundColor="#d4bb9e"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,22 +25,22 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center"
-            android:contentDescription="Back"
             android:src="@drawable/ic_back"
-            app:tint="#FFFFFF" />
-    </androidx.cardview.widget.CardView>
+            app:tint="@android:color/white" />
+    </com.google.android.material.card.MaterialCardView>
 
-    <!-- Title -->
-    <androidx.cardview.widget.CardView
+    <!-- Title Card -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/aboutUsTitleCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        app:cardBackgroundColor="#000000"
+        app:cardBackgroundColor="#d4bb9e"
         app:cardCornerRadius="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:cardElevation="0dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -53,49 +52,179 @@
                 android:id="@+id/infoIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_info"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="#FFFFFF" />
+                app:tint="@android:color/white" />
 
             <TextView
+                android:id="@+id/aboutUsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins"
                 android:text="ABOUT US"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/infoIcon"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <!-- Scrollable Text -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:id="@+id/scrollArea"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/aboutUsTitleCard"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/aboutText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
-            android:lineSpacingExtra="6dp"
-            android:fontFamily="@font/poppins_regular"
-            tools:text="About SafeHer..." />
+            android:orientation="vertical">
+
+            <!-- Section: Welcome -->
+            <TextView
+                android:id="@+id/sectionWelcome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Welcome to SafeHer"
+                android:textSize="20sp"
+                android:textColor="#333333"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/textWelcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:textColor="#555555"
+                android:textSize="16sp"
+                android:lineSpacingExtra="8dp"
+                android:text="Your trusted safety companion. SafeHer is a mobile application created to enhance personal safety for women by offering quick, reliable tools during emergencies..." />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d4bb9e"
+                android:layout_marginVertical="16dp" />
+
+            <!-- Section: Purpose -->
+            <TextView
+                android:id="@+id/sectionPurpose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Our Purpose"
+                android:textSize="20sp"
+                android:textColor="#333333" />
+
+            <TextView
+                android:id="@+id/textPurpose"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:textColor="#555555"
+                android:textSize="16sp"
+                android:lineSpacingExtra="8dp"
+                android:text="SafeHer was developed to empower users with a sense of control and security in vulnerable situations..." />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d4bb9e"
+                android:layout_marginVertical="16dp" />
+
+            <!-- Section: Key Features -->
+            <TextView
+                android:id="@+id/sectionFeatures"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Key Features"
+                android:textSize="20sp"
+                android:textColor="#333333" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textSize="16sp"
+                    android:textColor="#333333"
+                    android:text="• Build your Safe Circle – choose people you trust to be alerted in case of emergency." />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textSize="16sp"
+                    android:textColor="#333333"
+                    android:text="• One-tap SOS – instantly send a location-based alert to your Safe Circle." />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textSize="16sp"
+                    android:textColor="#333333"
+                    android:text="• Contact Management – add, remove or update emergency contacts anytime." />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textSize="16sp"
+                    android:textColor="#333333"
+                    android:text="• Location Sharing – send real-time GPS location when SOS is activated." />
+
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d4bb9e"
+                android:layout_marginVertical="16dp" />
+
+            <!-- Section: Mission -->
+            <TextView
+                android:id="@+id/sectionMission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Our Mission"
+                android:textSize="20sp"
+                android:textColor="#333333" />
+
+            <TextView
+                android:id="@+id/textMission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:textColor="#555555"
+                android:textSize="16sp"
+                android:lineSpacingExtra="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="To make personal safety accessible, discreet, and effective – no matter where you are." />
+
+        </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
