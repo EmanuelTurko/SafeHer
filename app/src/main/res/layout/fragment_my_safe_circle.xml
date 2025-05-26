@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="@color/red_background">
+    android:background="@color/cream_background">
 
     <!-- Back Button -->
     <androidx.cardview.widget.CardView
@@ -78,6 +77,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewConfirm"
         android:layout_width="0dp"
+        android:layout_marginTop="30dp"
         android:layout_height="0dp"
         android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@id/settingsTitleCard"
@@ -91,10 +91,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="60dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="40dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="2dp"
-        app:cardBackgroundColor="#FFF0F0"
+        app:cardBackgroundColor="@color/button_gold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

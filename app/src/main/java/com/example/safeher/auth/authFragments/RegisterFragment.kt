@@ -138,7 +138,6 @@ class RegisterFragment : Fragment() {
     }
 
 
-    // מאפשר לבחור תמונה מהגלריה
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
