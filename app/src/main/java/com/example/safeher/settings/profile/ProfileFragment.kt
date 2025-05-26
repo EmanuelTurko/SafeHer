@@ -75,7 +75,7 @@ class ProfileFragment : Fragment() {
         binding.backButtonCard.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsLobbyFragment)
         }
-        binding.homeButtonCard.setOnClickListener {
+        binding.homeButton.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_SOSHomeScreenFragment)
         }
 

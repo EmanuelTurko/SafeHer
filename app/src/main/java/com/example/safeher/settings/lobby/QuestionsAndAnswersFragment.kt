@@ -30,7 +30,7 @@ class QuestionsAndAnswersFragment : Fragment() {
         binding.backButtonCard.setOnClickListener {
             findNavController().navigate(R.id.action_questionsAndAnswersFragment_to_settingsLobbyFragment)
         }
-        binding.homeButtonCard.setOnClickListener{
+        binding.homeButton.setOnClickListener{
             findNavController().navigate(R.id.action_questionsAndAnswersFragment_to_SOSHomeScreenFragment)
 
         }

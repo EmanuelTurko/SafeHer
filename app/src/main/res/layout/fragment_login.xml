@@ -259,7 +259,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_regular"
             android:text="Don't have an account? "
-            android:textColor="#2D2D2D" />
+            android:textColor="#908f8f" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/signUpText"
@@ -267,7 +267,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_medium"
             android:text="Sign up"
-            android:textColor="#2D2D2D"
+            android:textColor="@color/button_gold"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -281,10 +281,12 @@
         android:layout_marginBottom="80dp"
         android:fontFamily="@font/poppins_medium"
         android:paddingHorizontal="30dp"
+        app:strokeColor="@color/second_white"
+        app:strokeWidth="5dp"
         android:text="Login"
         android:backgroundTint="@color/button_gold"
         android:textColor="#FFFFFF"
-        app:cornerRadius="24dp"
+        app:cornerRadius="30dp"
         app:icon="@drawable/ic_arrow_forward"
         app:iconGravity="end"
         app:iconTint="#FFFFFF"

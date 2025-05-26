@@ -339,8 +339,10 @@
         android:layout_marginHorizontal="100dp"
         android:fontFamily="@font/poppins_medium"
         android:paddingHorizontal="30dp"
-        app:cornerRadius="24dp"
+        app:cornerRadius="30dp"
         android:text="Join Now"
+        app:strokeColor="@color/second_white"
+        app:strokeWidth="5dp"
         android:layout_marginBottom="50dp"
         app:icon="@drawable/ic_arrow_forward"
         app:iconGravity="end"
@@ -365,16 +367,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_regular"
-            android:text="Already have an account? "
-            android:textColor="#2D2D2D" />
+            android:text="Already a member? "
+            android:textColor="#908f8f" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/loginText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_medium"
-            android:text="Login"
-            android:textColor="#2D2D2D"
+            android:text="Sign In"
+            android:textColor="@color/button_gold"
             android:textStyle="bold" />
     </LinearLayout>
 
