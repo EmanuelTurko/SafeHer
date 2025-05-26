@@ -14,9 +14,9 @@
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#d4bb9e"
+        app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="20dp"
-        app:cardElevation="0dp"
+        app:cardElevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -26,18 +26,19 @@
             android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_back"
-            app:tint="@color/black" />
+            app:tint="@color/white" />
     </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <!-- Home Button -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/homeButtonCard"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:cardBackgroundColor="#d4bb9e"
+        app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="20dp"
-        app:cardElevation="0dp"
+        app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -48,18 +49,18 @@
             android:layout_gravity="center"
             android:contentDescription="Home"
             android:src="@drawable/ic_home"
-            app:tint="@color/black" />
-    </androidx.cardview.widget.CardView>
+            app:tint="@android:color/white" />
+    </com.google.android.material.card.MaterialCardView>
 
-    <!-- Title Card -->
+    <!-- Title Card with QA Icon -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/qaTitleCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        app:cardBackgroundColor="#d4bb9e"
+        app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="20dp"
-        app:cardElevation="0dp"
+        app:cardElevation="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -70,18 +71,33 @@
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp">
 
+            <!-- QA Icon -->
+            <ImageView
+                android:id="@+id/qaIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_qa"
+                app:tint="@android:color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- Title Text -->
             <TextView
                 android:id="@+id/qaTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:fontFamily="@font/poppins_medium"
-                android:text="QUESTIONS &amp; ANSWERS"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Q &amp; A"
+                android:textColor="@android:color/white"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintVertical_bias="1.0"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@id/qaIcon"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -91,7 +107,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="16dp"
-        android:paddingHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/qaTitleCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -108,9 +123,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -148,9 +163,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -174,7 +189,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_regular"
-                        android:text="Go to Settings → Safe Circle → Choose Contacts. You can select up to 5 trusted contacts from your phonebook who will be notified in case of emergency."
+                        android:text="To add someone to your Safe Circlr, Go to Settings → Safe Circle → Choose Contacts. You can select up to 5 trusted contacts from your phonebook who will be notified in case of emergency."
                         android:textSize="14sp"
                         android:textColor="#555555"
                         android:visibility="gone"
@@ -188,9 +203,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -228,9 +243,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -254,7 +269,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_regular"
-                        android:text="Yes. Go to the Safe Circle screen and use the &quot;Edit&quot; option to remove contacts."
+                        android:text="Yes. Go to the Safe Circle screen and use the 'Edit' option to remove contacts."
                         android:textSize="14sp"
                         android:textColor="#555555"
                         android:visibility="gone"
@@ -268,9 +283,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -308,9 +323,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -348,9 +363,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -388,9 +403,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -414,7 +429,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_regular"
-                        android:text="You can request account deletion via the &quot;Help&quot; section."
+                        android:text="To delete your account, go to Settings → Profile and tap Remove Account"
                         android:textSize="14sp"
                         android:textColor="#555555"
                         android:visibility="gone"
