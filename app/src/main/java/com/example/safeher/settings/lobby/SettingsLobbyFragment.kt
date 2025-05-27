@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.edit
@@ -22,11 +23,11 @@ class SettingsLobbyFragment : Fragment() {
 
     private lateinit var mBackBtn: CardView
     private lateinit var mLogoutBtn: CardView
-    private lateinit var mVideoLibraryOption: ConstraintLayout
-    private lateinit var mSafeCircleOption: ConstraintLayout
-    private lateinit var mProfileOption: ConstraintLayout
-    private lateinit var mAboutOption: ConstraintLayout
-    private lateinit var mQuestionsOption: ConstraintLayout
+    private lateinit var mVideoLibraryOption: LinearLayout
+    private lateinit var mSafeCircleOption: LinearLayout
+    private lateinit var mProfileOption: LinearLayout
+    private lateinit var mAboutOption: LinearLayout
+    private lateinit var mQuestionsOption: LinearLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

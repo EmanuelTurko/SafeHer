@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cream_background">
 
-    <!-- Back Button -->
+    <!-- Back + Title -->
     <androidx.cardview.widget.CardView
         android:id="@+id/backButtonCard"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        app:cardBackgroundColor="@color/black"
+        app:cardBackgroundColor="#000000"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/backButton"
             android:layout_width="24dp"
@@ -26,21 +25,20 @@
             android:layout_gravity="center"
             android:contentDescription="Back"
             android:src="@drawable/ic_back"
-            app:tint="@color/white" />
+            app:tint="#FFFFFF" />
     </androidx.cardview.widget.CardView>
 
-    <!-- Settings Title -->
     <androidx.cardview.widget.CardView
         android:id="@+id/settingsTitleCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        app:cardBackgroundColor="@color/black"
+        app:cardBackgroundColor="#000000"
         app:cardCornerRadius="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,316 +51,201 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_settings"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="#FFFFFF"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/white" />
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
-                android:layout_width="74dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="SETTINGS"
-                android:textColor="@color/white"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="8dp"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@id/settingsIcon"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Profile Option -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/profileOption"
+    <!-- Options Grid -->
+    <androidx.gridlayout.widget.GridLayout
+        android:id="@+id/optionsGrid"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toStartOf="@id/pairOption"
+        android:layout_height="0dp"
+        app:columnCount="2"
+        app:layout_constraintTop_toBottomOf="@id/settingsTitleCard"
+        app:layout_constraintBottom_toTopOf="@id/logoutButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsTitleCard">
-
-        <ImageView
-            android:id="@+id/profileIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:contentDescription="Profile"
-            android:src="@drawable/ic_profile"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Profile"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profileIcon"
-            tools:ignore="HardcodedText" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Let's Pair Option -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/pairOption"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/profileOption"
-        app:layout_constraintTop_toBottomOf="@id/settingsTitleCard">
+        app:rowCount="3">
 
-        <ImageView
-            android:id="@+id/safecircleIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:contentDescription="Let's Pair"
-            android:src="@drawable/safe_circle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Safe Circle"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/safecircleIcon" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Divider 1 -->
-    <View
-        android:id="@+id/divider1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="20dp"
-        android:background="#E0E0E0"
-        app:layout_constraintTop_toBottomOf="@id/profileOption" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/questionsOption"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/transparent"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/aboutOption"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
+        <!-- Profile -->
+        <LinearLayout
+            android:id="@+id/profileOption"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Questions And Answers"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:fontFamily="@font/poppins_medium"
-            app:layout_constraintStart_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/videoLibraryOption"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toStartOf="@id/aboutOption"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider1">
+            <ImageView
+                android:id="@+id/profileIcon"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_profile" />
 
-        <ImageView
-            android:id="@+id/videoLibraryIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:contentDescription="Video Library"
-            android:src="@drawable/ic_video_play"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/black" />
+            <TextView
+                android:id="@+id/profileText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Profile"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/videoLibraryText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Video"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/videoLibraryIcon" />
+        <!-- Let's Pair -->
+        <LinearLayout
+            android:id="@+id/pairOption"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Library"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/videoLibraryText" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/pairIcon"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_pair" />
 
-    <!-- Divider 2 -->
+            <TextView
+                android:id="@+id/pairText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Let's Pair"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/aboutOption"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/videoLibraryOption"
-        app:layout_constraintTop_toBottomOf="@id/divider1">
+        <!-- Video Library -->
+        <LinearLayout
+            android:id="@+id/videoLibraryOption"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
-        <ImageView
-            android:id="@+id/aboutIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:contentDescription="About Us"
-            android:src="@drawable/ic_info"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/videoLibraryIcon"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_video_play" />
 
-        <TextView
-            android:id="@+id/aboutText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/poppins_medium"
-            android:text="About"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aboutIcon" />
+            <TextView
+                android:id="@+id/videoLibraryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Video Library"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Us"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aboutText" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Safe Circle -->
+        <LinearLayout
+            android:id="@+id/safeCircleOption"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
-    <View
-        android:id="@+id/divider2"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="20dp"
-        android:background="#E0E0E0"
-        app:layout_constraintTop_toBottomOf="@id/videoLibraryOption" />
+            <ImageView
+                android:id="@+id/safeCircleIcon"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/safe_circle" />
 
-    <!-- lets pair Option -->
+            <TextView
+                android:id="@+id/safeCircleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Safe Circle"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
-    <!-- Q&A Option -->
+        <!-- About Us -->
+        <LinearLayout
+            android:id="@+id/aboutOption"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
-    <!-- Divider 3 -->
+            <ImageView
+                android:id="@+id/aboutIcon"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_info" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/techSupportOption"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toStartOf="@id/qaOption"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider2">
+            <TextView
+                android:id="@+id/aboutText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="About Us"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/LetsPairIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="4dp"
-            android:contentDescription="Lets Pair"
-            android:src="@drawable/ic_pair"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <!-- Q&A -->
+        <LinearLayout
+            android:id="@+id/qaOption"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
-        <TextView
-            android:id="@+id/letspairText"
-            android:layout_width="42dp"
-            android:layout_height="35dp"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Let's"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/LetsPairIcon" />
+            <ImageView
+                android:id="@+id/qaIcon"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_qa" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Pair"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/letspairText" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/qaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Q&amp;A"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/qaOption"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/techSupportOption"
-        app:layout_constraintTop_toBottomOf="@id/divider2">
+    </androidx.gridlayout.widget.GridLayout>
 
-        <ImageView
-            android:id="@+id/qaIcon"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="Q&amp;A"
-            android:src="@drawable/ic_qa"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Q&amp;A"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/qaIcon" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-        android:id="@+id/divider3"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="20dp"
-        android:background="#E0E0E0"
-        app:layout_constraintTop_toBottomOf="@id/techSupportOption" />
 
     <!-- Logout Button -->
     <androidx.cardview.widget.CardView
@@ -371,20 +254,19 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="60dp"
         android:layout_marginBottom="40dp"
-        app:cardBackgroundColor="@color/button_gold"
+        app:cardBackgroundColor="@color/red_background"
         app:cardCornerRadius="24dp"
         app:cardElevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="horizontal"
-            android:padding="12dp"
-            tools:ignore="UseCompoundDrawables">
+            android:gravity="center"
+            android:padding="12dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -393,7 +275,7 @@
                 android:fontFamily="@font/poppins_semibold"
                 android:gravity="center"
                 android:text="Logout"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <ImageView
@@ -401,7 +283,7 @@
                 android:layout_height="28dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_logout"
-                tools:ignore="ContentDescription" />
+                app:tint="@color/white" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
