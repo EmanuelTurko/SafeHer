@@ -74,8 +74,8 @@ class VideoAdapter(private val context: Context, private var videoFiles: List<Fi
     inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dateText: TextView = itemView.findViewById(R.id.dateText)
         val addressText: TextView = itemView.findViewById(R.id.addressText)
-        val playButton: ImageView = itemView.findViewById(R.id.play_btn)
-        val deleteButton: ImageView = itemView.findViewById(R.id.delete_btn)
+        val playButton: ImageView = itemView.findViewById(R.id.playButtonCard)
+        val deleteButton: ImageView = itemView.findViewById(R.id.deleteButtonCard)
 
 
         init {

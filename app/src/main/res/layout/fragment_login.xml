@@ -220,6 +220,7 @@
                 <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/rememberMeCheckbox"
                     android:layout_width="24dp"
+                    android:checked="true"
                     android:layout_height="24dp"
                     android:buttonTint="#2D2D2D" />
 
