@@ -70,6 +70,7 @@ class SafeCircleFragment : Fragment() {
     }
 
     private fun initView() {
+
         binding?.recyclerViewContacts?.layoutManager =
             LinearLayoutManager(requireContext())
         adapter = ContactAdapter(5, requireContext())
