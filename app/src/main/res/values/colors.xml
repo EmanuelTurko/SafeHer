@@ -9,6 +9,7 @@
     <color name="alert_green">#BE4CAF50</color>
     <color name="red_background">#9c4544</color>
     <color name="cream_background">#f0ebe8</color>
+    <color name="color_border">#e7d9c8</color>
 
     <!-- Progress bar colors -->
     <color name="progress_red">#E05A5A</color>

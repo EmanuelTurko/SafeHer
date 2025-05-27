@@ -10,12 +10,12 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/main_activity_mainpage_logo"
-        android:layout_width="600dp"
-        android:layout_height="380dp"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:layout_marginHorizontal="0dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="40dp"
         android:src="@drawable/safeher"
-        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,7 +24,7 @@
         android:id="@+id/main_activity_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="30dp"
         android:fontFamily="@font/versailles"
         android:text="@string/app_name"
         android:textColor="@color/white"
@@ -38,13 +38,13 @@
         android:id="@+id/main_activity_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:fontFamily="@font/poppins_light"
         android:gravity="center"
         android:lineSpacingExtra="4dp"
-        android:text="Strength in connection, power in community"
+        android:text="Strength in connection, \npower in community"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="21dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_activity_title"
@@ -53,7 +53,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/main_activity_login_button"
         style="@style/SafeHerButton"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="50dp"
         android:text="@string/login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +61,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/main_activity_signup_button"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="@string/sign_up"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +69,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="50dp"
-        android:backgroundTint="#00000000"
+        android:backgroundTint="@color/red_background"
         android:fontFamily="@font/poppins_medium"
         android:letterSpacing="0"
         android:padding="14dp"
@@ -78,6 +78,7 @@
         android:textSize="18dp"
         app:cornerRadius="30dp"
         app:strokeWidth="3dp"
+        app:strokeColor="@color/button_gold"
         tools:ignore="SpUsage"/>
 
 

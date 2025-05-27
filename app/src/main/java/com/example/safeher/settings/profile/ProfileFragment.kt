@@ -75,7 +75,7 @@ class ProfileFragment : Fragment() {
         binding.backButtonCard.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsLobbyFragment)
         }
-        binding.homeButtonCard.setOnClickListener {
+        binding.homeButton.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_SOSHomeScreenFragment)
         }
 
@@ -126,7 +126,6 @@ class ProfileFragment : Fragment() {
                                 binding.ivProfile.setImageBitmap(bmp)
                             }
                     }
-                    // שוב כבה עריכה
                     binding.nameEditText.isEnabled = false
                     binding.emailEditText.isEnabled = false
                     binding.phoneEditText.isEnabled = false

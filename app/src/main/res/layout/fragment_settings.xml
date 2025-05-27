@@ -13,7 +13,7 @@
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        app:cardBackgroundColor="@color/button_gold"
+        app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +26,7 @@
             android:layout_gravity="center"
             android:contentDescription="Back"
             android:src="@drawable/ic_back"
-            app:tint="@color/black" />
+            app:tint="@color/white" />
     </androidx.cardview.widget.CardView>
 
     <!-- Settings Title -->
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        app:cardBackgroundColor="@color/button_gold"
+        app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,22 +56,21 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/black" />
+                app:tint="@color/white" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="74dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="SETTINGS"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@id/settingsIcon"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="1.0" />
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -336,8 +335,8 @@
 
         <ImageView
             android:id="@+id/qaIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:contentDescription="Q&amp;A"
             android:src="@drawable/ic_qa"
             app:layout_constraintEnd_toEndOf="parent"
@@ -374,7 +373,7 @@
         android:layout_marginBottom="40dp"
         app:cardBackgroundColor="@color/button_gold"
         app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
+        app:cardElevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

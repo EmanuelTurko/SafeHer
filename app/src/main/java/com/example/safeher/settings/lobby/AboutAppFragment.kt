@@ -29,7 +29,7 @@ class AboutAppFragment : Fragment() {
         binding.backButtonCard.setOnClickListener {
             findNavController().navigate(R.id.action_aboutAppFragment_to_settingsLobbyFragment)
         }
-        binding.homeButtonCard.setOnClickListener {
+        binding.homeButton.setOnClickListener {
             findNavController().navigate(R.id.action_aboutAppFragment_to_SOSHomeScreenFragment)
         }
 

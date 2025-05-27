@@ -2,53 +2,223 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/red_background">
+    android:background="@color/cream_background">
 
-    <ImageView
-        android:id="@+id/centerImage"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_marginTop="60dp"
-        android:src="@drawable/safe_circle_preview"
-        app:layout_constraintTop_toTopOf="parent"
+    <!-- Top Bar with Back and Home buttons -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/backButtonCard"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:cardBackgroundColor="#000000"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/introText"
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back"
+            app:tint="#FFFFFF" />
+    </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/homeButton"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="Home"
+            android:src="@drawable/ic_home"
+            app:tint="@color/black" />
+
+    <!-- Settings Title -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/settingsTitleCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Protection starts with connection –\nAdd your loved ones!"
-        android:textAlignment="center"
-        android:textColor="#000"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/poppins_medium"
-        app:layout_constraintTop_toBottomOf="@id/centerImage"
+        android:layout_marginTop="30dp"
+        app:cardBackgroundColor="#000000"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
+
+            <ImageView
+                android:id="@+id/safecircleIcon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/safe_circle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="SAFE CIRCLE"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@id/safecircleIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Center graphic container 300X300-->
+    <FrameLayout
+        android:id="@+id/centerContainer"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        app:layout_constraintTop_toBottomOf="@id/settingsTitleCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="70dp">
 
-    <androidx.cardview.widget.CardView
+        <!-- central avatar -->
+<!--        <ImageView-->
+<!--            android:id="@+id/imgCenter"-->
+<!--            android:layout_width="140dp"-->
+<!--            android:layout_height="140dp"-->
+<!--            android:src="@drawable/ic_profile"-->
+<!--            android:layout_gravity="center"/>-->
+
+        <!-- circle ring behind -->
+        <ImageView
+            android:id="@+id/imgRing"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/safe_circle_preview"
+            android:layout_gravity="center"/>
+
+        <!-- four peripheral avatars with arrows -->
+        <!-- Top -->
+<!--        <ImageView-->
+<!--            android:id="@+id/avatarTop"-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:src="@drawable/avatar_top"-->
+<!--            android:layout_gravity="top|center_horizontal"-->
+<!--            android:translationY="-20dp"/>-->
+<!--        <ImageView-->
+<!--            android:id="@+id/arrowTop"-->
+<!--            android:layout_width="24dp"-->
+<!--            android:layout_height="24dp"-->
+<!--            android:src="@drawable/ic_arrow_up"-->
+<!--            android:layout_gravity="top|center_horizontal"-->
+<!--            android:translationY="60dp"/>-->
+
+        <!-- Bottom -->
+<!--        <ImageView-->
+<!--            android:id="@+id/avatarBottom"-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:src="@drawable/avatar_bottom"-->
+<!--            android:layout_gravity="bottom|center_horizontal"-->
+<!--            android:translationY="20dp"/>-->
+<!--        <ImageView-->
+<!--            android:id="@+id/arrowBottom"-->
+<!--            android:layout_width="24dp"-->
+<!--            android:layout_height="24dp"-->
+<!--            android:src="@drawable/ic_arrow_down"-->
+<!--            android:layout_gravity="bottom|center_horizontal"-->
+<!--            android:translationY="-60dp"/>-->
+
+        <!-- Left -->
+<!--        <ImageView-->
+<!--            android:id="@+id/avatarLeft"-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:src="@drawable/avatar_left"-->
+<!--            android:layout_gravity="center_vertical|start"-->
+<!--            android:translationX="-20dp"/>-->
+<!--        <ImageView-->
+<!--            android:id="@+id/arrowLeft"-->
+<!--            android:layout_width="24dp"-->
+<!--            android:layout_height="24dp"-->
+<!--            android:src="@drawable/ic_arrow_left"-->
+<!--            android:layout_gravity="center_vertical|start"-->
+<!--            android:translationX="60dp"/>-->
+
+        <!-- Right -->
+<!--        <ImageView-->
+<!--            android:id="@+id/avatarRight"-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:src="@drawable/avatar_right"-->
+<!--            android:layout_gravity="center_vertical|end"-->
+<!--            android:translationX="20dp"/>-->
+<!--        <ImageView-->
+<!--            android:id="@+id/arrowRight"-->
+<!--            android:layout_width="24dp"-->
+<!--            android:layout_height="24dp"-->
+<!--            android:src="@drawable/ic_arrow_right"-->
+<!--            android:layout_gravity="center_vertical|end"-->
+<!--            android:translationX="-60dp"/>-->
+
+    </FrameLayout>
+
+    <!-- Intro text -->
+    <TextView
+        android:id="@+id/introText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Protection starts with connection –\nAdd your loved ones!"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:layout_marginHorizontal="8dp"
+        android:fontFamily="@font/poppins_bold"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/centerContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="60dp"/>
+
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/addButton"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="4dp"
-        app:cardBackgroundColor="@android:color/white"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="40dp">
+        app:cardCornerRadius="32dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="@color/button_gold"
+        app:strokeColor="#e7d9c8"
+        app:strokeWidth="5dp">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_add"
-            android:layout_gravity="center"
-            android:tint="@android:color/black"/>
-    </androidx.cardview.widget.CardView>
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_add"
+        app:tint="@color/white"/>
+</com.google.android.material.card.MaterialCardView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

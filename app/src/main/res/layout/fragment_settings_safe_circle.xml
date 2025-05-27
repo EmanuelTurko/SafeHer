@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/red_background">
+    android:background="@color/cream_background">
 
     <!--    Back Button-->
     <androidx.cardview.widget.CardView
@@ -49,8 +49,8 @@
 
             <ImageView
                 android:id="@+id/safecircleIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/safe_circle"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -89,7 +89,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="60dp"
         android:layout_marginBottom="40dp"
-        app:cardBackgroundColor="#FFF0F0"
+        app:cardBackgroundColor="@color/button_gold"
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -121,7 +121,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/searchview_border"
         android:elevation="4dp"
