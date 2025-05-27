@@ -23,6 +23,12 @@ class SafeCircleIntroFragment : Fragment() {
         binding.addButton.setOnClickListener {
             findNavController().navigate(R.id.action_safeCircleIntroFragment_to_safeCircleFragment)
         }
+        binding.backButtonCard.setOnClickListener {
+            findNavController().navigate(R.id.action_safeCircleIntroFragment_to_settingsLobbyFragment)
+        }
+        binding.homeButton.setOnClickListener {
+            findNavController().navigate(R.id.action_safeCircleIntroFragment_to_SOSHomeScreenFragment)
+        }
 
         return binding.root
     }

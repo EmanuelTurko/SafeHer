@@ -36,6 +36,8 @@
         <action
             android:id="@+id/action_settingsLobbyFragment_to_safeCircleIntroFragment"
             app:destination="@id/safeCircleIntroFragment" />
+
+
     </fragment>
 
     <fragment
@@ -119,6 +121,12 @@
         <action
             android:id="@+id/action_safeCircleIntroFragment_to_safeCircleFragment"
             app:destination="@id/SafeCircleFragment" />
+        <action
+            android:id="@+id/action_safeCircleIntroFragment_to_settingsLobbyFragment"
+            app:destination="@id/settingsLobbyFragment" />
+        <action
+            android:id="@+id/action_safeCircleIntroFragment_to_SOSHomeScreenFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
     </fragment>
 
     <fragment
