@@ -39,9 +39,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp">
 
@@ -51,22 +52,22 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_settings"
-                app:tint="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:tint="#FFFFFF" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="SETTINGS"
                 android:textColor="#FFFFFF"
-                android:layout_marginStart="8dp"
                 android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/settingsIcon"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -256,10 +257,10 @@
         android:id="@+id/logoutButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="60dp"
+        android:layout_marginHorizontal="80dp"
         android:layout_marginBottom="40dp"
         app:cardBackgroundColor="@color/red_background"
-        app:cardCornerRadius="24dp"
+        app:cardCornerRadius="21dp"
         app:cardElevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
