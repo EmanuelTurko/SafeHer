@@ -102,7 +102,7 @@ class ProfileFragment : Fragment() {
         }
 
         binding.saveButton.setOnClickListener { onSaveClicked() }
-        binding.removeAccountButton.setOnClickListener { onRemoveAccountClicked() }
+        binding.removeButton.setOnClickListener { onRemoveAccountClicked() }
         binding.btnAddPhoto.setOnClickListener { openGallery() }
     }
 
