@@ -23,7 +23,7 @@ class SettingsLobbyFragment : Fragment() {
     private lateinit var mBackBtn: CardView
     private lateinit var mLogoutBtn: CardView
     private lateinit var mVideoLibraryOption: ConstraintLayout
-    private lateinit var mPairOption: ConstraintLayout
+    private lateinit var mSafeCircleOption: ConstraintLayout
     private lateinit var mProfileOption: ConstraintLayout
     private lateinit var mAboutOption: ConstraintLayout
     private lateinit var mQuestionsOption: ConstraintLayout
@@ -42,7 +42,7 @@ class SettingsLobbyFragment : Fragment() {
         mBackBtn = view.findViewById(R.id.backButtonCard)
         mLogoutBtn = view.findViewById(R.id.logoutButton)
         mVideoLibraryOption = view.findViewById(R.id.videoLibraryOption)
-        mPairOption = view.findViewById(R.id.pairOption)
+        mSafeCircleOption = view.findViewById(R.id.safeCircleOption)
         mProfileOption = view.findViewById(R.id.profileOption)
         mAboutOption = view.findViewById(R.id.aboutOption)
         mQuestionsOption = view.findViewById(R.id.qaOption)
@@ -89,7 +89,7 @@ class SettingsLobbyFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        mPairOption.setOnClickListener {
+        mSafeCircleOption.setOnClickListener {
             handleSafeCircleNavigation()
         }
 

@@ -49,7 +49,7 @@ class VideoLibraryFragment :Fragment() {
 
     private fun initView(view: View) {
         mBackBtn = view.findViewById(R.id.backButtonCard)
-        mHome = view.findViewById(R.id.homeButton)
+        mHome = view.findViewById(R.id.homeButtonCard)
         recyclerView = view.findViewById(R.id.videoRecyclerView)
 
     }
