@@ -312,12 +312,6 @@
                 android:text="Save"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginEnd="8dp"
-                android:src="@drawable/ic_heart"
-                tools:ignore="ContentDescription" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -327,7 +321,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="60dp"
-        app:cardBackgroundColor="#FF5151"
+        app:cardBackgroundColor="@color/red_background"
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -350,14 +344,14 @@
                 android:fontFamily="@font/poppins_semibold"
                 android:gravity="center"
                 android:text="Remove Account"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_marginEnd="8dp"
-                android:src="@drawable/ic_delete"
+                android:src="@drawable/ic_remove"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -41,7 +41,7 @@
         android:id="@+id/buttonDeleteComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_delete"
+        android:src="@drawable/ic_trash"
     android:contentDescription="delete_comment"
     android:background="?attr/selectableItemBackgroundBorderless" />
 </LinearLayout>
