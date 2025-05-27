@@ -1,8 +1,5 @@
-// SafeCircleFragment.kt
 package com.example.safeher.settings.safeCircle
-
 import android.Manifest
-import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -10,12 +7,10 @@ import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AutoCompleteTextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.SearchView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -35,8 +30,7 @@ class SafeCircleFragment : Fragment() {
     private var binding: FragmentSettingsSafeCircleBinding? = null
     private lateinit var adapter: ContactAdapter
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-    private var contactsList = mutableListOf<ContactItem>()
-    private var preSelectedContacts: List<ContactItem>? = null
+    private val contactsList = mutableListOf<ContactItem>()
 
     private val safeCircleViewModel: SafeCircleViewModel by lazy {
         val apiService = RetroFitClient.getApiService(requireContext())
@@ -55,55 +49,28 @@ class SafeCircleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Back nav
-        binding?.backButtonCard?.setOnClickListener {
-            findNavController().navigate(R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment)
-        }
+        // intercept system back → conditional navigation
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = handleBack()
+            }
+        )
 
-        // If coming back with edited contacts
-        preSelectedContacts = arguments
-            ?.getParcelableArrayList<ContactItem>("selected_contacts")
+        // UI back arrow uses same logic
+        binding?.backButtonCard?.setOnClickListener { handleBack() }
 
         initView()
+        setupPermissionLauncher()
         requestContactsPermission()
-        setupSearch()
     }
 
-    private fun initView() {
-
-        binding?.recyclerViewContacts?.layoutManager =
-            LinearLayoutManager(requireContext())
-        adapter = ContactAdapter(5, requireContext())
-        binding?.recyclerViewContacts?.adapter = adapter
-
-        binding?.finishButton?.setOnClickListener {
-            val selected = adapter.getSelectedContacts()
-
-            // 1. Pull currentUserId
-            val authPrefs = requireContext()
-                .getSharedPreferences("auth", Context.MODE_PRIVATE)
-            val currentUserId = authPrefs.getString("userId", "") ?: ""
-
-            // 2. Save under per-user key
-            val prefs = requireContext()
-                .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
-            val key = "safe_circle_contacts_$currentUserId"
-            val json = Gson().toJson(selected)
-            prefs.edit().putString(key, json).apply()
-
-            // 3. Update backend
-            val fullName = requireContext()
-                .getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
-                .getString("fullName", "") ?: ""
-            safeCircleViewModel.updateUserSafeCircle(fullName, selected)
-
-            Toast.makeText(
-                requireActivity(),
-                "Selected: ${selected.joinToString { it.name }}",
-                Toast.LENGTH_LONG
-            ).show()
-
-            // 4. Navigate back with flag
+    private fun handleBack() {
+        val selected = adapter.getSelectedContacts()
+        if (selected.isEmpty()) {
+            // none chosen → pop back to intro
+            findNavController().popBackStack()
+        } else {
             val bundle = Bundle().apply {
                 putParcelableArrayList("selected_contacts", ArrayList(selected))
                 putBoolean("showDone", true)
@@ -115,99 +82,90 @@ class SafeCircleFragment : Fragment() {
         }
     }
 
-    private fun setupSearch() {
-        val searchEditText = binding?.pairSearchView
-            ?.findViewById<AutoCompleteTextView>(
-                androidx.appcompat.R.id.search_src_text
-            )
-        searchEditText?.setTextColor(
-            ContextCompat.getColor(requireContext(), android.R.color.black)
-        )
-        searchEditText?.setHintTextColor(
-            ContextCompat.getColor(requireContext(), android.R.color.black)
-        )
-        binding?.pairSearchView?.setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?) = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterContacts(newText)
-                val isRTL = newText?.any { it in '֐'..'׿' } == true
-                searchEditText?.textDirection = if (isRTL)
-                    View.TEXT_DIRECTION_RTL
-                else
-                    View.TEXT_DIRECTION_LTR
-                return true
+    private fun initView() {
+        binding?.recyclerViewContacts?.layoutManager = LinearLayoutManager(requireContext())
+        adapter = ContactAdapter(5, requireContext())
+        binding?.recyclerViewContacts?.adapter = adapter
+
+        binding?.finishButton?.setOnClickListener {
+            val selected = adapter.getSelectedContacts()
+            // 1. Persist selection locally
+            val authPrefs = requireContext()
+                .getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val currentUserId = authPrefs.getString("userId", "") ?: ""
+            val prefs = requireContext()
+                .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
+            val key = "safe_circle_contacts_$currentUserId"
+            prefs.edit().putString(key, Gson().toJson(selected)).apply()
+
+            // 2. Update backend
+            val fullName = requireContext()
+                .getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
+                .getString("fullName", "") ?: ""
+            safeCircleViewModel.updateUserSafeCircle(fullName, selected)
+
+            Toast.makeText(
+                requireActivity(),
+                "Selected: ${selected.joinToString { it.name }}",
+                Toast.LENGTH_LONG
+            ).show()
+
+            // 3. Navigate to MySafeCircle
+            val bundle = Bundle().apply {
+                putParcelableArrayList("selected_contacts", ArrayList(selected))
+                putBoolean("showDone", true)
             }
-        })
+            findNavController().navigate(
+                R.id.action_settingsSafeCircleFragment_to_mySafeCircleFragment,
+                bundle
+            )
+        }
     }
 
-    private fun requestContactsPermission() {
+    private fun setupPermissionLauncher() {
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { granted ->
             if (granted) loadContacts()
             else Toast.makeText(
-                requireActivity(),
-                "Permission denied",
+                requireContext(),
+                "Permission to read contacts was denied.",
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun requestContactsPermission() {
         when {
             ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.READ_CONTACTS
             ) == PackageManager.PERMISSION_GRANTED -> loadContacts()
-
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(),
-                Manifest.permission.READ_CONTACTS
-            ) -> AlertDialog.Builder(requireActivity())
-                .setTitle("Permission Required")
-                .setMessage("We need access to your contacts to display them.")
-                .setPositiveButton("Allow") { _, _ ->
-                    requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-                }
-                .setNegativeButton("Deny", null)
-                .show()
-
             else -> requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
     }
 
     private fun loadContacts() {
-        contactsList = mutableListOf()
+        contactsList.clear()
         val cursor = requireContext().contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            null, null, null, null
+            arrayOf(
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+            ),
+            null, null,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
         )
         cursor?.use {
-            val nameIdx = it.getColumnIndex(
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-            )
-            val numIdx = it.getColumnIndex(
-                ContactsContract.CommonDataKinds.Phone.NUMBER
-            )
+            val nameIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val numIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
             while (it.moveToNext()) {
-                val name = it.getString(nameIdx)
-                val num = it.getString(numIdx)
-                val isSel = preSelectedContacts
-                    ?.any { it.phoneNumber == num } == true
-                contactsList.add(ContactItem(name, num, isSel))
+                val name = it.getString(nameIdx) ?: continue
+                val number = it.getString(numIdx) ?: continue
+                contactsList.add(ContactItem(name, number))
             }
         }
         adapter.submitList(contactsList)
-    }
-
-    private fun filterContacts(query: String?) {
-        val filtered = if (query.isNullOrBlank()) {
-            contactsList
-        } else {
-            contactsList.filter {
-                it.name.contains(query, true) ||
-                        it.phoneNumber.contains(query)
-            }
-        }
-        adapter.submitList(filtered)
     }
 
     override fun onDestroyView() {

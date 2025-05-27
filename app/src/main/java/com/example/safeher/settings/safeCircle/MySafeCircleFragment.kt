@@ -1,4 +1,3 @@
-// MySafeCircleFragment.kt
 package com.example.safeher.settings.safeCircle
 
 import android.content.Context
@@ -6,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -46,14 +45,21 @@ class MySafeCircleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Back button
-        binding.backButtonCard.setOnClickListener {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = handleBack()
+            }
+        )
+        binding.backButtonCard.setOnClickListener { handleBack() }
+
+        binding.homeButtonCard.setOnClickListener {
             findNavController().navigate(
-                R.id.action_mySafeCircleFragment_to_settingsLobbyFragment
+                R.id.action_mySafeCircleFragment_to_SOSHomeScreenFragment
             )
         }
 
-        // DONE vs EDIT based on navigation flag
+        // DONE vs EDIT
         val showDone = arguments?.getBoolean("showDone", false) ?: false
         binding.editText.text = if (showDone) "DONE" else "EDIT"
         binding.editButton.setOnClickListener {
@@ -84,9 +90,21 @@ class MySafeCircleFragment : Fragment() {
         adapter.updateContacts(contactList)
     }
 
+    private fun handleBack() {
+        if (contactList.isEmpty()) {
+            findNavController().navigate(
+                R.id.action_mySafeCircleFragment_to_safeCircleIntroFragment
+            )
+        } else {
+            findNavController().navigate(
+                R.id.action_mySafeCircleFragment_to_settingsLobbyFragment
+            )
+        }
+    }
+
     private fun initRecycler() {
-        adapter = ConfirmContactsAdapter(contactList) { removedContact ->
-            contactList.remove(removedContact)
+        adapter = ConfirmContactsAdapter(contactList) { removedItem ->
+            contactList.remove(removedItem)
             updateSharedPrefs()
             updateMongo()
             adapter.updateContacts(contactList)
@@ -97,17 +115,12 @@ class MySafeCircleFragment : Fragment() {
     }
 
     private fun loadContactsFromPrefs() {
-        // 1. currentUserId
         val authPrefs = requireContext()
             .getSharedPreferences("auth", Context.MODE_PRIVATE)
         val currentUserId = authPrefs.getString("userId", "") ?: ""
-
-        // 2. load JSON under per-user key
         val prefs = requireContext()
             .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
-        val key = "safe_circle_contacts_$currentUserId"
-        val json = prefs.getString(key, "") ?: ""
-
+        val json = prefs.getString("safe_circle_contacts_$currentUserId", "") ?: ""
         contactList = if (json.isNotEmpty()) {
             val type = object : TypeToken<List<ContactItem>>() {}.type
             Gson().fromJson<List<ContactItem>>(json, type).toMutableList()
@@ -120,12 +133,11 @@ class MySafeCircleFragment : Fragment() {
         val authPrefs = requireContext()
             .getSharedPreferences("auth", Context.MODE_PRIVATE)
         val currentUserId = authPrefs.getString("userId", "") ?: ""
-
         val prefs = requireContext()
             .getSharedPreferences("safeher_prefs", Context.MODE_PRIVATE)
-        val key = "safe_circle_contacts_$currentUserId"
-        val updatedJson = Gson().toJson(contactList)
-        prefs.edit().putString(key, updatedJson).apply()
+        prefs.edit()
+            .putString("safe_circle_contacts_$currentUserId", Gson().toJson(contactList))
+            .apply()
     }
 
     private fun updateMongo() {
