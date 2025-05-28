@@ -97,6 +97,11 @@ class SOSHomeScreenFragment : Fragment() {
             else Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
         }
 
+    override fun onStart() {
+        super.onStart()
+        updateWelcomeText()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
