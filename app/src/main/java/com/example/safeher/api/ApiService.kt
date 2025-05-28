@@ -79,6 +79,10 @@ interface ApiService {
 
     @POST("twilio/send-emergency-message")
     suspend fun sendEmergencyMessage(@Body request: TwilioEmergencyMessageRequest): ApiResponse<Unit>
+
+    @POST("auth/forgot-password")
+    suspend fun forgotPassword(@Body email: Map<String, String>): ApiResponse<Unit>
+
 }
 
 

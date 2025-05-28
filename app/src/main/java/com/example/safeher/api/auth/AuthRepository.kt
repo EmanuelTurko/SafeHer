@@ -14,4 +14,10 @@ class AuthRepository(private val apiService: ApiService) {
     suspend fun loginUser(data: LoginRequest): ApiResponse<User>{
         return apiService.loginUser(data)
     }
+
+    suspend fun forgotPassword(email: String): ApiResponse<Unit> {
+        return apiService.forgotPassword(mapOf("email" to email))
+
+    }
+
 }
