@@ -10,27 +10,43 @@
     <!-- Caller logo -->
     <ImageView
         android:id="@+id/caller_imageView"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="60dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginTop="40dp"
         android:src="@drawable/ic_female_avatar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Caller name -->
+    <TextView
+        android:id="@+id/caller_name_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Shira"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/caller_imageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
     <!-- Call Duration -->
     <TextView
         android:id="@+id/call_duration_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="30dp"
         android:text="00:00"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/caller_imageView" />
+        app:layout_constraintTop_toBottomOf="@id/caller_name_textView" />
 
     <!-- Mute -->
     <ImageButton
@@ -38,7 +54,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="330dp"
+        android:layout_marginTop="360dp"
         android:layout_marginEnd="25dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="muted btn"
@@ -57,7 +73,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="330dp"
+        android:layout_marginTop="360dp"
         android:layout_marginEnd="25dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="Hold"
@@ -72,7 +88,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="420dp"
+        android:layout_marginTop="460dp"
         android:layout_marginEnd="25dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="video btn"
@@ -89,7 +105,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="420dp"
+        android:layout_marginTop="460dp"
         android:layout_marginEnd="25dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="add btn"
@@ -108,7 +124,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="330dp"
+        android:layout_marginTop="360dp"
         android:layout_marginEnd="50dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="speaker btn"
@@ -139,7 +155,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="420dp"
+        android:layout_marginTop="460dp"
         android:layout_marginEnd="50dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="keypad btn"
