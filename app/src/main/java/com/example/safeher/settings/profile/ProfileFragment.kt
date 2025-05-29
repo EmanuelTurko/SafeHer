@@ -13,11 +13,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
 import com.example.safeher.auth.MainActivity
@@ -28,6 +30,9 @@ import com.example.safeher.model.ContactItem
 import com.example.safeher.model.User
 import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 class ProfileFragment : Fragment() {
@@ -102,8 +107,22 @@ class ProfileFragment : Fragment() {
         }
 
         binding.saveButton.setOnClickListener { onSaveClicked() }
-        binding.removeButton.setOnClickListener { onRemoveAccountClicked() }
+        binding.removeButton.setOnClickListener { showRemoveAccountDialog() }
         binding.btnAddPhoto.setOnClickListener { openGallery() }
+    }
+
+    private fun showRemoveAccountDialog() {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Remove Account")
+            .setMessage("Are you sure you want to remove your account? This action cannot be undone.")
+            .setPositiveButton("Remove") { _, _ -> onRemoveAccountConfirmed() }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun onRemoveAccountConfirmed() {
+        Log.d("ProfileFragment", "Attempting to delete account for userId=$userId")
+        viewModel.deleteAccount(userId)
     }
 
     private fun setupObservers() {
@@ -140,11 +159,16 @@ class ProfileFragment : Fragment() {
                 }
 
                 ProfileState.DeleteAccountSuccess -> {
-                    startActivity(
-                        Intent(requireContext(), MainActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                    )
+                    Log.d("ProfileFragment", "Account deleted successfully, clearing prefs")
+                    val savedUserId = userId
+                    requireContext()
+                        .getSharedPreferences("auth", Context.MODE_PRIVATE)
+                        .edit()
+                        .clear()
+                        .apply()
+
+                    Log.d("ProfileFragment", "UserId AFTER clearing prefs: $savedUserId")
+                    findNavController().navigate(R.id.action_profileFragment_to_homePageFragment)
                 }
 
                 is ProfileState.ProfileError -> {
@@ -198,21 +222,17 @@ class ProfileFragment : Fragment() {
         } else emptyList()
 
         val user = User(
-            id                 = userId,
-            fullName           = newName,
-            email              = newEmail,
-            password           = originalUser?.password.orEmpty(),
-            phoneNumber        = newPhone.takeIf(String::isNotEmpty)
+            id = userId,
+            fullName = newName,
+            email = newEmail,
+            password = originalUser?.password.orEmpty(),
+            phoneNumber = newPhone.takeIf(String::isNotEmpty)
                 ?: originalUser?.phoneNumber.orEmpty(),
-            idPhotoUrl         = originalUser?.idPhotoUrl.orEmpty(),
-            profilePicture     = encoded,
+            idPhotoUrl = originalUser?.idPhotoUrl.orEmpty(),
+            profilePicture = encoded,
             safeCircleContacts = contacts
         )
         viewModel.saveUserData(user)
-    }
-
-    private fun onRemoveAccountClicked() {
-        viewModel.deleteAccount(userId)
     }
 
     private fun openGallery() {
@@ -284,4 +304,5 @@ class ProfileFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

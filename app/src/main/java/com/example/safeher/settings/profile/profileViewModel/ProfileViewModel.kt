@@ -8,12 +8,15 @@ import android.util.Base64
 import androidx.lifecycle.*
 import com.example.safeher.model.User
 import com.example.safeher.settings.profile.profileRepository.ProfileRepository
-import com.example.safeher.settings.profile.profileViewModel.ProfileViewModel
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import android.util.Log
+
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
+
     private val repo = ProfileRepository(application)
+
     private val _profileState = MutableLiveData<ProfileState>()
     val profileState: LiveData<ProfileState> = _profileState
 
@@ -44,17 +47,22 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun deleteAccount(userId: String) {
+        Log.d("ProfileViewModel", "Calling deleteAccount for userId=$userId")
         _profileState.value = ProfileState.Loading
         viewModelScope.launch {
             repo.deleteAccount(userId)
                 .onSuccess {
-                    _profileState.value = ProfileState.DeleteAccountSuccess
+                    Log.d("ProfileViewModel", "Successfully deleted account")
+                    _profileState.postValue(ProfileState.DeleteAccountSuccess)
                 }
-                .onFailure { ex ->
-                    _profileState.value = ProfileState.ProfileError(ex.message ?: "Error deleting account")
+                .onFailure { e ->
+                    Log.e("ProfileViewModel", "Failed to delete account: ${e.message}")
+                    _profileState.postValue(ProfileState.ProfileError(e.message ?: "Error deleting account"))
                 }
         }
     }
+
+
 
     fun signOut() = repo.signOut()
 
