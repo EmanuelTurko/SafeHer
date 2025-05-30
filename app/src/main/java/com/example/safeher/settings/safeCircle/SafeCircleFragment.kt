@@ -1,6 +1,7 @@
 package com.example.safeher.settings.safeCircle
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -33,6 +34,7 @@ class SafeCircleFragment : Fragment() {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val contactsList = mutableListOf<ContactItem>()
     private var originalContacts: List<ContactItem> = listOf()
+    private var preSelectedContacts: List<ContactItem> = emptyList()
     private lateinit var searchView: androidx.appcompat.widget.SearchView
 
     private val safeCircleViewModel: SafeCircleViewModel by lazy {
@@ -49,8 +51,13 @@ class SafeCircleFragment : Fragment() {
         return binding!!.root
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        arguments?.getParcelableArrayList<ContactItem>("selected_contacts")?.let {
+            preSelectedContacts = it
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -65,17 +72,14 @@ class SafeCircleFragment : Fragment() {
         setupPermissionLauncher()
         requestContactsPermission()
 
-        // התחברות לשדה החיפוש
         searchView = binding?.pairSearchView!!
 
-        // הגדרת צבע טקסט וה־hint של שדה החיפוש
         val searchEditText = searchView.findViewById<androidx.appcompat.widget.SearchView.SearchAutoComplete>(
             androidx.appcompat.R.id.search_src_text
         )
         searchEditText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
         searchEditText.setHintTextColor(ContextCompat.getColor(requireContext(), android.R.color.darker_gray))
 
-        // סינון אנשי קשר תוך כדי הקלדה
         searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
@@ -127,7 +131,7 @@ class SafeCircleFragment : Fragment() {
 
             Toast.makeText(
                 requireActivity(),
-                "Selected: ${selected.joinToString { it.name }}",
+                "Selected: ${selected.joinToString(", ") { it.name }}",
                 Toast.LENGTH_LONG
             ).show()
 
@@ -188,6 +192,9 @@ class SafeCircleFragment : Fragment() {
 
         originalContacts = contactsList.toList()
         adapter.submitList(originalContacts)
+        if (preSelectedContacts.isNotEmpty()) {
+            adapter.setPreSelectedContacts(preSelectedContacts)
+        }
     }
 
     override fun onDestroyView() {
