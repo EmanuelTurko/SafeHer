@@ -58,10 +58,10 @@
             <ImageButton
                 android:id="@+id/buttonComment"
                 android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_comment"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_comment" />
 
             <ImageButton
                 android:id="@+id/buttonLike"
