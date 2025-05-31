@@ -141,8 +141,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:cardBackgroundColor="@color/button_gold"
-        app:cardCornerRadius="32dp"
-        app:cardElevation="6dp"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="3dp"
         app:strokeColor="#e7d9c8"
         app:strokeWidth="5dp"
         app:cardUseCompatPadding="true">
