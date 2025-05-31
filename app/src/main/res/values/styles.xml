@@ -62,4 +62,8 @@
     <style name="Widget.AppCompat.SearchView" parent="Base.Widget.AppCompat.SearchView">
         <item name="searchIcon">@null</item> <!-- removes magnifying glass -->
     </style>
+
+        <style name="Theme.SafeHer.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+            <item name="android:windowBackground">@drawable/splash_background</item>
+        </style>
 </resources>
