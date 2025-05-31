@@ -14,9 +14,9 @@ import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.safeher.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.safeher.R
 import com.example.safeher.adapters.CommentsAdapter
 import com.example.safeher.adapters.PostAdapter
 import com.example.safeher.api.RetroFitClient
@@ -30,8 +30,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SistersFragment : Fragment() {
-    private lateinit var mBackBtn: CardView
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var backBtn: CardView
+    private lateinit var horizontalRecyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
 
     override fun onCreateView(
@@ -41,7 +41,7 @@ class SistersFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_sisters, container, false)
         initView(view)
         initListener()
-        setupRecyclerView(view)
+        setupHorizontalScroll(view)
         return view
     }
 
@@ -51,7 +51,7 @@ class SistersFragment : Fragment() {
     }
 
     private fun initView(view: View) {
-        mBackBtn = view.findViewById(R.id.backButtonCard)
+        backBtn = view.findViewById(R.id.backButtonCard)
         val writePostBtn = view.findViewById<MaterialButton>(R.id.write_new_post_button)
         writePostBtn.setOnClickListener {
             findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
@@ -59,14 +59,18 @@ class SistersFragment : Fragment() {
     }
 
     private fun initListener() {
-        mBackBtn.setOnClickListener {
+        backBtn.setOnClickListener {
             findNavController().navigate(R.id.action_sistersFragment_to_SOSHomeScreenFragment)
         }
     }
 
-    private fun setupRecyclerView(view: View) {
-        recyclerView = view.findViewById(R.id.postsRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    private fun setupHorizontalScroll(view: View) {
+        horizontalRecyclerView = view.findViewById(R.id.postsRecyclerView)
+        horizontalRecyclerView.layoutManager = LinearLayoutManager(
+            requireContext(),
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
 
         lifecycleScope.launch {
             try {
@@ -77,17 +81,14 @@ class SistersFragment : Fragment() {
                 postAdapter = PostAdapter(
                     requireContext(),
                     postsList.toMutableList(),
-                    showPostDialog = { post ->
-                        showPostDialog(post)
-                    },
+                    showPostDialog = { post -> showPostDialog(post) },
                     onEditPost = { post ->
                         val action = SistersFragmentDirections
                             .actionSistersFragmentToEditPostFragment(post.id, post.body)
                         findNavController().navigate(action)
                     }
                 )
-
-                recyclerView.adapter = postAdapter
+                horizontalRecyclerView.adapter = postAdapter
             } catch (e: Exception) {
                 Log.e("SistersFragment", "Error loading posts: ${e.message}")
             }
@@ -95,40 +96,32 @@ class SistersFragment : Fragment() {
     }
 
     private fun showPostDialog(post: Post) {
-        // 1. Inflate the custom dialog layout
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_post, null)
 
-        // 2. Bind views
-        val tvDialogPostAuthor = dialogView.findViewById<TextView>(R.id.tvDialogPostAuthor)
-        val tvDialogPostTime   = dialogView.findViewById<TextView>(R.id.tvDialogPostTime)
-        val tvBody             = dialogView.findViewById<TextView>(R.id.tvPostBody)
-        val rvComments         = dialogView.findViewById<RecyclerView>(R.id.rvComments)
-        val etNewComment       = dialogView.findViewById<EditText>(R.id.etNewComment)
+        val tvAuthor = dialogView.findViewById<TextView>(R.id.tvDialogPostAuthor)
+        val tvTime   = dialogView.findViewById<TextView>(R.id.tvDialogPostTime)
+        val tvBody   = dialogView.findViewById<TextView>(R.id.tvPostBody)
+        val rvComments = dialogView.findViewById<RecyclerView>(R.id.rvComments)
+        val etNewComment = dialogView.findViewById<EditText>(R.id.etNewComment)
 
-        // 3. Populate post data
-        tvDialogPostAuthor.text = post.user.fullName
-        tvDialogPostTime.text   = DateUtils.formatDateTime(post.createdAt)
-        tvBody.text             = post.body
+        tvAuthor.text = post.user.fullName
+        tvTime.text   = DateUtils.formatDateTime(post.createdAt)
+        tvBody.text   = post.body
 
-        // 4. Load comments
         val commentsList = post.comments.toMutableList()
         val commentsAdapter = CommentsAdapter(requireContext(), commentsList)
         rvComments.layoutManager = LinearLayoutManager(requireContext())
-        rvComments.adapter       = commentsAdapter
+        rvComments.adapter = commentsAdapter
 
-        // 4.5 Retrieve currentUserId and check ownership
-        val prefs = requireContext()
-            .getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
         val currentUserId = prefs.getString("userId", "") ?: ""
         val isOwner = post.user.id == currentUserId
 
-        // 5. Build the dialog
         val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setNegativeButton("Close", null)
 
-        // 5.5 Only add Edit button if the current user is the post owner
         if (isOwner) {
             builder.setNeutralButton("Edit") { _, _ ->
                 val action = SistersFragmentDirections
@@ -138,10 +131,8 @@ class SistersFragment : Fragment() {
         }
 
         builder.setPositiveButton("Send", null)
-        val dialog = builder.create()
-        dialog.show()
+        val dialog = builder.create().apply { show() }
 
-        // 6. Handle the Send button manually so dialog stays open
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val text = etNewComment.text.toString().trim()
             if (text.isEmpty()) {
@@ -149,7 +140,6 @@ class SistersFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // 7. Send the new comment to the server
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val resp = RetroFitClient
                     .getApiService(requireContext())
@@ -157,7 +147,6 @@ class SistersFragment : Fragment() {
 
                 withContext(Dispatchers.Main) {
                     if (resp.data != null) {
-                        // 8. Add to the same list and notify adapter
                         commentsList.add(resp.data)
                         commentsAdapter.notifyItemInserted(commentsList.size - 1)
                         etNewComment.text.clear()
@@ -173,6 +162,4 @@ class SistersFragment : Fragment() {
             }
         }
     }
-
-
 }

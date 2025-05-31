@@ -8,9 +8,9 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/tvCommentAuthor"
@@ -39,9 +39,11 @@
 
     <ImageButton
         android:id="@+id/buttonDeleteComment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_trash"
-    android:contentDescription="delete_comment"
-    android:background="?attr/selectableItemBackgroundBorderless" />
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_red_trash"
+        android:contentDescription="delete_comment"
+         />
 </LinearLayout>
