@@ -1,18 +1,18 @@
 package com.example.safeher.auth.safeCircle.adapter
 
+import android.content.Context
+import android.widget.Toast
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
 import com.example.safeher.model.ContactItem
 import com.example.safeher.utils.getStringListShareRef
-import android.content.Context
 
 class ContactAdapter(
     private val maxSelection: Int = 5,
@@ -34,7 +34,6 @@ class ContactAdapter(
         val item = getItem(position)
         holder.name.text = item.name
 
-        // מסמן אנשי קשר שהיו שמורים בעבר (מ־SharedPreferences)
         val savedNumbers = context.getStringListShareRef("safeCircle", "or")
         if (savedNumbers.contains(item.phoneNumber)) {
             item.isSelected = true
@@ -50,7 +49,7 @@ class ContactAdapter(
                 holder.checkbox.isChecked = false
                 Toast.makeText(
                     context,
-                    "You can only select up to $maxSelection contacts.",
+                    "You can only select up to \$maxSelection contacts.",
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
@@ -62,12 +61,10 @@ class ContactAdapter(
 
     override fun getItemCount(): Int = currentList.size
 
-    // מחזיר את כל אנשי הקשר שסומנו בפועל
     fun getSelectedContacts(): List<ContactItem> {
         return currentList.filter { it.isSelected }
     }
 
-    // מסמן אנשי קשר שהיו נבחרים במסך קודם
     fun setPreSelectedContacts(preSelected: List<ContactItem>) {
         val updatedList = currentList.map { contact ->
             contact.copy(isSelected = preSelected.any { it.phoneNumber == contact.phoneNumber })

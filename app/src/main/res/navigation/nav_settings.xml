@@ -86,6 +86,11 @@
         <action
             android:id="@+id/action_profileFragment_to_SOSHomeScreenFragment"
             app:destination="@id/SOSHomeScreenFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment" />
+
+
     </fragment>
 
     <!-- About App -->
@@ -166,4 +171,10 @@
         android:id="@+id/SOSHomeScreenFragment"
         android:name="com.example.safeher.home_screen.sos.SOSHomeScreenFragment"
         android:label="SOSHomeScreenFragment" />
+    <fragment
+        android:id="@+id/homePageFragment"
+        android:name="com.example.safeher.auth.authFragments.HomePageFragment"
+        android:label="HomePageFragment" />
+
+
 </navigation>

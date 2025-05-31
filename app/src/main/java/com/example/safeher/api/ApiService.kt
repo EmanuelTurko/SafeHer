@@ -72,10 +72,10 @@ interface ApiService {
         @Path("commentId") commentId: String
     ): Response<Void>
 
-    @DELETE("users/{id}")
-    suspend fun deleteUserAccount(
-        @Path("id") userId: String
-    ): ApiResponse<Unit>
+    @DELETE("user/delete/{userId}")
+    suspend fun deleteUser(
+        @Path("userId") userId: String
+    ): Response<Unit>
 
     @POST("twilio/send-emergency-message")
     suspend fun sendEmergencyMessage(@Body request: TwilioEmergencyMessageRequest): ApiResponse<Unit>

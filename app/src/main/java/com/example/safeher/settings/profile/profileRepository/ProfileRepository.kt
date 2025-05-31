@@ -24,10 +24,15 @@ class ProfileRepository(context: Context) {
     }
 
     suspend fun deleteAccount(userId: String): Result<Unit> = runCatching {
-        val resp = api.deleteUserAccount(userId)
-        if (resp.error == null) Unit
-        else throw Exception(resp.error)
+        Log.d("ProfileRepository", "Sending DELETE request for userId=$userId")
+        val resp = api.deleteUser(userId)
+        Log.d("ProfileRepository", "Response code: ${resp.code()}, success: ${resp.isSuccessful}")
+        if (resp.isSuccessful) Unit
+        else throw Exception("Failed to delete user: ${resp.code()}")
     }
+
+
+
 
     fun signOut() = Unit
 }

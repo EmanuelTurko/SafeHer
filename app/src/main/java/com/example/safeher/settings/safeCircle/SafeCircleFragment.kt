@@ -1,5 +1,7 @@
 package com.example.safeher.settings.safeCircle
+
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -31,6 +33,9 @@ class SafeCircleFragment : Fragment() {
     private lateinit var adapter: ContactAdapter
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val contactsList = mutableListOf<ContactItem>()
+    private var originalContacts: List<ContactItem> = listOf()
+    private var preSelectedContacts: List<ContactItem> = emptyList()
+    private lateinit var searchView: androidx.appcompat.widget.SearchView
 
     private val safeCircleViewModel: SafeCircleViewModel by lazy {
         val apiService = RetroFitClient.getApiService(requireContext())
@@ -46,10 +51,14 @@ class SafeCircleFragment : Fragment() {
         return binding!!.root
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // intercept system back → conditional navigation
+        arguments?.getParcelableArrayList<ContactItem>("selected_contacts")?.let {
+            preSelectedContacts = it
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -57,18 +66,35 @@ class SafeCircleFragment : Fragment() {
             }
         )
 
-        // UI back arrow uses same logic
         binding?.backButtonCard?.setOnClickListener { handleBack() }
 
         initView()
         setupPermissionLauncher()
         requestContactsPermission()
+
+        searchView = binding?.pairSearchView!!
+
+        val searchEditText = searchView.findViewById<androidx.appcompat.widget.SearchView.SearchAutoComplete>(
+            androidx.appcompat.R.id.search_src_text
+        )
+        searchEditText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+        searchEditText.setHintTextColor(ContextCompat.getColor(requireContext(), android.R.color.darker_gray))
+
+        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val filtered = originalContacts.filter {
+                    it.name.lowercase().startsWith(newText?.lowercase() ?: "")
+                }
+                adapter.submitList(filtered)
+                return true
+            }
+        })
     }
 
     private fun handleBack() {
         val selected = adapter.getSelectedContacts()
         if (selected.isEmpty()) {
-            // none chosen → pop back to intro
             findNavController().popBackStack()
         } else {
             val bundle = Bundle().apply {
@@ -89,7 +115,7 @@ class SafeCircleFragment : Fragment() {
 
         binding?.finishButton?.setOnClickListener {
             val selected = adapter.getSelectedContacts()
-            // 1. Persist selection locally
+
             val authPrefs = requireContext()
                 .getSharedPreferences("auth", Context.MODE_PRIVATE)
             val currentUserId = authPrefs.getString("userId", "") ?: ""
@@ -98,7 +124,6 @@ class SafeCircleFragment : Fragment() {
             val key = "safe_circle_contacts_$currentUserId"
             prefs.edit().putString(key, Gson().toJson(selected)).apply()
 
-            // 2. Update backend
             val fullName = requireContext()
                 .getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
                 .getString("fullName", "") ?: ""
@@ -106,11 +131,10 @@ class SafeCircleFragment : Fragment() {
 
             Toast.makeText(
                 requireActivity(),
-                "Selected: ${selected.joinToString { it.name }}",
+                "Selected: ${selected.joinToString(", ") { it.name }}",
                 Toast.LENGTH_LONG
             ).show()
 
-            // 3. Navigate to MySafeCircle
             val bundle = Bundle().apply {
                 putParcelableArrayList("selected_contacts", ArrayList(selected))
                 putBoolean("showDone", true)
@@ -165,7 +189,12 @@ class SafeCircleFragment : Fragment() {
                 contactsList.add(ContactItem(name, number))
             }
         }
-        adapter.submitList(contactsList)
+
+        originalContacts = contactsList.toList()
+        adapter.submitList(originalContacts)
+        if (preSelectedContacts.isNotEmpty()) {
+            adapter.setPreSelectedContacts(preSelectedContacts)
+        }
     }
 
     override fun onDestroyView() {

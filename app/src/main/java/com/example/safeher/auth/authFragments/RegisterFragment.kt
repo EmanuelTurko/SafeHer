@@ -96,23 +96,52 @@ class RegisterFragment : Fragment() {
     }
 
     private fun registerUser() {
+        val fullName = mFullName?.text.toString().trim()
+        val email = mEmail?.text.toString().trim()
+        val password = mPassword?.text.toString()
+        val phone = mPhone?.text.toString().trim()
+
+        // ולידציה לשם: חובה שם פרטי ושם משפחה
+        if (!fullName.contains(" ")) {
+            showCustomToast("Please enter your full name")
+            return
+        }
+
+        //ולידציה לאימייל
+        if (!email.matches(Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+\$"))) {
+            showCustomToast("Please enter a valid email address")
+            return
+        }
+
+        //ולידציה למספר טלפון
+        if (!phone.matches(Regex("^05[0-9]{8}$"))) {
+            showCustomToast("Please enter a valid phone number")
+            return
+        }
+
+        //ולידציה לסיסמא
+        if (password.length < 8) {
+            showCustomToast("Password must be at least 8 characters long")
+            return
+        }
 
         val request = RegisterRequest(
-            fullName = mFullName?.text.toString().trim(),
-            email = mEmail?.text.toString().trim(),
-            password = mPassword?.text.toString(),
-            phoneNumber = mPhone?.text.toString().trim(),
-            idPhotoUrl =  ""//mIdPhoto?.text.toString().trim()
+            fullName = fullName,
+            email = email,
+            password = password,
+            phoneNumber = phone,
+            idPhotoUrl = ""
         )
 
         val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
-            putString("fullName", request.fullName)
+            putString("fullName", fullName)
             apply()
         }
-        viewModelApi.registerUser(request)
 
+        viewModelApi.registerUser(request)
     }
+
 
     private fun registerObserver() {
         viewModelApi.registerResponse.observe(viewLifecycleOwner) { response ->
