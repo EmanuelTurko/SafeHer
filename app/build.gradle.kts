@@ -68,7 +68,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.play.services.auth)
     implementation(libs.play.services.location)
-
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation(libs.androidx.lifecycle.viewmodel.ktx.v261)
 
 }

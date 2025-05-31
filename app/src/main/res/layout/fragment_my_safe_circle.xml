@@ -108,42 +108,36 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Edit Button -->
-    <com.google.android.material.card.MaterialCardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/editButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="80dp"
-        android:layout_marginBottom="30dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="60dp"
+        android:layout_marginBottom="40dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="2dp"
         app:cardBackgroundColor="@color/button_gold"
-        app:cardCornerRadius="26dp"
-        app:cardElevation="3dp"
-        app:strokeColor="#e7d9c8"
-        app:strokeWidth="5dp"
-        app:cardUseCompatPadding="true">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:gravity="center"
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/editText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:maxLines="1"
-                android:layout_marginRight="5dp"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="Edit"
-                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:text="EDIT"
+                android:textColor="#000000"
                 android:textSize="18sp" />
-
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
