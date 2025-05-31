@@ -14,15 +14,11 @@ import com.example.safeher.R
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Post
 import com.example.safeher.utils.DateUtils
-import com.example.safeher.utils.getStringShareRef
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
-import com.example.safeher.utils.getStringShareRef
-
-
 
 class PostAdapter(
     private val context: Context,
@@ -50,18 +46,18 @@ class PostAdapter(
         val post = posts[position]
         Log.d("PostAdapter", "post JSON = $post")
 
-
         holder.tvAuthor.text = post.user?.fullName ?: "Anonymous"
         holder.tvTime.text   = DateUtils.formatDateTime(post.createdAt)
         holder.tvBody.text   = post.body
 
+        // Entire item click shows dialog
+        holder.itemView.setOnClickListener {
+            showPostDialog(post)
+        }
+
         val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
-        val currentUserId = prefs?.getString("userId", "") ?: ""
-
+        val currentUserId = prefs.getString("userId", "") ?: ""
         val isOwner = post.user.id == currentUserId
-
-        Log.d("PostAdapter", "currentUserId=$currentUserId, postOwnerId=${post.user.id}")
-
 
         holder.ivEdit.visibility   = if (isOwner) View.VISIBLE else View.GONE
         holder.ivDelete.visibility = if (isOwner) View.VISIBLE else View.GONE
@@ -78,7 +74,8 @@ class PostAdapter(
                         notifyItemRemoved(position)
                     } else {
                         Log.e("PostAdapter", "deletePost failed: ${response.code()} / ${response.errorBody()?.string()}")
-                        Toast.makeText(context,
+                        Toast.makeText(
+                            context,
                             "Failed to delete post: ${response.code()}",
                             Toast.LENGTH_SHORT
                         ).show()
