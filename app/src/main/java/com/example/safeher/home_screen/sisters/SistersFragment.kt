@@ -32,6 +32,7 @@ import kotlinx.coroutines.withContext
 import android.widget.ImageButton
 import com.example.safeher.adapters.NotificationAdapter
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
 
 class SistersFragment : Fragment() {
 
@@ -86,6 +87,7 @@ class SistersFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        checkForNewNotifications()
     }
 
     override fun onPause() {
@@ -117,33 +119,9 @@ class SistersFragment : Fragment() {
 
         notificationsButton = view.findViewById(R.id.notificationsButton)
         notificationsButton.setOnClickListener {
+            view?.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
             showNotificationDialog()
         }
-
-
-        val badge = view.findViewById<View>(R.id.notificationBadge)
-
-        lifecycleScope.launch {
-            try {
-                val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
-                val userId = prefs.getString("userId", "") ?: ""
-
-                val response = RetroFitClient
-                    .getApiService(requireContext())
-                    .hasUnreadNotifications(userId)
-
-                if (response.isSuccessful) {
-                    val hasUnread = response.body()?.data ?: false
-                    badge.visibility = if (hasUnread) View.VISIBLE else View.GONE
-                } else {
-                    badge.visibility = View.GONE
-                }
-
-            } catch (e: Exception) {
-                Log.e("SistersFragment", "Error checking notifications: ${e.message}")
-            }
-        }
-
     }
 
 
@@ -283,6 +261,32 @@ class SistersFragment : Fragment() {
             .setNegativeButton("close", null)
             .show()
     }
+
+    private fun checkForNewNotifications() {
+        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val userId = prefs.getString("userId", "") ?: return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = RetroFitClient
+                    .getApiService(requireContext())
+                    .hasUnreadNotifications(userId)
+
+                val badge = view?.findViewById<View>(R.id.notificationBadge)
+                if (response.isSuccessful) {
+                    val hasUnread = response.body()?.data ?: false
+                    badge?.visibility = if (hasUnread) View.VISIBLE else View.GONE
+                    Log.d("BadgeCheck", "hasUnread=$hasUnread")
+                } else {
+                    Log.e("BadgeCheck", "❌ failed: ${response.code()}")
+                    badge?.visibility = View.GONE
+                }
+            } catch (e: Exception) {
+                Log.e("BadgeCheck", "❌ exception: ${e.localizedMessage}")
+            }
+        }
+    }
+
 
 
 }
