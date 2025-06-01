@@ -63,7 +63,7 @@ class SistersFragment : Fragment() {
             val israelCenter = LatLng(31.0461, 34.8516)
             val cameraPosition = CameraPosition.Builder()
                 .target(israelCenter)
-                .zoom(8.5f)
+                .zoom(10.0f)
                 .build()
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         }
@@ -144,7 +144,8 @@ class SistersFragment : Fragment() {
                 )
                 horizontalRecyclerView.adapter = postAdapter
             } catch (e: Exception) {
-                Log.e("SistersFragment", "Error loading posts: ${e.message}")            }
+                Log.e("SistersFragment", "Error loading posts: ${e.message}")
+            }
         }
     }
 
