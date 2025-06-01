@@ -34,6 +34,7 @@ class PostAdapter(
         val ivDelete: ImageView  = itemView.findViewById(R.id.buttonDelete)
         val ivComment: ImageView = itemView.findViewById(R.id.buttonComment)
         val ivEdit: ImageButton  = itemView.findViewById(R.id.buttonEdit)
+        val ivLike: ImageView = itemView.findViewById(R.id.buttonLike)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -91,6 +92,27 @@ class PostAdapter(
         holder.ivEdit.setOnClickListener {
             if (isOwner) onEditPost(post)
         }
+
+        holder.ivLike.setOnClickListener {
+            Log.d("PostAdapter", "👆 נלחץ כפתור לייק") // שורת בדיקה
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val response = RetroFitClient.getApiService(context).likePost(post.id)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            Log.d("PostAdapter", "✅ לייק הצליח")
+                            Toast.makeText(context, "Liked!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.e("PostAdapter", "❌ לייק נכשל: ${response.code()}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("PostAdapter", "❌ שגיאה ב־likePost: ${e.localizedMessage}")
+                }
+            }
+        }
+
+
     }
 
     override fun getItemCount(): Int = posts.size
