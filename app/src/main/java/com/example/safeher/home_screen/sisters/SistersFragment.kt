@@ -29,6 +29,7 @@ import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.widget.ImageButton
 
 class SistersFragment : Fragment() {
 
@@ -36,6 +37,7 @@ class SistersFragment : Fragment() {
     private lateinit var backBtn: CardView
     private lateinit var horizontalRecyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
+    private lateinit var notificationsButton: ImageButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -110,7 +112,13 @@ class SistersFragment : Fragment() {
         writePostBtn.setOnClickListener {
             findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
         }
+
+        notificationsButton = view.findViewById(R.id.notificationsButton)
+        notificationsButton.setOnClickListener {
+            findNavController().navigate(R.id.action_sistersFragment_to_notificationsFragment)
+        }
     }
+
 
     private fun initListener() {
         backBtn.setOnClickListener {
