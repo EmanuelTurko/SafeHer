@@ -2,6 +2,7 @@ package com.example.safeher.home_screen.sisters
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
@@ -10,17 +11,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.FutureTarget
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.example.safeher.R
 import com.example.safeher.adapters.CommentsAdapter
@@ -36,6 +40,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -72,26 +77,18 @@ class SistersFragment : Fragment() {
             googleMap.uiSettings.isZoomControlsEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = false
 
-            // Define bounds roughly covering Israel
+            // Define bounds roughly covering Israel initially (fallback)
             val israelBounds = LatLngBounds(
                 LatLng(29.0, 34.0),   // southwest corner
                 LatLng(33.6, 35.9)    // northeast corner
             )
             googleMap.setLatLngBoundsForCameraTarget(israelBounds)
-
-            // Restrict minimum/maximum zoom levels
             googleMap.setMinZoomPreference(7.0f)
             googleMap.setMaxZoomPreference(15.0f)
-
-            // Center camera on Israel with a higher initial zoom (cities more visible)
             val israelCenter = LatLng(31.0461, 34.8516)
-            val cameraPosition = CameraPosition.Builder()
-                .target(israelCenter)
-                .zoom(10.0f) // zoom in further (10.0) for city-level view
-                .build()
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(israelCenter, 10.0f))
 
-            // Now fetch all users, geocode their "city", and add a marker with their profile picture and name
+            // Fetch all users, geocode their "city", add custom markers, then fit camera
             loadAllUsersAndAddMarkers(googleMap)
         }
 
@@ -135,8 +132,6 @@ class SistersFragment : Fragment() {
 
     private fun initView(view: View) {
         backBtn = view.findViewById(R.id.backButtonCard)
-
-        // Notification (bell) button hides the badge on click
         notificationsButton = view.findViewById(R.id.notificationsButton)
         notificationsButton.setOnClickListener {
             view.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
@@ -178,13 +173,11 @@ class SistersFragment : Fragment() {
                     },
                     isCarousel = true,
                     onShowAll = {
-                        // Navigate to AllPosts screen
                         val action = SistersFragmentDirections
                             .actionSistersFragmentToAllPostsFragment()
                         findNavController().navigate(action)
                     },
                     onNewPostClick = {
-                        // Navigate to Create New Post screen
                         findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
                     }
                 )
@@ -330,85 +323,179 @@ class SistersFragment : Fragment() {
                     .getApiService(requireContext())
                     .getAllUsers()
 
-                // 2) For each user, geocode their city and add marker
+                Log.d("SistersFragment", "Fetched ${users.size} users from API")
+
+                if (users.isEmpty()) {
+                    Log.d("SistersFragment", "No users to display.")
+                    return@launch
+                }
+
+                // 2) Build LatLngBounds to include all markers
+                val boundsBuilder = LatLngBounds.Builder()
+
+                // נעביר את הלולאה ל־IO כדי לקרוא ל־Geocoder
                 withContext(Dispatchers.IO) {
                     for (user in users) {
-                        val cityName = user.city ?: continue
-                        if (cityName.isBlank()) continue
+                        val cityName = user.city ?: ""
+                        if (cityName.isBlank()) {
+                            Log.d("SistersFragment", "Skipping user ${user.fullName} because city is blank")
+                            continue
+                        }
 
                         try {
-                            Log.d("SistersFragment", "Geocoding cityName: \"$cityName\" for user ${user.fullName}")
+                            Log.d("SistersFragment", "Geocoding cityName=\"$cityName\" for user=${user.fullName}")
                             val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                            val addressList = geocoder.getFromLocationName(cityName, 1)
-                            Log.d("SistersFragment", "Geocoder returned: $addressList for user ${user.fullName}")
+                            val addressList: List<android.location.Address>? = geocoder.getFromLocationName(cityName, 1)
 
-                            if (!addressList.isNullOrEmpty()) {
+                            if (addressList != null && addressList.isNotEmpty()) {
                                 val address = addressList[0]
                                 val userLatLng = LatLng(address.latitude, address.longitude)
+                                Log.d("SistersFragment", "User ${user.fullName} geocoded to lat=${address.latitude}, lon=${address.longitude}")
 
+                                // נוסיף את הקואורדינטה לבנאי הגבולות
                                 withContext(Dispatchers.Main) {
-                                    // 3) On Main: load profile pic with Glide if available, else use default marker
-                                    val profilePicUrl = user.profilePicture ?: ""
-                                    val fullName = user.fullName
+                                    boundsBuilder.include(userLatLng)
+                                }
 
-                                    if (profilePicUrl.isBlank()) {
-                                        // No profile picture => add default marker with name
-                                        googleMap.addMarker(
-                                            MarkerOptions()
-                                                .position(userLatLng)
-                                                .title(fullName)
-                                        )
-                                    } else {
-                                        // Load profile picture and place marker
-                                        Glide.with(requireContext())
-                                            .asBitmap()
-                                            .load(profilePicUrl)
-                                            .circleCrop()
-                                            .into(object : CustomTarget<Bitmap>(100, 100) {
-                                                override fun onResourceReady(
-                                                    resource: Bitmap,
-                                                    transition: Transition<in Bitmap>?
-                                                ) {
-                                                    val markerIcon = BitmapDescriptorFactory.fromBitmap(resource)
-                                                    googleMap.addMarker(
-                                                        MarkerOptions()
-                                                            .position(userLatLng)
-                                                            .title(fullName)
-                                                            .icon(markerIcon)
-                                                    )
-                                                }
+                                // 3) בחזרה ל־Main: טוענים את תמונת הפרופיל וצובעים את הסימן
+                                withContext(Dispatchers.Main) {
+                                    val isHelper = user.safeCircleContacts?.isNotEmpty() == true
+                                    Log.d("SistersFragment", "Preparing to create marker icon for ${user.fullName}. isHelper=$isHelper")
 
-                                                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
-                                                    // no-op
-                                                }
-
-                                                override fun onLoadFailed(errorDrawable: android.graphics.drawable.Drawable?) {
-                                                    super.onLoadFailed(errorDrawable)
-                                                    // On failure, fallback to default marker
-                                                    googleMap.addMarker(
-                                                        MarkerOptions()
-                                                            .position(userLatLng)
-                                                            .title(fullName)
-                                                    )
-                                                }
-                                            })
+                                    createCustomMarkerIcon(user, isHelper) { descriptor ->
+                                        if (descriptor != null) {
+                                            Log.d("SistersFragment", "Adding marker for ${user.fullName} at $userLatLng")
+                                            googleMap.addMarker(
+                                                MarkerOptions()
+                                                    .position(userLatLng)
+                                                    .title(user.fullName)
+                                                    .icon(descriptor)
+                                            )
+                                        } else {
+                                            Log.e("SistersFragment", "Descriptor was null for ${user.fullName}, adding default marker")
+                                            googleMap.addMarker(
+                                                MarkerOptions()
+                                                    .position(userLatLng)
+                                                    .title(user.fullName)
+                                            )
+                                        }
                                     }
                                 }
                             } else {
                                 Log.e(
                                     "SistersFragment",
-                                    "Geocoder returned empty for city: \"$cityName\""
+                                    "Geocoder returned empty or null for city: \"$cityName\" (user=${user.fullName})"
                                 )
                             }
                         } catch (ge: Exception) {
-                            Log.e("SistersFragment", "Geocoder exception for user ${user.fullName}: ${ge.message}")
+                            Log.e("SistersFragment", "Geocoder exception for ${user.fullName}: ${ge.message}")
                         }
                     }
-                    // 4) After adding all markers, optionally adjust camera to show all
-                    // (not required; the camera is currently centered on Israel)
                 }
+
+                // 4) אחרי שציירנו את כל ה־Markers, נעביר את המצלמה לכלול את כולם
+                withContext(Dispatchers.Main) {
+                    try {
+                        val bounds = boundsBuilder.build()
+                        val width = resources.displayMetrics.widthPixels
+                        val height = resources.displayMetrics.heightPixels
+                        val padding = (0.20 * minOf(width, height)).toInt()
+                        Log.d("SistersFragment", "Animating camera to bounds with padding=$padding")
+                        googleMap.animateCamera(
+                            CameraUpdateFactory.newLatLngBounds(bounds, padding)
+                        )
+                    } catch (e: Exception) {
+                        Log.e("SistersFragment", "Error animating camera to bounds: ${e.message}")
+                    }
+                }
+
             } catch (e: Exception) {
                 Log.e("SistersFragment", "Exception in loadAllUsersAndAddMarkers: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Asynchronously loads (או ברירת מחדל) את תמונת הפרופיל,
+     * יוצר את ה־View המותאם למרקר, ומחזיר BitmapDescriptor ב־callback.
+     */
+    private fun createCustomMarkerIcon(
+        user: User,
+        isHelper: Boolean,
+        callback: (BitmapDescriptor?) -> Unit
+    ) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            var profileBitmap: Bitmap? = null
+            try {
+                val url = user.profilePicture.orEmpty()
+                if (url.isNotBlank()) {
+                    Log.d("SistersFragment", "Loading profile image for ${user.fullName} from URL=\"$url\"")
+                    // נטען את התמונה כ־Bitmap בגודל 100×100
+                    val futureTarget: FutureTarget<Bitmap> = Glide.with(requireContext())
+                        .asBitmap()
+                        .load(url)
+                        .circleCrop()
+                        .submit(100, 100)
+
+                    profileBitmap = futureTarget.get()
+                    Glide.with(requireContext()).clear(futureTarget)
+                    Log.d("SistersFragment", "Successfully loaded profile image for ${user.fullName}")
+                } else {
+                    Log.d("SistersFragment", "No profile URL for ${user.fullName}, using default.")
+                }
+            } catch (e: Exception) {
+                Log.e("SistersFragment", "Failed loading profile image for ${user.fullName}: ${e.message}")
+                profileBitmap = null
+            }
+
+            // חוזרים לחוט ה־Main בשביל לצייר את ה־View
+            withContext(Dispatchers.Main) {
+                try {
+                    val markerView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.marker_user, null)
+
+                    // 1) קביעת תמונת הפרופיל (או ברירת מחדל)
+                    val ivProfile = markerView.findViewById<ImageView>(R.id.profileImageView)
+                    if (profileBitmap != null) {
+                        ivProfile.setImageBitmap(profileBitmap)
+                    } else {
+                        ivProfile.setImageResource(R.drawable.profile)
+                    }
+
+                    // 2) קביעת ה־statusDot (ירוק/אפור)
+                    val statusDot = markerView.findViewById<View>(R.id.statusDot)
+                    if (isHelper) {
+                        statusDot.setBackgroundResource(R.drawable.circle_green)
+                    } else {
+                        statusDot.setBackgroundResource(R.drawable.circle_gray)
+                    }
+
+                    // 3) קביעת המחט בתחתית
+                    val ivPointer = markerView.findViewById<ImageView>(R.id.pinPointer)
+                    ivPointer.setImageResource(R.drawable.ic_map_pin)
+
+                    // מודדים ומניחים את ה־View
+                    markerView.measure(
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                    )
+                    markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
+
+                    // יוצרים Bitmap בגודל ה־View
+                    val bitmap = Bitmap.createBitmap(
+                        markerView.measuredWidth,
+                        markerView.measuredHeight,
+                        Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = Canvas(bitmap)
+                    markerView.draw(canvas)
+
+                    Log.d("SistersFragment", "Created custom marker bitmap for ${user.fullName} (w=${bitmap.width}, h=${bitmap.height})")
+                    callback(BitmapDescriptorFactory.fromBitmap(bitmap))
+                } catch (e: Exception) {
+                    Log.e("SistersFragment", "Error creating marker view for ${user.fullName}: ${e.message}")
+                    callback(null)
+                }
             }
         }
     }
