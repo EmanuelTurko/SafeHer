@@ -41,9 +41,6 @@
             android:id="@+id/action_sistersFragment_to_editPostFragment"
             app:destination="@id/editPostFragment" />
         <action
-            android:id="@+id/action_sistersFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
-        <action
             android:id="@+id/action_sistersFragment_to_allPostsFragment"
             app:destination="@id/allPostsFragment" />
     </fragment>
@@ -85,14 +82,5 @@
             android:name="currentBody"
             app:argType="string" />
     </fragment>
-
-    <fragment
-        android:id="@+id/notificationsFragment"
-        android:name="com.example.safeher.home_screen.sisters.NotificationsFragment"
-        android:label="Notifications"
-        tools:layout="@layout/fragment_notifications" />
-    <action
-        android:id="@+id/action_notificationsFragment_to_sistersFragment"
-        app:destination="@id/sistersFragment" />
 
 </navigation>

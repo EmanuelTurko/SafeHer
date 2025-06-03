@@ -6,6 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
-import com.example.safeher.adapters.CommentsAdapter
+import com.example.safeher.adapters.NotificationAdapter
 import com.example.safeher.adapters.PostAdapter
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Post
@@ -26,17 +30,10 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
+import com.example.safeher.adapters.CommentsAdapter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import com.example.safeher.adapters.NotificationAdapter
-import android.content.Context
-import kotlinx.coroutines.CoroutineScope
 
 class SistersFragment : Fragment() {
 
@@ -52,6 +49,7 @@ class SistersFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_sisters, container, false)
 
+        // מאתחלים את ה־MapView
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         MapsInitializer.initialize(requireContext())
@@ -60,6 +58,7 @@ class SistersFragment : Fragment() {
             googleMap.uiSettings.isZoomControlsEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = false
 
+            // הגבלת התצוגה לישראל
             val israelBounds = LatLngBounds(
                 LatLng(29.0, 34.0),
                 LatLng(33.6, 35.9)
@@ -85,6 +84,7 @@ class SistersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // שם קוראים ל־setupUI כדי להסתיר מקלדת כשנלחצים מחוץ לאלמנטים ממוקדים
         requireActivity().setupUI(view)
     }
 
@@ -116,20 +116,17 @@ class SistersFragment : Fragment() {
 
     private fun initView(view: View) {
         backBtn = view.findViewById(R.id.backButtonCard)
-        val writePostBtn = view.findViewById<MaterialButton>(R.id.write_new_post_button)
-        writePostBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
-        }
 
+        // כפתור ההתראה (פעמון) שמסתיר את הסימן (Badge) בעת לחיצה
         notificationsButton = view.findViewById(R.id.notificationsButton)
         notificationsButton.setOnClickListener {
-            view?.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
+            view.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
             showNotificationDialog()
         }
     }
 
-
     private fun initListener() {
+        // לחיצה על חץ חזרה מביאה חזרה למסך SOSHomeScreenFragment
         backBtn.setOnClickListener {
             findNavController().navigate(R.id.action_sistersFragment_to_SOSHomeScreenFragment)
         }
@@ -145,15 +142,18 @@ class SistersFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
+                // מביאים את רשימת כל הפוסטים מה־API
                 val postsList: List<Post> = RetroFitClient
                     .getApiService(requireContext())
                     .getAllPosts()
 
+                // יוצרים את האדפטר המעודכן עם הפרמטר onNewPostClick
                 postAdapter = PostAdapter(
-                    requireContext(),
-                    postsList.toMutableList(),
+                    context = requireContext(),
+                    posts = postsList.toMutableList(),
                     showPostDialog = { post -> showPostDialog(post) },
                     onEditPost = { post ->
+                        // ניווט לעריכה של פוסט
                         val action = SistersFragmentDirections
                             .actionSistersFragmentToEditPostFragment(
                                 post.id,
@@ -163,24 +163,25 @@ class SistersFragment : Fragment() {
                     },
                     isCarousel = true,
                     onShowAll = {
-                        val action = SistersFragmentDirections
-                            .actionSistersFragmentToAllPostsFragment()
+                        // ניווט למסך AllPosts
+                        val action =
+                            SistersFragmentDirections
+                                .actionSistersFragmentToAllPostsFragment()
                         findNavController().navigate(action)
+                    },
+                    onNewPostClick = {
+                        // ניווט למסך יצירת פוסט חדש
+                        findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
                     }
                 )
+
                 horizontalRecyclerView.adapter = postAdapter
+
             } catch (e: Exception) {
                 Log.e("SistersFragment", "Error loading posts: ${e.message}")
             }
         }
     }
-
-    private fun onShowAllClicked() {
-        val action = SistersFragmentDirections.actionSistersFragmentToAllPostsFragment()
-        findNavController().navigate(action)
-    }
-
-
 
     private fun showPostDialog(post: Post) {
         val dialogView = LayoutInflater.from(requireContext())
@@ -201,7 +202,7 @@ class SistersFragment : Fragment() {
         rvComments.layoutManager = LinearLayoutManager(requireContext())
         rvComments.adapter = commentsAdapter
 
-        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
         val currentUserId = prefs.getString("userId", "") ?: ""
         val isOwner = post.user.id == currentUserId
 
@@ -251,17 +252,18 @@ class SistersFragment : Fragment() {
     }
 
     private fun showNotificationDialog() {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.notification_dialog, null)
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.notification_dialog, null)
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.notificationRecyclerView)
 
         val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
-        val userId = prefs.getString("userId", "") ?: ""
+        val token = "Bearer " + (prefs.getString("token", "") ?: "")
 
         lifecycleScope.launch {
             try {
-                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
-                val token = "Bearer " + (prefs.getString("token", "") ?: "")
-                val response = RetroFitClient.getApiService(requireContext()).getUserNotifications(token)
+                val response = RetroFitClient
+                    .getApiService(requireContext())
+                    .getUserNotifications(token)
 
                 if (response.isSuccessful) {
                     val notifications = response.body()?.data ?: emptyList()
@@ -275,15 +277,14 @@ class SistersFragment : Fragment() {
             }
         }
 
-
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setView(dialogView)
-            .setNegativeButton("close", null)
+            .setNegativeButton("Close", null)
             .show()
     }
 
     private fun checkForNewNotifications() {
-        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
         val userId = prefs.getString("userId", "") ?: return
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -306,7 +307,4 @@ class SistersFragment : Fragment() {
             }
         }
     }
-
-
-
 }
