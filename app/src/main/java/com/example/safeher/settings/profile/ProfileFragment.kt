@@ -114,7 +114,7 @@ class ProfileFragment : Fragment() {
     private fun showRemoveAccountDialog() {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle("Remove Account")
-            .setMessage("Are you sure you want to remove your account? This action cannot be undone.")
+            .setMessage("Are you sure you want to remove your account? \nThis action cannot be undone.")
             .setPositiveButton("Remove") { _, _ -> onRemoveAccountConfirmed() }
             .setNegativeButton("Cancel", null)
             .show()

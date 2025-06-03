@@ -5,6 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -12,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
-import com.example.safeher.adapters.CommentsAdapter
+import com.example.safeher.adapters.NotificationAdapter
 import com.example.safeher.adapters.PostAdapter
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Post
@@ -28,6 +33,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
+import com.example.safeher.adapters.CommentsAdapter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -37,6 +43,7 @@ class SistersFragment : Fragment() {
     private lateinit var backBtn: CardView
     private lateinit var horizontalRecyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
+    private lateinit var notificationsButton: ImageButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,6 +97,7 @@ class SistersFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        checkForNewNotifications()
     }
 
     override fun onPause() {
@@ -114,11 +122,15 @@ class SistersFragment : Fragment() {
 
     private fun initView(view: View) {
         backBtn = view.findViewById(R.id.backButtonCard)
-        val writePostBtn = view.findViewById<MaterialButton>(R.id.write_new_post_button)
-        writePostBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
+
+        // כפתור ההתראה (פעמון) שמסתיר את הסימן (Badge) בעת לחיצה
+        notificationsButton = view.findViewById(R.id.notificationsButton)
+        notificationsButton.setOnClickListener {
+            view.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
+            showNotificationDialog()
         }
     }
+
 
     private fun initListener() {
         backBtn.setOnClickListener {
@@ -141,16 +153,33 @@ class SistersFragment : Fragment() {
                     .getAllPosts()
 
                 postAdapter = PostAdapter(
-                    requireContext(),
-                    postsList.toMutableList(),
+                    context = requireContext(),
+                    posts = postsList.toMutableList(),
                     showPostDialog = { post -> showPostDialog(post) },
                     onEditPost = { post ->
                         val action = SistersFragmentDirections
-                            .actionSistersFragmentToEditPostFragment(post.id, post.body)
+                            .actionSistersFragmentToEditPostFragment(
+                                post.id,
+                                post.body
+                            )
                         findNavController().navigate(action)
+                    },
+                    isCarousel = true,
+                    onShowAll = {
+                        // ניווט למסך AllPosts
+                        val action =
+                            SistersFragmentDirections
+                                .actionSistersFragmentToAllPostsFragment()
+                        findNavController().navigate(action)
+                    },
+                    onNewPostClick = {
+                        // ניווט למסך יצירת פוסט חדש
+                        findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
                     }
                 )
+
                 horizontalRecyclerView.adapter = postAdapter
+
             } catch (e: Exception) {
                 Log.e("SistersFragment", "Error loading posts: ${e.message}")
             }
@@ -161,11 +190,11 @@ class SistersFragment : Fragment() {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_post, null)
 
-        val tvAuthor = dialogView.findViewById<android.widget.TextView>(R.id.tvDialogPostAuthor)
-        val tvTime = dialogView.findViewById<android.widget.TextView>(R.id.tvDialogPostTime)
-        val tvBody = dialogView.findViewById<android.widget.TextView>(R.id.tvPostBody)
+        val tvAuthor = dialogView.findViewById<TextView>(R.id.tvDialogPostAuthor)
+        val tvTime = dialogView.findViewById<TextView>(R.id.tvDialogPostTime)
+        val tvBody = dialogView.findViewById<TextView>(R.id.tvPostBody)
         val rvComments = dialogView.findViewById<RecyclerView>(R.id.rvComments)
-        val etNewComment = dialogView.findViewById<android.widget.EditText>(R.id.etNewComment)
+        val etNewComment = dialogView.findViewById<EditText>(R.id.etNewComment)
 
         tvAuthor.text = post.user.fullName
         tvTime.text = DateUtils.formatDateTime(post.createdAt)
@@ -181,7 +210,7 @@ class SistersFragment : Fragment() {
         val currentUserId = prefs.getString("userId", "") ?: ""
         val isOwner = post.user.id == currentUserId
 
-        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setNegativeButton("Close", null)
 
@@ -196,34 +225,90 @@ class SistersFragment : Fragment() {
         builder.setPositiveButton("Send", null)
         val dialog = builder.create().apply { show() }
 
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
-            .setOnClickListener {
-                val text = etNewComment.text.toString().trim()
-                if (text.isEmpty()) {
-                    etNewComment.error = "Write a comment"
-                    return@setOnClickListener
-                }
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val text = etNewComment.text.toString().trim()
+            if (text.isEmpty()) {
+                etNewComment.error = "Write a comment"
+                return@setOnClickListener
+            }
 
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    val resp = RetroFitClient
-                        .getApiService(requireContext())
-                        .createComment(post.id, CommentRequest(text))
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val resp = RetroFitClient
+                    .getApiService(requireContext())
+                    .createComment(post.id, CommentRequest(text))
 
-                    withContext(Dispatchers.Main) {
-                        if (resp.data != null) {
-                            commentsList.add(resp.data)
-                            commentsAdapter.notifyItemInserted(commentsList.size - 1)
-                            etNewComment.text.clear()
-                            rvComments.scrollToPosition(commentsList.size - 1)
-                        } else {
-                            android.widget.Toast.makeText(
-                                requireContext(),
-                                "Error sending comment",
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                withContext(Dispatchers.Main) {
+                    if (resp.data != null) {
+                        commentsList.add(resp.data)
+                        commentsAdapter.notifyItemInserted(commentsList.size - 1)
+                        etNewComment.text.clear()
+                        rvComments.scrollToPosition(commentsList.size - 1)
+                    } else {
+                        android.widget.Toast.makeText(
+                            requireContext(),
+                            "Error sending comment",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
+        }
+    }
+
+    private fun showNotificationDialog() {
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.notification_dialog, null)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.notificationRecyclerView)
+
+        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val token = "Bearer " + (prefs.getString("token", "") ?: "")
+
+        lifecycleScope.launch {
+            try {
+                val response = RetroFitClient
+                    .getApiService(requireContext())
+                    .getUserNotifications(token)
+
+                if (response.isSuccessful) {
+                    val notifications = response.body()?.data ?: emptyList()
+                    recyclerView.layoutManager = LinearLayoutManager(requireContext())
+                    recyclerView.adapter = NotificationAdapter(notifications)
+                } else {
+                    Log.e("Notifications", "Response not successful: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("Notifications", "Error fetching notifications: ${e.message}")
+            }
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setNegativeButton("Close", null)
+            .show()
+    }
+
+    private fun checkForNewNotifications() {
+        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val userId = prefs.getString("userId", "") ?: return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = RetroFitClient
+                    .getApiService(requireContext())
+                    .hasUnreadNotifications(userId)
+
+                val badge = view?.findViewById<View>(R.id.notificationBadge)
+                if (response.isSuccessful) {
+                    val hasUnread = response.body()?.data ?: false
+                    badge?.visibility = if (hasUnread) View.VISIBLE else View.GONE
+                    Log.d("BadgeCheck", "hasUnread=$hasUnread")
+                } else {
+                    Log.e("BadgeCheck", "❌ failed: ${response.code()}")
+                    badge?.visibility = View.GONE
+                }
+            } catch (e: Exception) {
+                Log.e("BadgeCheck", "❌ exception: ${e.localizedMessage}")
+            }
+        }
     }
 }

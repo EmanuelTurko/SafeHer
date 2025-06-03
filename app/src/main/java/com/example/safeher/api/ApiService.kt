@@ -1,7 +1,6 @@
 package com.example.safeher.api
 
 import com.example.safeher.model.Comment
-import com.example.safeher.model.ContactItem
 import com.example.safeher.model.Post
 import com.example.safeher.model.RegisterRequest
 import com.example.safeher.model.LoginRequest
@@ -17,6 +16,7 @@ import com.example.safeher.model.api.TwilioEmergencyMessageRequest
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
+import com.example.safeher.model.NotificationItem
 
 interface ApiService {
 
@@ -65,6 +65,9 @@ interface ApiService {
         @Path("postId") postId: String
     ): Response<Void>
 
+    @POST("post/{postId}/like")
+    suspend fun likePost(@Path("postId") postId: String): Response<Post>
+
     @POST("post/{postId}/comment")
     suspend fun createComment(
         @Path("postId") postId: String,
@@ -86,6 +89,17 @@ interface ApiService {
 
     @POST("auth/forgot-password")
     suspend fun forgotPassword(@Body email: Map<String, String>): ApiResponse<Unit>
+
+    @GET("notifications/has-unread/{userId}")
+    suspend fun hasUnreadNotifications(
+        @Path("userId") userId: String
+    ): Response<ApiResponse<Boolean>>
+
+    @GET("notifications/my-notifications")
+    suspend fun getUserNotifications(
+        @Header("Authorization") token: String
+    ): Response<ApiResponse<List<NotificationItem>>>
+
 
 }
 

@@ -5,12 +5,10 @@
     android:layout_width="150dp"
     android:layout_height="110dp"
     android:layout_margin="8dp"
-    android:clickable="true"
-    android:focusable="true"
     android:foreground="?attr/selectableItemBackgroundBorderless"
+    app:cardBackgroundColor="@color/button_gold"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/button_gold">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +18,7 @@
 
         <!-- Author -->
         <TextView
-            android:id="@+id/tvPostAuthor"
+            android:id="@+id/tvPostAuthor_carousel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Author Name"
@@ -30,7 +28,7 @@
 
         <!-- Time -->
         <TextView
-            android:id="@+id/tvPostTime"
+            android:id="@+id/tvPostTime_carousel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -40,18 +38,17 @@
 
         <!-- Preview of body (up to 3 lines) -->
         <TextView
-            android:id="@+id/textViewPost"
+            android:id="@+id/textViewPost_carousel"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
-            android:layout_marginTop="0dp"
             android:ellipsize="end"
             android:maxLines="3"
             android:text="The content of the post"
             android:textColor="@android:color/black"
             android:textSize="12sp" />
 
-        <!-- Action icons -->
+        <!-- Action icon: רק כפתור לייק ותגובה (רצוי שיהיו צמודים) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -60,37 +57,19 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/buttonEdit"
+                android:id="@+id/buttonLike_carousel"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_edit" />
-
-            <ImageButton
-                android:id="@+id/buttonComment"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:backgroundTint="@color/transparent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_comment" />
-
-            <ImageButton
-                android:id="@+id/buttonLike"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_heart" />
 
             <ImageButton
-                android:id="@+id/buttonDelete"
+                android:id="@+id/buttonComment_carousel"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_red_trash" />
-
+                android:src="@drawable/ic_comment" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

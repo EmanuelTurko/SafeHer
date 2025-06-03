@@ -41,8 +41,17 @@
             android:id="@+id/action_sistersFragment_to_editPostFragment"
             app:destination="@id/editPostFragment" />
         <action
-            android:id="@+id/action_sistersFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
+            android:id="@+id/action_sistersFragment_to_allPostsFragment"
+            app:destination="@id/allPostsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/allPostsFragment"
+        android:name="com.example.safeher.home_screen.sisters.AllPostsFragment"
+        android:label="All Posts"
+        tools:layout="@layout/fragment_all_posts">
+        <action
+            android:id="@+id/actionAllPostsFragmentToEditPostFragment"
+            app:destination="@id/editPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/SupportCallAiFragment"
@@ -59,29 +68,19 @@
 
     </fragment>
     <fragment
-           android:id="@+id/editPostFragment"
-           android:name="com.example.safeher.EditPostFragment"
-           android:label="EditPostFragment"
-           tools:layout="@layout/fragment_edit_post" >
-          <!-- חזרה אוטומטית אחורה -->
-           <action
-              android:id="@+id/action_editPostFragment_to_sistersFragment"
-               app:destination="@id/sistersFragment" />
-           <!-- העברת ה-postId וטקסט קיים כארגומנטים -->
-           <argument
-               android:name="postId"
-               app:argType="string" />
-          <argument
-               android:name="currentBody"
-               app:argType="string" />
-       </fragment>
-    <fragment
-        android:id="@+id/notificationsFragment"
-        android:name="com.example.safeher.home_screen.sisters.NotificationsFragment"
-        android:label="Notifications"
-        tools:layout="@layout/fragment_notifications" />
-    <action
-        android:id="@+id/action_notificationsFragment_to_sistersFragment"
-        app:destination="@id/sistersFragment" />
+        android:id="@+id/editPostFragment"
+        android:name="com.example.safeher.EditPostFragment"
+        android:label="EditPostFragment"
+        tools:layout="@layout/fragment_edit_post" >
+        <action
+            android:id="@+id/action_editPostFragment_to_sistersFragment"
+            app:destination="@id/sistersFragment" />
+        <argument
+            android:name="postId"
+            app:argType="string" />
+        <argument
+            android:name="currentBody"
+            app:argType="string" />
+    </fragment>
 
 </navigation>
