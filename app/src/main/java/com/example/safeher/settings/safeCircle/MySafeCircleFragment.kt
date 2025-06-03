@@ -60,7 +60,7 @@ class MySafeCircleFragment : Fragment() {
         }
 
         // DONE vs EDIT
-        val showDone = arguments?.getBoolean("showDone", false) ?: false
+        val showDone = arguments?.getBoolean("showDone", false) == true
         binding.editText.text = if (showDone) "DONE" else "EDIT"
         binding.editButton.setOnClickListener {
             if (showDone) {

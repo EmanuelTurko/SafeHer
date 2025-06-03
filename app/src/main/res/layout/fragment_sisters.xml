@@ -108,14 +108,13 @@
         </androidx.cardview.widget.CardView>
 
         <!-- Horizontal posts scroller -->
-
-        <!-- New post button -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/postsRecyclerView"
             android:layout_width="0dp"
             android:layout_height="120dp"
             android:overScrollMode="always"
             android:padding="0dp"
+            android:layout_marginBottom="10dp"
             android:scrollbars="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

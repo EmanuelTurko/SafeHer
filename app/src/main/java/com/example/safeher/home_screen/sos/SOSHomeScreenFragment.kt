@@ -71,7 +71,7 @@ class SOSHomeScreenFragment : Fragment() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val logout = result.data?.getBooleanExtra("LOGOUT_SUCCESS", false) ?: false
+            val logout = result.data?.getBooleanExtra("LOGOUT_SUCCESS", false) == true
             if (logout) activity?.finish()
         }
     }

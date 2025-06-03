@@ -40,14 +40,13 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Locale
 
 class SistersFragment : Fragment() {
 
@@ -331,12 +330,10 @@ class SistersFragment : Fragment() {
                 // 2) Build LatLngBounds to include all markers
                 val boundsBuilder = LatLngBounds.Builder()
 
-                // —————— כאן השינוי העיקרי:  משיכה של currentUserId מתוך ה־"auth" SharedPreferences ——————
                 val prefsAuth = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                 val currentUserId = prefsAuth.getString("userId", "")
                 // ————————————————————————————————————————————————————————————————————————————————
 
-                // מה SharedPrefs השכן של "userInfo" נקבל רק את ה־isHelper
                 val prefsUserInfo = requireContext()
                     .getSharedPreferences("userInfo", Context.MODE_PRIVATE)
                 val isHelperSaved = prefsUserInfo.getBoolean("isHelper", false)
@@ -364,7 +361,6 @@ class SistersFragment : Fragment() {
                                 }
 
                                 withContext(Dispatchers.Main) {
-                                    // —————— כאן הקביעה בפועל של isHelper לפי matching userId + הערך ב־SharedPrefs ——————
                                     val isHelper = (user.id == currentUserId) && isHelperSaved
                                     Log.d("SistersFragment", "Preparing to create marker icon for ${user.fullName}. isHelper=$isHelper")
 
