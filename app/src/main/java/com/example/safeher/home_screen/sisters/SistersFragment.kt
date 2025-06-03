@@ -1,10 +1,12 @@
 package com.example.safeher.home_screen.sisters
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +32,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 
 class SistersFragment : Fragment() {
 
@@ -134,37 +139,61 @@ class SistersFragment : Fragment() {
             false
         )
 
+        // בתוך ה־launch אנחנו מגדירים את משתנה postsList ומייד בונים ממנו את ה־Adapter,
+        // כך שאין ניסיון להשתמש ב־postsList מחוץ לתחום הזה:
         lifecycleScope.launch {
             try {
                 val postsList: List<Post> = RetroFitClient
                     .getApiService(requireContext())
                     .getAllPosts()
 
+                // כאן בונים את ה־Adapter ומעבירים לו גם את callback של "Show All"
                 postAdapter = PostAdapter(
                     requireContext(),
                     postsList.toMutableList(),
                     showPostDialog = { post -> showPostDialog(post) },
                     onEditPost = { post ->
                         val action = SistersFragmentDirections
-                            .actionSistersFragmentToEditPostFragment(post.id, post.body)
+                            .actionSistersFragmentToEditPostFragment(
+                                post.id,
+                                post.body
+                            )
+                        findNavController().navigate(action)
+                    },
+                    isCarousel = true,
+                    onShowAll = {
+                        // כאשר לוחצים על ה-"Show All" בסוף הקרוסלה,
+                        // מפנים למסך AllPostsFragment בלי להעביר פוסט ספציפי:
+                        val action = SistersFragmentDirections
+                            .actionSistersFragmentToAllPostsFragment()
                         findNavController().navigate(action)
                     }
                 )
+
                 horizontalRecyclerView.adapter = postAdapter
+
             } catch (e: Exception) {
-                Log.e("SistersFragment", "Error loading posts: ${e.message}")            }
+                Log.e("SistersFragment", "Error loading posts: ${e.message}")
+            }
         }
     }
+
+    private fun onShowAllClicked() {
+        val action = SistersFragmentDirections.actionSistersFragmentToAllPostsFragment()
+        findNavController().navigate(action)
+    }
+
+
 
     private fun showPostDialog(post: Post) {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_post, null)
 
-        val tvAuthor = dialogView.findViewById<android.widget.TextView>(R.id.tvDialogPostAuthor)
-        val tvTime = dialogView.findViewById<android.widget.TextView>(R.id.tvDialogPostTime)
-        val tvBody = dialogView.findViewById<android.widget.TextView>(R.id.tvPostBody)
+        val tvAuthor = dialogView.findViewById<TextView>(R.id.tvDialogPostAuthor)
+        val tvTime = dialogView.findViewById<TextView>(R.id.tvDialogPostTime)
+        val tvBody = dialogView.findViewById<TextView>(R.id.tvPostBody)
         val rvComments = dialogView.findViewById<RecyclerView>(R.id.rvComments)
-        val etNewComment = dialogView.findViewById<android.widget.EditText>(R.id.etNewComment)
+        val etNewComment = dialogView.findViewById<EditText>(R.id.etNewComment)
 
         tvAuthor.text = post.user.fullName
         tvTime.text = DateUtils.formatDateTime(post.createdAt)
@@ -175,11 +204,11 @@ class SistersFragment : Fragment() {
         rvComments.layoutManager = LinearLayoutManager(requireContext())
         rvComments.adapter = commentsAdapter
 
-        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
         val currentUserId = prefs.getString("userId", "") ?: ""
         val isOwner = post.user.id == currentUserId
 
-        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setNegativeButton("Close", null)
 
@@ -194,7 +223,7 @@ class SistersFragment : Fragment() {
         builder.setPositiveButton("Send", null)
         val dialog = builder.create().apply { show() }
 
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val text = etNewComment.text.toString().trim()
             if (text.isEmpty()) {
                 etNewComment.error = "Write a comment"
@@ -213,10 +242,10 @@ class SistersFragment : Fragment() {
                         etNewComment.text.clear()
                         rvComments.scrollToPosition(commentsList.size - 1)
                     } else {
-                        android.widget.Toast.makeText(
+                        Toast.makeText(
                             requireContext(),
                             "Error sending comment",
-                            android.widget.Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
