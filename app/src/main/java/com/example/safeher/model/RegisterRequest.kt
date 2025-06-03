@@ -6,4 +6,5 @@ data class RegisterRequest(
     val password: String = "",
     val phoneNumber: String = "",
     val idPhotoUrl: String = "",
+    val city: String? = "",
 )

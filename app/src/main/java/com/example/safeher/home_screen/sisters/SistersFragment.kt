@@ -25,11 +25,11 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.widget.ImageButton
 
 class SistersFragment : Fragment() {
 
@@ -37,35 +37,40 @@ class SistersFragment : Fragment() {
     private lateinit var backBtn: CardView
     private lateinit var horizontalRecyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
-    private lateinit var notificationsButton: ImageButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Inflate layout containing MapView as background
         val view = inflater.inflate(R.layout.fragment_sisters, container, false)
 
+        // Initialize and manage MapView lifecycle
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         MapsInitializer.initialize(requireContext())
         mapView.getMapAsync { googleMap ->
+            // Enable map UI controls
             googleMap.uiSettings.isCompassEnabled = true
             googleMap.uiSettings.isZoomControlsEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = false
 
+            // Define bounds roughly covering Israel
             val israelBounds = LatLngBounds(
-                LatLng(29.0, 34.0),
-                LatLng(33.6, 35.9)
+                LatLng(29.0, 34.0),   // southwest corner
+                LatLng(33.6, 35.9)    // northeast corner
             )
             googleMap.setLatLngBoundsForCameraTarget(israelBounds)
 
+            // Restrict minimum/maximum zoom levels
             googleMap.setMinZoomPreference(7.0f)
             googleMap.setMaxZoomPreference(15.0f)
 
+            // Center camera on Israel with a higher initial zoom (cities more visible)
             val israelCenter = LatLng(31.0461, 34.8516)
             val cameraPosition = CameraPosition.Builder()
                 .target(israelCenter)
-                .zoom(10.0f)
+                .zoom(10.0f) // zoom in further (10.0) for city-level view
                 .build()
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         }
@@ -81,6 +86,7 @@ class SistersFragment : Fragment() {
         requireActivity().setupUI(view)
     }
 
+    // Manage MapView lifecycle
     override fun onResume() {
         super.onResume()
         mapView.onResume()
@@ -112,13 +118,7 @@ class SistersFragment : Fragment() {
         writePostBtn.setOnClickListener {
             findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
         }
-
-        notificationsButton = view.findViewById(R.id.notificationsButton)
-        notificationsButton.setOnClickListener {
-            findNavController().navigate(R.id.action_sistersFragment_to_notificationsFragment)
-        }
     }
-
 
     private fun initListener() {
         backBtn.setOnClickListener {
@@ -176,7 +176,8 @@ class SistersFragment : Fragment() {
         rvComments.layoutManager = LinearLayoutManager(requireContext())
         rvComments.adapter = commentsAdapter
 
-        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val prefs =
+            requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
         val currentUserId = prefs.getString("userId", "") ?: ""
         val isOwner = post.user.id == currentUserId
 
@@ -195,33 +196,34 @@ class SistersFragment : Fragment() {
         builder.setPositiveButton("Send", null)
         val dialog = builder.create().apply { show() }
 
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val text = etNewComment.text.toString().trim()
-            if (text.isEmpty()) {
-                etNewComment.error = "Write a comment"
-                return@setOnClickListener
-            }
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            .setOnClickListener {
+                val text = etNewComment.text.toString().trim()
+                if (text.isEmpty()) {
+                    etNewComment.error = "Write a comment"
+                    return@setOnClickListener
+                }
 
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val resp = RetroFitClient
-                    .getApiService(requireContext())
-                    .createComment(post.id, CommentRequest(text))
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val resp = RetroFitClient
+                        .getApiService(requireContext())
+                        .createComment(post.id, CommentRequest(text))
 
-                withContext(Dispatchers.Main) {
-                    if (resp.data != null) {
-                        commentsList.add(resp.data)
-                        commentsAdapter.notifyItemInserted(commentsList.size - 1)
-                        etNewComment.text.clear()
-                        rvComments.scrollToPosition(commentsList.size - 1)
-                    } else {
-                        android.widget.Toast.makeText(
-                            requireContext(),
-                            "Error sending comment",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
+                    withContext(Dispatchers.Main) {
+                        if (resp.data != null) {
+                            commentsList.add(resp.data)
+                            commentsAdapter.notifyItemInserted(commentsList.size - 1)
+                            etNewComment.text.clear()
+                            rvComments.scrollToPosition(commentsList.size - 1)
+                        } else {
+                            android.widget.Toast.makeText(
+                                requireContext(),
+                                "Error sending comment",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        }
     }
 }

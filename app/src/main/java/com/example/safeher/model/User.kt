@@ -12,5 +12,6 @@ data class User(
     val phoneNumber: String = "",
     val idPhotoUrl: String = "",
     val accessToken: String? = null,
+    @SerializedName("city") val city: String?,
     val safeCircleContacts: List<ContactItem> = emptyList()
 )

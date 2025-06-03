@@ -42,6 +42,8 @@ class RegisterFragment : Fragment() {
     private var mEmail: TextInputEditText? = null
     private var mIdPhoto: TextInputEditText? = null
     private var mAnimationView: LottieAnimationView? = null
+
+    private var mCity: TextInputEditText? = null
     private val viewModel: AuthViewModel by viewModels()
 
     private lateinit var viewModelApi: AuthViewModelApi
@@ -75,6 +77,8 @@ class RegisterFragment : Fragment() {
         mRegisterBtn = binding?.registerButton
         mMoveToLoginScreenBtn = binding?.loginText
         mPhone = binding?.phoneEditText
+        mCity= binding?.cityEditText
+
         //mIdPhoto = binding?.idPhotoEditText
         //binding?.idPhotoInputLayout?.setOnClickListener { openGallery() }
 
@@ -100,6 +104,12 @@ class RegisterFragment : Fragment() {
         val email = mEmail?.text.toString().trim()
         val password = mPassword?.text.toString()
         val phone = mPhone?.text.toString().trim()
+        val cityName = mCity?.text.toString().trim()
+
+        if (cityName.isEmpty()) {
+            binding?.cityEditText?.error = "Please enter your city"
+            return
+        }
 
         // ולידציה לשם: חובה שם פרטי ושם משפחה
         if (!fullName.contains(" ")) {
@@ -130,8 +140,10 @@ class RegisterFragment : Fragment() {
             email = email,
             password = password,
             phoneNumber = phone,
-            idPhotoUrl = ""
+            idPhotoUrl = "",
+            city = cityName
         )
+        Log.d("RegisterFragment", ">>> Register payload: $request")
 
         val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {

@@ -12,7 +12,7 @@ fun Context.getStringListShareRef(resource: String, library:String): List<String
     val sharedPref = this.getSharedPreferences(library, MODE_PRIVATE)
     return sharedPref?.getStringSet(resource, setOf())?.toList() ?: listOf()
 }
-fun Context.setStringShareRef(resource: String, value: String, library:String) {
+fun Context.setStringShareRef(resource: String, value: String?, library: String) {
     val sharedPref = this.getSharedPreferences(library, MODE_PRIVATE)
     with(sharedPref.edit()) {
         putString(resource, value)

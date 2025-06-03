@@ -37,6 +37,10 @@ interface ApiService {
     @GET("user/{userId}")
     suspend fun getUserProfile(@Path("userId") userId: String): ApiResponse<User>
 
+    @GET("user/all")
+    suspend fun getAllUsers(): List<User>
+
+
     @PUT("user/update-profile/{userId}")
     suspend fun updateUserProfile(
         @Path("userId") userId: String,

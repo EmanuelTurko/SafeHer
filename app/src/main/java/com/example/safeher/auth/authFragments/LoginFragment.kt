@@ -69,9 +69,18 @@ class LoginFragment : Fragment() {
                 context?.getSharedPreferences("auth", Context.MODE_PRIVATE)?.edit()?.putString("userId", response.data.id)?.apply()
 
                 requireContext().setStringShareRef("fullName", response.data.fullName, "userInfo")
+                requireContext().setStringShareRef("city", response.data.city, "userInfo")
                 requireContext().setStringShareRef("email", response.data.email, "userInfo")
-                requireContext().setStringShareRef("phoneNumber", response.data.phoneNumber, "userInfo")
-                requireContext().setStringShareRef("profilePic", response.data.profilePicture.toString(), "userInfo")
+                requireContext().setStringShareRef(
+                    "phoneNumber",
+                    response.data.phoneNumber,
+                    "userInfo"
+                )
+                requireContext().setStringShareRef(
+                    "profilePic",
+                    response.data.profilePicture.toString(),
+                    "userInfo"
+                )
 
                 SharedPrefsHelper(requireContext()).save(REMEMBER_MY_LOGIN, rememberMe)
                 startActivity(Intent(requireActivity(), HomeScreenActivity::class.java))

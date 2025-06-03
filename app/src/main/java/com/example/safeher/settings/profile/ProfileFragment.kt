@@ -230,6 +230,7 @@ class ProfileFragment : Fragment() {
                 ?: originalUser?.phoneNumber.orEmpty(),
             idPhotoUrl = originalUser?.idPhotoUrl.orEmpty(),
             profilePicture = encoded,
+            city = originalUser?.city ?: "",
             safeCircleContacts = contacts
         )
         viewModel.saveUserData(user)
