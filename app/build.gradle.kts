@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.navigation.safe.args.plugin)
     id("kotlin-parcelize")
+    kotlin("kapt")
 }
 
 android {
@@ -70,5 +73,6 @@ dependencies {
     implementation(libs.play.services.location)
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation(libs.androidx.lifecycle.viewmodel.ktx.v261)
-
+    implementation(libs.glide)
+    kapt(libs.glide.compiler)
 }

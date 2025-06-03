@@ -1,5 +1,8 @@
 package com.example.safeher.home_screen.sisters
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,26 +19,32 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.example.safeher.R
+import com.example.safeher.adapters.CommentsAdapter
 import com.example.safeher.adapters.NotificationAdapter
 import com.example.safeher.adapters.PostAdapter
 import com.example.safeher.api.RetroFitClient
 import com.example.safeher.model.Post
+import com.example.safeher.model.User
 import com.example.safeher.model.api.CommentRequest
 import com.example.safeher.utils.DateUtils
 import com.example.safeher.utils.setupUI
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
-import com.example.safeher.adapters.CommentsAdapter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 class SistersFragment : Fragment() {
 
@@ -46,7 +55,8 @@ class SistersFragment : Fragment() {
     private lateinit var notificationsButton: ImageButton
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate layout containing MapView as background
@@ -80,6 +90,9 @@ class SistersFragment : Fragment() {
                 .zoom(10.0f) // zoom in further (10.0) for city-level view
                 .build()
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+
+            // Now fetch all users, geocode their "city", and add a marker with their profile picture and name
+            loadAllUsersAndAddMarkers(googleMap)
         }
 
         initView(view)
@@ -123,14 +136,13 @@ class SistersFragment : Fragment() {
     private fun initView(view: View) {
         backBtn = view.findViewById(R.id.backButtonCard)
 
-        // כפתור ההתראה (פעמון) שמסתיר את הסימן (Badge) בעת לחיצה
+        // Notification (bell) button hides the badge on click
         notificationsButton = view.findViewById(R.id.notificationsButton)
         notificationsButton.setOnClickListener {
             view.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
             showNotificationDialog()
         }
     }
-
 
     private fun initListener() {
         backBtn.setOnClickListener {
@@ -166,14 +178,13 @@ class SistersFragment : Fragment() {
                     },
                     isCarousel = true,
                     onShowAll = {
-                        // ניווט למסך AllPosts
-                        val action =
-                            SistersFragmentDirections
-                                .actionSistersFragmentToAllPostsFragment()
+                        // Navigate to AllPosts screen
+                        val action = SistersFragmentDirections
+                            .actionSistersFragmentToAllPostsFragment()
                         findNavController().navigate(action)
                     },
                     onNewPostClick = {
-                        // ניווט למסך יצירת פוסט חדש
+                        // Navigate to Create New Post screen
                         findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
                     }
                 )
@@ -205,8 +216,7 @@ class SistersFragment : Fragment() {
         rvComments.layoutManager = LinearLayoutManager(requireContext())
         rvComments.adapter = commentsAdapter
 
-        val prefs =
-            requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
         val currentUserId = prefs.getString("userId", "") ?: ""
         val isOwner = post.user.id == currentUserId
 
@@ -225,7 +235,7 @@ class SistersFragment : Fragment() {
         builder.setPositiveButton("Send", null)
         val dialog = builder.create().apply { show() }
 
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val text = etNewComment.text.toString().trim()
             if (text.isEmpty()) {
                 etNewComment.error = "Write a comment"
@@ -241,13 +251,13 @@ class SistersFragment : Fragment() {
                     if (resp.data != null) {
                         commentsList.add(resp.data)
                         commentsAdapter.notifyItemInserted(commentsList.size - 1)
-                        etNewComment.text.clear()
+                        etNewComment.text?.clear()
                         rvComments.scrollToPosition(commentsList.size - 1)
                     } else {
-                        android.widget.Toast.makeText(
+                        Toast.makeText(
                             requireContext(),
                             "Error sending comment",
-                            android.widget.Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
@@ -260,7 +270,7 @@ class SistersFragment : Fragment() {
             .inflate(R.layout.notification_dialog, null)
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.notificationRecyclerView)
 
-        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
         val token = "Bearer " + (prefs.getString("token", "") ?: "")
 
         lifecycleScope.launch {
@@ -288,7 +298,7 @@ class SistersFragment : Fragment() {
     }
 
     private fun checkForNewNotifications() {
-        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
         val userId = prefs.getString("userId", "") ?: return
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -299,7 +309,7 @@ class SistersFragment : Fragment() {
 
                 val badge = view?.findViewById<View>(R.id.notificationBadge)
                 if (response.isSuccessful) {
-                    val hasUnread = response.body()?.data ?: false
+                    val hasUnread = response.body()?.data == true
                     badge?.visibility = if (hasUnread) View.VISIBLE else View.GONE
                     Log.d("BadgeCheck", "hasUnread=$hasUnread")
                 } else {
@@ -308,6 +318,97 @@ class SistersFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 Log.e("BadgeCheck", "❌ exception: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    private fun loadAllUsersAndAddMarkers(googleMap: GoogleMap) {
+        lifecycleScope.launch {
+            try {
+                // 1) Fetch all users from backend
+                val users: List<User> = RetroFitClient
+                    .getApiService(requireContext())
+                    .getAllUsers()
+
+                // 2) For each user, geocode their city and add marker
+                withContext(Dispatchers.IO) {
+                    for (user in users) {
+                        val cityName = user.city ?: continue
+                        if (cityName.isBlank()) continue
+
+                        try {
+                            Log.d("SistersFragment", "Geocoding cityName: \"$cityName\" for user ${user.fullName}")
+                            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                            val addressList = geocoder.getFromLocationName(cityName, 1)
+                            Log.d("SistersFragment", "Geocoder returned: $addressList for user ${user.fullName}")
+
+                            if (!addressList.isNullOrEmpty()) {
+                                val address = addressList[0]
+                                val userLatLng = LatLng(address.latitude, address.longitude)
+
+                                withContext(Dispatchers.Main) {
+                                    // 3) On Main: load profile pic with Glide if available, else use default marker
+                                    val profilePicUrl = user.profilePicture ?: ""
+                                    val fullName = user.fullName
+
+                                    if (profilePicUrl.isBlank()) {
+                                        // No profile picture => add default marker with name
+                                        googleMap.addMarker(
+                                            MarkerOptions()
+                                                .position(userLatLng)
+                                                .title(fullName)
+                                        )
+                                    } else {
+                                        // Load profile picture and place marker
+                                        Glide.with(requireContext())
+                                            .asBitmap()
+                                            .load(profilePicUrl)
+                                            .circleCrop()
+                                            .into(object : CustomTarget<Bitmap>(100, 100) {
+                                                override fun onResourceReady(
+                                                    resource: Bitmap,
+                                                    transition: Transition<in Bitmap>?
+                                                ) {
+                                                    val markerIcon = BitmapDescriptorFactory.fromBitmap(resource)
+                                                    googleMap.addMarker(
+                                                        MarkerOptions()
+                                                            .position(userLatLng)
+                                                            .title(fullName)
+                                                            .icon(markerIcon)
+                                                    )
+                                                }
+
+                                                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
+                                                    // no-op
+                                                }
+
+                                                override fun onLoadFailed(errorDrawable: android.graphics.drawable.Drawable?) {
+                                                    super.onLoadFailed(errorDrawable)
+                                                    // On failure, fallback to default marker
+                                                    googleMap.addMarker(
+                                                        MarkerOptions()
+                                                            .position(userLatLng)
+                                                            .title(fullName)
+                                                    )
+                                                }
+                                            })
+                                    }
+                                }
+                            } else {
+                                Log.e(
+                                    "SistersFragment",
+                                    "Geocoder returned empty for city: \"$cityName\""
+                                )
+                            }
+                        } catch (ge: Exception) {
+                            Log.e("SistersFragment", "Geocoder exception for user ${user.fullName}: ${ge.message}")
+                        }
+                    }
+                    // 4) After adding all markers, optionally adjust camera to show all
+                    // (not required; the camera is currently centered on Israel)
+                }
+            } catch (e: Exception) {
+                Log.e("SistersFragment", "Exception in loadAllUsersAndAddMarkers: ${e.message}")
             }
         }
     }

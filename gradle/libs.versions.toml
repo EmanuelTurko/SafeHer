@@ -29,6 +29,7 @@ firebaseFirestore = "25.1.1"
 firebaseDatabase = "21.0.0"
 picasso = "2.8"
 gridlayout = "1.1.0"
+glide = "4.15.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,7 +50,6 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 lottie = {group = "com.airbnb.android", name = "lottie", version.ref = "lottie"}
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesLocation" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
-play-services-location-v2101 = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocationVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 view-model = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewModel" }
 fragment = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "fragment" }
@@ -60,6 +60,8 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database-k
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestore" }
 picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
 androidx-gridlayout = { group = "androidx.gridlayout", name = "gridlayout", version.ref = "gridlayout" }
+glide           = { module = "com.github.bumptech.glide:glide",           version.ref = "glide" }
+glide-compiler  = { module = "com.github.bumptech.glide:compiler",        version.ref = "glide" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
