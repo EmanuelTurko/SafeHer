@@ -2,9 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/registerRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cream_background">
+    android:background="@color/cream_background"
+    tools:context=".auth.authFragments.RegisterFragment">
 
     <!-- Sign Up Header with Icon -->
     <androidx.cardview.widget.CardView
@@ -36,6 +38,7 @@
                 app:tint="#FFFFFF" />
 
             <TextView
+                android:id="@+id/signUpTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -49,26 +52,28 @@
                 app:layout_constraintStart_toEndOf="@id/signUpIcon"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="1.0" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Form Fields -->
+
+    <!-- Form Fields Container -->
     <LinearLayout
         android:id="@+id/form_fields_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/signUpHeaderCard">
 
-
+        <!-- Full Name Field -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -111,14 +116,16 @@
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="12dp"
                     android:textColor="#2D2D2D"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    tools:ignore="Autofill" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
+        <!-- Email Field -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -158,15 +165,16 @@
                     android:inputType="textEmailAddress"
                     android:paddingHorizontal="16dp"
                     android:textColor="#2D2D2D"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    tools:ignore="Autofill" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Password Input -->
+        <!-- Password Field -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -209,15 +217,16 @@
                     android:inputType="textPassword"
                     android:paddingHorizontal="16dp"
                     android:textColor="#2D2D2D"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    tools:ignore="Autofill" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Phone Number Input -->
+        <!-- Phone Number Field -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="12dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -257,36 +266,16 @@
                     android:inputType="phone"
                     android:paddingHorizontal="16dp"
                     android:textColor="#2D2D2D"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    tools:ignore="Autofill" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/cityInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:boxBackgroundMode="none"
-            android:layout_marginTop="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/cityEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_edittext_bg"
-                android:fontFamily="@font/poppins_regular"
-                android:hint="City"
-                android:paddingHorizontal="16dp"
-                android:textColor="#2D2D2D"
-                android:textSize="14sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-
-        <!-- ID Photo Input
+        <!-- ======= City Dropdown (Spinner) ======= -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -298,7 +287,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_id_card"
+                    android:src="@drawable/ic_map_pin"
                     app:tint="#2D2D2D" />
 
                 <TextView
@@ -306,50 +295,40 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="ID Photo"
+                    android:text="City"
                     android:textColor="#2D2D2D"
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/idPhotoInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <Spinner
+                android:id="@+id/citySpinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_edittext_bg"
-                app:boxBackgroundMode="none"
-                app:endIconDrawable="@drawable/ic_upload"
-                app:endIconMode="custom"
-                app:endIconTint="#2D2D2D">
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:spinnerMode="dropdown"
+                android:backgroundTint="@color/white"
+                android:prompt="@string/select_city_prompt" />
+        </LinearLayout>
+        <!-- ======= End City Dropdown ======= -->
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/idPhotoEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="24dp"
-                    android:background="@null"
-                    android:enabled="false"
-                    android:fontFamily="@font/poppins_regular"
-                    android:hint="Upload ID photo"
-                    android:paddingHorizontal="16dp"
-                    android:textColor="#2D2D2D"
-                    android:textSize="14sp" />
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout> -->
     </LinearLayout>
 
-    <!-- Terms of use text with original ID -->
+
+    <!-- Terms of Use Text -->
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/registerTermsSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
-        android:text="By registering, you are agreeing to our \n Terms of use and Privacy Policy"
+        android:text="By registering, you are agreeing to our\nTerms of use and Privacy Policy"
         android:textAlignment="center"
         android:textColor="#2D2D2D"
         android:textSize="11sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/form_fields_container" />
+        app:layout_constraintTop_toBottomOf="@id/form_fields_container" />
 
     <!-- Join Now Button -->
     <com.google.android.material.button.MaterialButton
@@ -371,14 +350,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/registerTermsSubtitle" />
+        app:layout_constraintTop_toBottomOf="@id/registerTermsSubtitle" />
 
-    <!-- Already a member? Sign In with original IDs -->
+    <!-- Already a member? Sign In -->
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="35dp"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -400,7 +379,5 @@
             android:textColor="@color/button_gold"
             android:textStyle="bold" />
     </LinearLayout>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -333,7 +333,6 @@ class SistersFragment : Fragment() {
                 // 2) Build LatLngBounds to include all markers
                 val boundsBuilder = LatLngBounds.Builder()
 
-                // נעביר את הלולאה ל־IO כדי לקרוא ל־Geocoder
                 withContext(Dispatchers.IO) {
                     for (user in users) {
                         val cityName = user.city ?: ""
@@ -352,12 +351,10 @@ class SistersFragment : Fragment() {
                                 val userLatLng = LatLng(address.latitude, address.longitude)
                                 Log.d("SistersFragment", "User ${user.fullName} geocoded to lat=${address.latitude}, lon=${address.longitude}")
 
-                                // נוסיף את הקואורדינטה לבנאי הגבולות
                                 withContext(Dispatchers.Main) {
                                     boundsBuilder.include(userLatLng)
                                 }
 
-                                // 3) בחזרה ל־Main: טוענים את תמונת הפרופיל וצובעים את הסימן
                                 withContext(Dispatchers.Main) {
                                     val isHelper = user.safeCircleContacts?.isNotEmpty() == true
                                     Log.d("SistersFragment", "Preparing to create marker icon for ${user.fullName}. isHelper=$isHelper")
@@ -393,7 +390,6 @@ class SistersFragment : Fragment() {
                     }
                 }
 
-                // 4) אחרי שציירנו את כל ה־Markers, נעביר את המצלמה לכלול את כולם
                 withContext(Dispatchers.Main) {
                     try {
                         val bounds = boundsBuilder.build()
@@ -415,10 +411,6 @@ class SistersFragment : Fragment() {
         }
     }
 
-    /**
-     * Asynchronously loads (או ברירת מחדל) את תמונת הפרופיל,
-     * יוצר את ה־View המותאם למרקר, ומחזיר BitmapDescriptor ב־callback.
-     */
     private fun createCustomMarkerIcon(
         user: User,
         isHelper: Boolean,
@@ -430,7 +422,6 @@ class SistersFragment : Fragment() {
                 val url = user.profilePicture.orEmpty()
                 if (url.isNotBlank()) {
                     Log.d("SistersFragment", "Loading profile image for ${user.fullName} from URL=\"$url\"")
-                    // נטען את התמונה כ־Bitmap בגודל 100×100
                     val futureTarget: FutureTarget<Bitmap> = Glide.with(requireContext())
                         .asBitmap()
                         .load(url)
@@ -448,13 +439,11 @@ class SistersFragment : Fragment() {
                 profileBitmap = null
             }
 
-            // חוזרים לחוט ה־Main בשביל לצייר את ה־View
             withContext(Dispatchers.Main) {
                 try {
                     val markerView = LayoutInflater.from(requireContext())
                         .inflate(R.layout.marker_user, null)
 
-                    // 1) קביעת תמונת הפרופיל (או ברירת מחדל)
                     val ivProfile = markerView.findViewById<ImageView>(R.id.profileImageView)
                     if (profileBitmap != null) {
                         ivProfile.setImageBitmap(profileBitmap)
@@ -462,7 +451,6 @@ class SistersFragment : Fragment() {
                         ivProfile.setImageResource(R.drawable.profile)
                     }
 
-                    // 2) קביעת ה־statusDot (ירוק/אפור)
                     val statusDot = markerView.findViewById<View>(R.id.statusDot)
                     if (isHelper) {
                         statusDot.setBackgroundResource(R.drawable.circle_green)
@@ -470,18 +458,15 @@ class SistersFragment : Fragment() {
                         statusDot.setBackgroundResource(R.drawable.circle_gray)
                     }
 
-                    // 3) קביעת המחט בתחתית
                     val ivPointer = markerView.findViewById<ImageView>(R.id.pinPointer)
                     ivPointer.setImageResource(R.drawable.ic_map_pin)
 
-                    // מודדים ומניחים את ה־View
                     markerView.measure(
                         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
                     )
                     markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
 
-                    // יוצרים Bitmap בגודל ה־View
                     val bitmap = Bitmap.createBitmap(
                         markerView.measuredWidth,
                         markerView.measuredHeight,

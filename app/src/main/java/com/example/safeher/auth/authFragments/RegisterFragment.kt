@@ -8,6 +8,8 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -27,8 +29,6 @@ import com.example.safeher.general.showCustomToast
 import com.example.safeher.model.RegisterRequest
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import androidx.core.content.edit
 import com.example.safeher.utils.setupUI
 
 class RegisterFragment : Fragment() {
@@ -43,9 +43,9 @@ class RegisterFragment : Fragment() {
     private var mIdPhoto: TextInputEditText? = null
     private var mAnimationView: LottieAnimationView? = null
 
-    private var mCity: TextInputEditText? = null
-    private val viewModel: AuthViewModel by viewModels()
+    private lateinit var citySpinner: Spinner
 
+    private val viewModel: AuthViewModel by viewModels()
     private lateinit var viewModelApi: AuthViewModelApi
 
     override fun onCreateView(
@@ -61,6 +61,7 @@ class RegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().setupUI(view)
         initializeViews()
+        setupCitySpinner()
         setupClickListeners()
 
         val authRepository = AuthRepository(RetroFitClient.getApiService(requireContext()))
@@ -77,12 +78,23 @@ class RegisterFragment : Fragment() {
         mRegisterBtn = binding?.registerButton
         mMoveToLoginScreenBtn = binding?.loginText
         mPhone = binding?.phoneEditText
-        mCity= binding?.cityEditText
-
-        //mIdPhoto = binding?.idPhotoEditText
-        //binding?.idPhotoInputLayout?.setOnClickListener { openGallery() }
-
+        citySpinner = binding?.citySpinner!!
+        // mIdPhoto omitted/commented out since not used
     }
+
+    private fun setupCitySpinner() {
+        ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.israel_cities,
+            R.layout.spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(
+                R.layout.spinner_dropdown_item
+            )
+            citySpinner.adapter = adapter
+        }
+    }
+
 
     private fun setupClickListeners() {
         mMoveToLoginScreenBtn?.setOnClickListener {
@@ -94,7 +106,6 @@ class RegisterFragment : Fragment() {
         }
     }
 
-
     private fun showLoadingState(isLoading: Boolean) {
         mRegisterBtn?.isEnabled = !isLoading
     }
@@ -104,34 +115,30 @@ class RegisterFragment : Fragment() {
         val email = mEmail?.text.toString().trim()
         val password = mPassword?.text.toString()
         val phone = mPhone?.text.toString().trim()
-        val cityName = mCity?.text.toString().trim()
+        val cityName = citySpinner.selectedItem as String
 
-        if (cityName.isEmpty()) {
-            binding?.cityEditText?.error = "Please enter your city"
-            return
-        }
-
-        // ולידציה לשם: חובה שם פרטי ושם משפחה
-        if (!fullName.contains(" ")) {
+        if (fullName.isEmpty() || !fullName.contains(" ")) {
             showCustomToast("Please enter your full name")
             return
         }
 
-        //ולידציה לאימייל
         if (!email.matches(Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+\$"))) {
             showCustomToast("Please enter a valid email address")
             return
         }
 
-        //ולידציה למספר טלפון
-        if (!phone.matches(Regex("^05[0-9]{8}$"))) {
+        if (!phone.matches(Regex("^05[0-9]{8}\$"))) {
             showCustomToast("Please enter a valid phone number")
             return
         }
 
-        //ולידציה לסיסמא
         if (password.length < 8) {
             showCustomToast("Password must be at least 8 characters long")
+            return
+        }
+
+        if (cityName.isEmpty()) {
+            showCustomToast("Please select your city")
             return
         }
 
@@ -146,22 +153,17 @@ class RegisterFragment : Fragment() {
         Log.d("RegisterFragment", ">>> Register payload: $request")
 
         val sharedPref = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE)
-        with(sharedPref.edit()) {
-            putString("fullName", fullName)
-            apply()
-        }
+        sharedPref.edit().putString("fullName", fullName).apply()
 
         viewModelApi.registerUser(request)
     }
-
 
     private fun registerObserver() {
         viewModelApi.registerResponse.observe(viewLifecycleOwner) { response ->
             showLoadingState(false)
 
             if (response.error != null) {
-                val customProp = ErrorDialog(requireActivity())
-                customProp.show(
+                ErrorDialog(requireActivity()).show(
                     "Oops",
                     response.error,
                     "TRY AGAIN"
@@ -178,7 +180,6 @@ class RegisterFragment : Fragment() {
         }
     }
 
-
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
@@ -189,6 +190,7 @@ class RegisterFragment : Fragment() {
     private fun openGallery() {
         pickImageLauncher.launch("image/*")
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
