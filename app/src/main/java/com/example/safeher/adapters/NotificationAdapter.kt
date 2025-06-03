@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.safeher.R
-import com.example.safeher.model.api.NotificationItem
+import com.example.safeher.model.NotificationItem
 
 class NotificationAdapter(private val notifications: List<NotificationItem>) :
     RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {

@@ -1,7 +1,6 @@
 package com.example.safeher.api
 
 import com.example.safeher.model.Comment
-import com.example.safeher.model.ContactItem
 import com.example.safeher.model.Post
 import com.example.safeher.model.RegisterRequest
 import com.example.safeher.model.LoginRequest
@@ -17,7 +16,7 @@ import com.example.safeher.model.api.TwilioEmergencyMessageRequest
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
-import com.example.safeher.model.api.NotificationItem
+import com.example.safeher.model.NotificationItem
 
 interface ApiService {
 

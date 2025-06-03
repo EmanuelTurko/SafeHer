@@ -1,4 +1,4 @@
-package com.example.safeher.model.api
+package com.example.safeher.model
 
 data class NotificationItem(
     val type: String,
