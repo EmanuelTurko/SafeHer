@@ -1,6 +1,7 @@
 package com.example.safeher.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -130,7 +131,23 @@ class PostAdapter(
 
             holder.itemView.setOnClickListener { showPostDialog(post) }
             holder.btnLike.setOnClickListener {
-                Toast.makeText(context, "Liked!", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "Liked!", Toast.LENGTH_SHORT).show()
+                Log.d("PostAdapter", "👆 נלחץ כפתור לייק")
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = RetroFitClient.getApiService(context).likePost(post.id)
+                        withContext(Dispatchers.Main) {
+                            if (response.isSuccessful) {
+                                Log.d("PostAdapter", "✅ לייק הצליח")
+                                Toast.makeText(context, "Liked!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Log.e("PostAdapter", "❌ לייק נכשל: ${response.code()}")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("PostAdapter", "❌ שגיאה ב־likePost: ${e.localizedMessage}")
+                    }
+                }
             }
             holder.btnComment.setOnClickListener {
                 showPostDialog(post)
