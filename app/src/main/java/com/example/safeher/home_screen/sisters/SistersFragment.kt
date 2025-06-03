@@ -1,6 +1,5 @@
 package com.example.safeher.home_screen.sisters
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,6 +34,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.example.safeher.adapters.NotificationAdapter
+import android.content.Context
+import kotlinx.coroutines.CoroutineScope
 
 class SistersFragment : Fragment() {
 
@@ -70,7 +72,7 @@ class SistersFragment : Fragment() {
             val israelCenter = LatLng(31.0461, 34.8516)
             val cameraPosition = CameraPosition.Builder()
                 .target(israelCenter)
-                .zoom(8.5f)
+                .zoom(10.0f)
                 .build()
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         }
@@ -89,6 +91,7 @@ class SistersFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        checkForNewNotifications()
     }
 
     override fun onPause() {
@@ -120,7 +123,8 @@ class SistersFragment : Fragment() {
 
         notificationsButton = view.findViewById(R.id.notificationsButton)
         notificationsButton.setOnClickListener {
-            findNavController().navigate(R.id.action_sistersFragment_to_notificationsFragment)
+            view?.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
+            showNotificationDialog()
         }
     }
 
@@ -139,15 +143,12 @@ class SistersFragment : Fragment() {
             false
         )
 
-        // בתוך ה־launch אנחנו מגדירים את משתנה postsList ומייד בונים ממנו את ה־Adapter,
-        // כך שאין ניסיון להשתמש ב־postsList מחוץ לתחום הזה:
         lifecycleScope.launch {
             try {
                 val postsList: List<Post> = RetroFitClient
                     .getApiService(requireContext())
                     .getAllPosts()
 
-                // כאן בונים את ה־Adapter ומעבירים לו גם את callback של "Show All"
                 postAdapter = PostAdapter(
                     requireContext(),
                     postsList.toMutableList(),
@@ -162,16 +163,12 @@ class SistersFragment : Fragment() {
                     },
                     isCarousel = true,
                     onShowAll = {
-                        // כאשר לוחצים על ה-"Show All" בסוף הקרוסלה,
-                        // מפנים למסך AllPostsFragment בלי להעביר פוסט ספציפי:
                         val action = SistersFragmentDirections
                             .actionSistersFragmentToAllPostsFragment()
                         findNavController().navigate(action)
                     }
                 )
-
                 horizontalRecyclerView.adapter = postAdapter
-
             } catch (e: Exception) {
                 Log.e("SistersFragment", "Error loading posts: ${e.message}")
             }
@@ -252,4 +249,64 @@ class SistersFragment : Fragment() {
             }
         }
     }
+
+    private fun showNotificationDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.notification_dialog, null)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.notificationRecyclerView)
+
+        val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+        val userId = prefs.getString("userId", "") ?: ""
+
+        lifecycleScope.launch {
+            try {
+                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                val token = "Bearer " + (prefs.getString("token", "") ?: "")
+                val response = RetroFitClient.getApiService(requireContext()).getUserNotifications(token)
+
+                if (response.isSuccessful) {
+                    val notifications = response.body()?.data ?: emptyList()
+                    recyclerView.layoutManager = LinearLayoutManager(requireContext())
+                    recyclerView.adapter = NotificationAdapter(notifications)
+                } else {
+                    Log.e("Notifications", "Response not successful: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("Notifications", "Error fetching notifications: ${e.message}")
+            }
+        }
+
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setNegativeButton("close", null)
+            .show()
+    }
+
+    private fun checkForNewNotifications() {
+        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val userId = prefs.getString("userId", "") ?: return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = RetroFitClient
+                    .getApiService(requireContext())
+                    .hasUnreadNotifications(userId)
+
+                val badge = view?.findViewById<View>(R.id.notificationBadge)
+                if (response.isSuccessful) {
+                    val hasUnread = response.body()?.data ?: false
+                    badge?.visibility = if (hasUnread) View.VISIBLE else View.GONE
+                    Log.d("BadgeCheck", "hasUnread=$hasUnread")
+                } else {
+                    Log.e("BadgeCheck", "❌ failed: ${response.code()}")
+                    badge?.visibility = View.GONE
+                }
+            } catch (e: Exception) {
+                Log.e("BadgeCheck", "❌ exception: ${e.localizedMessage}")
+            }
+        }
+    }
+
+
+
 }

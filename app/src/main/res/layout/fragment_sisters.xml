@@ -51,6 +51,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/notificationBadge"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/red_circle"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:text=""
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/notificationsButton"
+            app:layout_constraintTop_toTopOf="@id/notificationsButton"/>
+
+
 
 
         <!-- Title -->
