@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@color/cream_background">
 
     <EditText
         android:id="@+id/editTextPostContent"
@@ -28,7 +29,7 @@
         android:layout_height="wrap_content"
         android:text="Submit Post"
         android:textColor="#FFFFFF"
-        android:backgroundTint="#C2185B"
+        android:backgroundTint="@color/button_gold"
         app:cornerRadius="24dp"
         app:layout_constraintTop_toBottomOf="@id/editTextPostContent"
         app:layout_constraintStart_toStartOf="parent"

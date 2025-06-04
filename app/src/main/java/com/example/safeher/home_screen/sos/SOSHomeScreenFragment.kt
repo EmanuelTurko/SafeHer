@@ -39,10 +39,13 @@ import com.example.safeher.utils.PermissionManager
 import com.example.safeher.utils.getStringShareRef
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.concurrent.thread
+import android.graphics.Color
+
 
 class SOSHomeScreenFragment : Fragment() {
 
@@ -63,6 +66,8 @@ class SOSHomeScreenFragment : Fragment() {
     private lateinit var mSupportCallButton: LinearLayout
     private lateinit var mHelperSwitch: SwitchMaterial
     private lateinit var mHelperStatusText: TextView
+
+    private lateinit var mHelperSwitchContainer: MaterialCardView
     private lateinit var mWelcomeText: TextView
     private lateinit var mSettingsButtonCard: CardView
 
@@ -158,6 +163,7 @@ class SOSHomeScreenFragment : Fragment() {
         mSupportCallButton = view.findViewById(R.id.supportCallButton)
         mHelperSwitch = view.findViewById(R.id.helperSwitch)
         mHelperStatusText = view.findViewById(R.id.helperStatusText)
+        mHelperSwitchContainer = view.findViewById(R.id.helperSwitchContainer)
         mWelcomeText = view.findViewById(R.id.welcomeText)
         mSettingsButtonCard = view.findViewById(R.id.settingsButtonCard)
         userPhoneNumber = requireContext().getStringShareRef("phoneNumber", "userInfo")
@@ -187,27 +193,38 @@ class SOSHomeScreenFragment : Fragment() {
         // מאזינים לשינוי מצב ה־Switch של Helper
         // הצגה לפי המצב הקיים תעשה בתוך loadHelperState()
         mHelperSwitch.setOnCheckedChangeListener { _, isChecked ->
-            // אם השינוי נגרם מתוך הקוד (ignoreListener=true), מדלגים
-            if (ignoreListener) return@setOnCheckedChangeListener
+                       if (ignoreListener) return@setOnCheckedChangeListener
 
-            // מעדכנים את הטקסט
-            mHelperStatusText.text = if (isChecked) "ON" else "OFF"
+                       // Update status text
+                       mHelperStatusText.text = if (isChecked) "ON" else "OFF"
 
-            // שומרים את המצב ב־SharedPreferences
-            requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
-                .edit()
-                .putBoolean("isHelper", isChecked)
-                .apply()
+                       // Change container’s background color  <<< השורות האלו נוספו
+                       if (isChecked) {
+                               // ON = green (#66CD5A)
+                               mHelperSwitchContainer.setCardBackgroundColor(
+                                       Color.parseColor("#66CD5A")
+                                        )
+                           } else {
+                               // OFF = gray (android’s darker_gray)
+                               val gray = ContextCompat.getColor(requireContext(), android.R.color.darker_gray)
+                               mHelperSwitchContainer.setCardBackgroundColor(gray)
+                           }
 
-            // אם עוברים ל־ON, מתחילים סריקה; אם OFF – מפסיקים
-            if (isChecked) {
-                if (bluetoothViewModel.bluetoothState.value != BluetoothState.CONNECTED) {
-                    bluetoothViewModel.startScan()
-                }
-            } else {
-                bluetoothViewModel.disconnect()
-            }
-        }
+                       // Save into SharedPreferences
+                       requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+                           .edit()
+                           .putBoolean("isHelper", isChecked)
+                           .apply()
+
+                      // If ON → start scanning; if OFF → disconnect
+                      if (isChecked) {
+                        if (bluetoothViewModel.bluetoothState.value != BluetoothState.CONNECTED) {
+                           bluetoothViewModel.startScan()
+                                }
+                        } else {
+                               bluetoothViewModel.disconnect()
+                           }
+                  }
     }
 
     /**
