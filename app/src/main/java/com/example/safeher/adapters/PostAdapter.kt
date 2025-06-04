@@ -104,8 +104,6 @@ class PostAdapter(
                 }
             }
             is PostFullViewHolder -> {
-                // In full-list mode, posts start at index 0.
-                // In carousel mode, actual posts start at position=1, so index = position - 1
                 val index = if (isCarousel) position - 1 else position
                 val post = posts[index]
 

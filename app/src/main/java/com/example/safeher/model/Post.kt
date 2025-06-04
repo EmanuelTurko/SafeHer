@@ -7,6 +7,8 @@ data class Post(
     @SerializedName("body") val body: String,
     @SerializedName("comments") val comments: MutableList<Comment> = mutableListOf(),
     @SerializedName("user") val user: User,
+    var likeCount: Int,
+    val commentCount: Int,
     @SerializedName("createdAt") val createdAt: String,
 //    val likes: List<String> = emptyList(),
 )

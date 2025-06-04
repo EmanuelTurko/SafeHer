@@ -71,7 +71,7 @@ class SOSHomeScreenFragment : Fragment() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val logout = result.data?.getBooleanExtra("LOGOUT_SUCCESS", false) ?: false
+            val logout = result.data?.getBooleanExtra("LOGOUT_SUCCESS", false) == true
             if (logout) activity?.finish()
         }
     }
@@ -97,28 +97,28 @@ class SOSHomeScreenFragment : Fragment() {
             else Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
         }
 
-    override fun onStart() {
-        super.onStart()
-        updateWelcomeText()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_sos_home_screen, container, false).also { view ->
             initView(view)
             initListeners()
-            updateWelcomeText()
+            // לא נטען את welcome כאן כי נטען ב־onStart
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // אתחול fusedLocationClient, viewModel וכדומה
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         bluetoothViewModel = initBluetoothViewModel()
-        videoViewModel     = initVideoViewModel()
+        videoViewModel = initVideoViewModel()
         bluetoothViewModel.checkPermissionsAndScan()
 
+        // • טוענים מידית את המצב השמור של ה־Switch
+        loadHelperState()
+
+        // מאזינים לאירועי BLE
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bluetoothViewModel.bleEvent.collect { event ->
@@ -132,6 +132,7 @@ class SOSHomeScreenFragment : Fragment() {
             }
         }
 
+        // ‍ Observe לקבלת תמונות בוידאו
         bluetoothViewModel.imageData.observe(viewLifecycleOwner) { data ->
             if (bluetoothViewModel.isConverting.value == true) {
                 val saved = videoViewModel.saveImageData(data, bluetoothViewModel.imagesReceived)
@@ -144,50 +145,61 @@ class SOSHomeScreenFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        updateWelcomeText()
+    }
+
     private fun initView(view: View) {
-        mSosButtonContainer  = view.findViewById(R.id.sosButtonContainer)
-        mSosButton           = view.findViewById(R.id.sosButton)
-        mSistersButton       = view.findViewById(R.id.sistersButton)
-        mVideoLibraryButton  = view.findViewById(R.id.videoLibraryButton)
-        mSupportCallButton   = view.findViewById(R.id.supportCallButton)
-        mHelperSwitch        = view.findViewById(R.id.helperSwitch)
-        mHelperStatusText    = view.findViewById(R.id.helperStatusText)
-        mWelcomeText         = view.findViewById(R.id.welcomeText)
-        mSettingsButtonCard  = view.findViewById(R.id.settingsButtonCard)
+        mSosButtonContainer = view.findViewById(R.id.sosButtonContainer)
+        mSosButton = view.findViewById(R.id.sosButton)
+        mSistersButton = view.findViewById(R.id.sistersButton)
+        mVideoLibraryButton = view.findViewById(R.id.videoLibraryButton)
+        mSupportCallButton = view.findViewById(R.id.supportCallButton)
+        mHelperSwitch = view.findViewById(R.id.helperSwitch)
+        mHelperStatusText = view.findViewById(R.id.helperStatusText)
+        mWelcomeText = view.findViewById(R.id.welcomeText)
+        mSettingsButtonCard = view.findViewById(R.id.settingsButtonCard)
         userPhoneNumber = requireContext().getStringShareRef("phoneNumber", "userInfo")
     }
 
     private fun initListeners() {
-        // Slide-to-start/stop now replaced by tap:
+        // לחיצה על SOS
         mSosButtonContainer.setOnClickListener { toggleSos() }
 
+        // ניווט ל־SistersScreen
         mSistersButton.setOnClickListener {
             findNavController().navigate(R.id.action_SOSHomeScreenFragment_to_sistersFragment)
         }
+        // ניווט לספריית וידאו
         mVideoLibraryButton.setOnClickListener {
             findNavController().navigate(R.id.action_SOSHomeScreenFragment_to_videoLibraryFragment)
         }
+        // לתמיכה
         mSupportCallButton.setOnClickListener {
             supportCallAlertBuilder()
         }
+        // להגדרות
         mSettingsButtonCard.setOnClickListener {
             launcher.launch(Intent(requireContext(), SettingsMainActivity::class.java))
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                bluetoothViewModel.bluetoothState.collect { state ->
-                    val isConnected = (state == BluetoothState.CONNECTED)
-                    if (mHelperSwitch.isChecked != isConnected) {
-                        ignoreListener = true
-                        mHelperSwitch.isChecked = isConnected
-                        ignoreListener = false
-                    }
-                }
-            }
-        }
+
+        // מאזינים לשינוי מצב ה־Switch של Helper
+        // הצגה לפי המצב הקיים תעשה בתוך loadHelperState()
         mHelperSwitch.setOnCheckedChangeListener { _, isChecked ->
-            mHelperStatusText.text = if (isChecked) "ON" else "OFF"
+            // אם השינוי נגרם מתוך הקוד (ignoreListener=true), מדלגים
             if (ignoreListener) return@setOnCheckedChangeListener
+
+            // מעדכנים את הטקסט
+            mHelperStatusText.text = if (isChecked) "ON" else "OFF"
+
+            // שומרים את המצב ב־SharedPreferences
+            requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("isHelper", isChecked)
+                .apply()
+
+            // אם עוברים ל־ON, מתחילים סריקה; אם OFF – מפסיקים
             if (isChecked) {
                 if (bluetoothViewModel.bluetoothState.value != BluetoothState.CONNECTED) {
                     bluetoothViewModel.startScan()
@@ -198,6 +210,20 @@ class SOSHomeScreenFragment : Fragment() {
         }
     }
 
+    /**
+     * טוען מה־SharedPreferences האם המשתמש כבר Helper – ומעדכן את ה־Switch והטקסט
+     * בלי להפעיל את ה־OnCheckedChangeListener בשלב האיתחול (ignoreListener=true).
+     */
+    private fun loadHelperState() {
+        val prefs = requireContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        val isHelper = prefs.getBoolean("isHelper", false)
+
+        // כעת, לפני שנגדיר את isChecked, נסמן ignoreListener כדי שה־Listener לא יופעל:
+        ignoreListener = true
+        mHelperSwitch.isChecked = isHelper
+        mHelperStatusText.text = if (isHelper) "ON" else "OFF"
+        ignoreListener = false
+    }
 
     private fun updateWelcomeText() {
         val name = requireContext()
@@ -248,6 +274,7 @@ class SOSHomeScreenFragment : Fragment() {
         return ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val c = BluetoothController(requireContext().applicationContext, permissionManager)
+                @Suppress("UNCHECKED_CAST")
                 return BluetoothViewModelBLE(c, permissionManager) as T
             }
         })[BluetoothViewModelBLE::class.java]
@@ -256,6 +283,7 @@ class SOSHomeScreenFragment : Fragment() {
     private fun initVideoViewModel(): VideoViewModel {
         return ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
                 return VideoViewModel(requireContext().applicationContext) as T
             }
         })[VideoViewModel::class.java]
@@ -263,7 +291,7 @@ class SOSHomeScreenFragment : Fragment() {
 
     private fun toggleSos() {
         val colorOff = ContextCompat.getColor(requireContext(), R.color.sos_card_off)
-        val colorOn  = ContextCompat.getColor(requireContext(), R.color.sos_card_on)
+        val colorOn = ContextCompat.getColor(requireContext(), R.color.sos_card_on)
         if (!sosActive) {
             checkAndRequestLocationPermission()
             bluetoothViewModel.sendCommand("START")
@@ -275,6 +303,7 @@ class SOSHomeScreenFragment : Fragment() {
             mSosButtonContainer.setCardBackgroundColor(colorOff)
         }
     }
+
     private fun checkAndRequestLocationPermission() {
         when {
             ContextCompat.checkSelfPermission(
@@ -292,6 +321,7 @@ class SOSHomeScreenFragment : Fragment() {
             else -> requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
+
     @SuppressLint("MissingPermission")
     private fun getLastLocation() {
         if (ContextCompat.checkSelfPermission(
@@ -311,7 +341,7 @@ class SOSHomeScreenFragment : Fragment() {
                             ?.firstOrNull()?.getAddressLine(0) ?: "No address"
                         activity?.runOnUiThread {
                             Log.d("LocationDebug", "Address: $address")
-                            sendEmergencyMessage(userPhoneNumber,address, it.latitude, it.longitude)
+                            sendEmergencyMessage(userPhoneNumber, address, it.latitude, it.longitude)
                         }
                     }
                 } ?: Log.d("LocationDebug", "Location is null")
@@ -320,21 +350,23 @@ class SOSHomeScreenFragment : Fragment() {
                 Log.d("LocationDebug", "Failed to get location")
             }
     }
+
     private fun sendEmergencyMessage(
         userPhoneNumber: String,
         address: String,
         latitude: Double,
         longitude: Double
-    ){
+    ) {
         val request = TwilioEmergencyMessageRequest(
             userPhoneNumber,
             address,
             latitude,
             longitude
         )
-        lifecycleScope.launch{
-            try{
-                val response = RetroFitClient.getApiService(requireContext()).sendEmergencyMessage(request)
+        lifecycleScope.launch {
+            try {
+                val response = RetroFitClient.getApiService(requireContext())
+                    .sendEmergencyMessage(request)
                 if (response.error.isNullOrEmpty()) {
                     Log.d("LocationDebug", "Emergency message sent successfully: ${response.message}")
                 } else {

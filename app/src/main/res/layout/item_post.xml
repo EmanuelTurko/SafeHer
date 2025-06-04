@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="6dp">
 
         <!-- Author -->
         <TextView
@@ -51,45 +51,59 @@
             android:textColor="@android:color/black"
             android:textSize="12sp" />
 
-        <!-- Action icons -->
+        <!-- Action icons + counts -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:gravity="end"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingTop="4dp">
 
+            <!-- Like button -->
             <ImageButton
-                android:id="@+id/buttonEdit"
+                android:id="@+id/buttonLike_carousel"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_edit" />
+                android:src="@drawable/ic_heart"
+                android:contentDescription="Like" />
 
+            <!-- Count of likes -->
+            <TextView
+                android:id="@+id/tvLikeCount_carousel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:text="0"
+                android:textColor="@android:color/black"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
+
+            <!-- Comment button -->
             <ImageButton
-                android:id="@+id/buttonComment"
+                android:id="@+id/buttonComment_carousel"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="8dp"
-                android:backgroundTint="@color/transparent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_comment" />
+                android:src="@drawable/ic_comment"
+                android:contentDescription="Comment" />
 
-            <ImageButton
-                android:id="@+id/buttonLike"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_heart" />
-
-            <ImageButton
-                android:id="@+id/buttonDelete"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_red_trash" />
+            <!-- Count of comments -->
+            <TextView
+                android:id="@+id/tvCommentCount_carousel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:text="0"
+                android:textColor="@android:color/black"
+                android:textSize="12sp" />
 
         </LinearLayout>
     </LinearLayout>

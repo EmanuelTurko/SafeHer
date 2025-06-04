@@ -119,8 +119,7 @@ class SettingsLobbyFragment : Fragment() {
             )
         } else {
             val type = object : TypeToken<List<ContactItem>>() {}.type
-            val selectedList: ArrayList<ContactItem> =
-                Gson().fromJson(json, type) as ArrayList<ContactItem>
+            Gson().fromJson(json, type) as ArrayList<ContactItem>
 
 //            val bundle = Bundle().apply {
 //                putParcelableArrayList("selected_contacts", selectedList)

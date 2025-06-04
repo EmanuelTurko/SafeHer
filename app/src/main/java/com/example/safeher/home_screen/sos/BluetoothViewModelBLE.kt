@@ -25,7 +25,7 @@ sealed class BleEvent{
     object ReadyToScan : BleEvent()
 }
 
-public class BluetoothViewModelBLE @Inject constructor (
+class BluetoothViewModelBLE @Inject constructor (
     private val bluetoothController: BluetoothController,
     private val permissionManager: PermissionManager
     ) : ViewModel(), BluetoothCallback {

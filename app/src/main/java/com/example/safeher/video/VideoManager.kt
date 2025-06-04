@@ -408,7 +408,7 @@ class VideoManager(private val context: Context) {
         val resolver = context.contentResolver
         val videoCollection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
         val dateFormat = SimpleDateFormat("HH:mm a, dd/MM/yyyy", Locale.getDefault())
-        val formattedDate = dateFormat.format(Date())
+        dateFormat.format(Date())
         val videoName = "TEST.mp4"
         val relativeLocation = "${Environment.DIRECTORY_MOVIES}/ESP32_Videos"
 

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
@@ -16,7 +17,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -24,8 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.FutureTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
 import com.example.safeher.R
 import com.example.safeher.adapters.CommentsAdapter
 import com.example.safeher.adapters.NotificationAdapter
@@ -42,14 +40,13 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Locale
 
 class SistersFragment : Fragment() {
 
@@ -333,6 +330,14 @@ class SistersFragment : Fragment() {
                 // 2) Build LatLngBounds to include all markers
                 val boundsBuilder = LatLngBounds.Builder()
 
+                val prefsAuth = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                val currentUserId = prefsAuth.getString("userId", "")
+                // ————————————————————————————————————————————————————————————————————————————————
+
+                val prefsUserInfo = requireContext()
+                    .getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+                val isHelperSaved = prefsUserInfo.getBoolean("isHelper", false)
+
                 withContext(Dispatchers.IO) {
                     for (user in users) {
                         val cityName = user.city ?: ""
@@ -356,7 +361,7 @@ class SistersFragment : Fragment() {
                                 }
 
                                 withContext(Dispatchers.Main) {
-                                    val isHelper = user.safeCircleContacts?.isNotEmpty() == true
+                                    val isHelper = (user.id == currentUserId) && isHelperSaved
                                     Log.d("SistersFragment", "Preparing to create marker icon for ${user.fullName}. isHelper=$isHelper")
 
                                     createCustomMarkerIcon(user, isHelper) { descriptor ->
@@ -441,9 +446,11 @@ class SistersFragment : Fragment() {
 
             withContext(Dispatchers.Main) {
                 try {
+                    // Inflate our marker layout
                     val markerView = LayoutInflater.from(requireContext())
                         .inflate(R.layout.marker_user, null)
 
+                    // Update profile ImageView
                     val ivProfile = markerView.findViewById<ImageView>(R.id.profileImageView)
                     if (profileBitmap != null) {
                         ivProfile.setImageBitmap(profileBitmap)
@@ -451,6 +458,7 @@ class SistersFragment : Fragment() {
                         ivProfile.setImageResource(R.drawable.profile)
                     }
 
+                    // Update status dot (green if helper, gray otherwise)
                     val statusDot = markerView.findViewById<View>(R.id.statusDot)
                     if (isHelper) {
                         statusDot.setBackgroundResource(R.drawable.circle_green)
@@ -458,15 +466,18 @@ class SistersFragment : Fragment() {
                         statusDot.setBackgroundResource(R.drawable.circle_gray)
                     }
 
+                    // Update pin pointer
                     val ivPointer = markerView.findViewById<ImageView>(R.id.pinPointer)
                     ivPointer.setImageResource(R.drawable.ic_map_pin)
 
+                    // Measure & layout the view
                     markerView.measure(
-                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+                        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
                     )
                     markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
 
+                    // Create bitmap
                     val bitmap = Bitmap.createBitmap(
                         markerView.measuredWidth,
                         markerView.measuredHeight,
