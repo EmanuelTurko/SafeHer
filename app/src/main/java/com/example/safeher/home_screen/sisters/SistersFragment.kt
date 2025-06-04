@@ -233,20 +233,38 @@ class SistersFragment : Fragment() {
             }
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val resp = RetroFitClient
-                    .getApiService(requireContext())
-                    .createComment(post.id, CommentRequest(text))
+                try {
+                    // הקריאה ל־API בהתאם לחתימה שלך
+                    val apiResponse = RetroFitClient
+                        .getApiService(requireContext())
+                        .createComment(post.id, CommentRequest(text))
 
-                withContext(Dispatchers.Main) {
-                    if (resp.data != null) {
-                        commentsList.add(resp.data)
-                        commentsAdapter.notifyItemInserted(commentsList.size - 1)
-                        etNewComment.text?.clear()
-                        rvComments.scrollToPosition(commentsList.size - 1)
-                    } else {
+                    withContext(Dispatchers.Main) {
+                        // ApiResponse<Comment> ישירות, לא Response<>
+                        val newComment = apiResponse.data
+                        if (newComment != null) {
+                            commentsList.add(newComment)
+                            commentsAdapter.notifyItemInserted(commentsList.size - 1)
+                            etNewComment.text?.clear()
+                            rvComments.scrollToPosition(commentsList.size - 1)
+
+                            // מעלה את המונה המקומי של התגובות
+                            post.commentCount = post.commentCount + 1
+                            // רענון כל הקרוסלה כדי שהמספר יתעדכן
+                            postAdapter.notifyDataSetChanged()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Error sending comment",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
                         Toast.makeText(
                             requireContext(),
-                            "Error sending comment",
+                            "שגיאת רשת",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
