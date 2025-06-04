@@ -61,7 +61,7 @@ class MySafeCircleFragment : Fragment() {
             )
         }
 
-        // ALWAYS show "EDIT" (remove Done)
+
         binding.editText.text = "EDIT"
         binding.editButton.setOnClickListener {
             // Navigate to edit-contacts screen with currently loaded list
