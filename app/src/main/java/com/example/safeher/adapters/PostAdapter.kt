@@ -90,7 +90,8 @@ class PostAdapter(
             is PostCarouselViewHolder -> {
                 // Carousel items occupy positions [1 .. posts.size]
                 val post = posts[position - 1]
-                holder.tvAuthor.text = post.user.fullName ?: "Anonymous"
+                val authorName = post.user?.fullName ?: "Anonymous"
+                holder.tvAuthor.text = authorName
                 holder.tvTime.text = DateUtils.formatDateTime(post.createdAt)
                 holder.tvBody.text = post.body
 
@@ -110,9 +111,11 @@ class PostAdapter(
 
                 val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
                 val currentUserId = prefs.getString("userId", "") ?: ""
-                val isOwner = (post.user.id == currentUserId)
+                val author = post.user
+                val authorName = author?.fullName ?: "Anonymous"
+                val isOwner = author?.id == currentUserId
 
-                holder.tvAuthor.text = post.user.fullName ?: "Anonymous"
+                holder.tvAuthor.text = authorName
                 holder.tvTime.text   = DateUtils.formatDateTime(post.createdAt)
                 holder.tvBody.text   = post.body
 

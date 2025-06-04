@@ -45,6 +45,7 @@ class MySafeCircleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Handle system Back press
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -53,32 +54,27 @@ class MySafeCircleFragment : Fragment() {
         )
         binding.backButtonCard.setOnClickListener { handleBack() }
 
+        // Home button always navigates home
         binding.homeButtonCard.setOnClickListener {
             findNavController().navigate(
                 R.id.action_mySafeCircleFragment_to_SOSHomeScreenFragment
             )
         }
 
-        // DONE vs EDIT
-        val showDone = arguments?.getBoolean("showDone", false) ?: false
-        binding.editText.text = if (showDone) "DONE" else "EDIT"
+        // ALWAYS show "EDIT" (remove Done)
+        binding.editText.text = "EDIT"
         binding.editButton.setOnClickListener {
-            if (showDone) {
-                findNavController().navigate(
-                    R.id.action_mySafeCircleFragment_to_settingsLobbyFragment
-                )
-            } else {
-                val bundle = Bundle().apply {
-                    putParcelableArrayList(
-                        "selected_contacts",
-                        ArrayList(contactList)
-                    )
-                }
-                findNavController().navigate(
-                    R.id.action_mySafeCircleFragment_to_settingsSafeCircleFragment,
-                    bundle
+            // Navigate to edit-contacts screen with currently loaded list
+            val bundle = Bundle().apply {
+                putParcelableArrayList(
+                    "selected_contacts",
+                    ArrayList(contactList)
                 )
             }
+            findNavController().navigate(
+                R.id.action_mySafeCircleFragment_to_settingsSafeCircleFragment,
+                bundle
+            )
         }
 
         initRecycler()
