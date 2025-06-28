@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -21,19 +22,25 @@ class NewPostFragment : Fragment() {
 
     private lateinit var editTextPostContent: EditText
     private lateinit var buttonSubmitPost: MaterialButton
+    private lateinit var checkboxAnonymous: CheckBox
+
 
     override fun onCreateView(
+
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_new_post, container, false)
         editTextPostContent = view.findViewById(R.id.editTextPostContent)
         buttonSubmitPost   = view.findViewById(R.id.buttonSubmitPost)
+        checkboxAnonymous = view.findViewById(R.id.checkboxAnonymous)
+
 
         buttonSubmitPost.setOnClickListener {
             val postText = editTextPostContent.text.toString().trim()
+            val isAnonymous = checkboxAnonymous.isChecked
             if (postText.isNotEmpty()) {
-                submitPost(postText)
+                submitPost(postText,isAnonymous)
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -45,12 +52,12 @@ class NewPostFragment : Fragment() {
         return view
     }
 
-    private fun submitPost(text: String) {
+    private fun submitPost(text: String , isAnonymous: Boolean) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetroFitClient
                     .getApiService(requireContext())
-                    .createPost(CreatePostRequest(body = text))
+                    .createPost(CreatePostRequest(body = text, isAnonymous = isAnonymous))
 
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {

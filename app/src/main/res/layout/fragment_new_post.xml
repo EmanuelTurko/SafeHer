@@ -22,6 +22,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+    <CheckBox
+        android:id="@+id/checkboxAnonymous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post Anonymously"
+        android:textColor="@color/button_gold"
+        app:layout_constraintTop_toBottomOf="@id/editTextPostContent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"/>
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonSubmitPost"

@@ -327,7 +327,6 @@ class ProfileFragment : Fragment() {
             }
         }
 
-    // בקשה דינמית להרשאת מצלמה
     private val cameraPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
