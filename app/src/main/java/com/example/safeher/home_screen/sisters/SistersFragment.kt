@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -48,6 +49,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
+
 class SistersFragment : Fragment() {
 
     private lateinit var mapView: MapView
@@ -55,6 +57,37 @@ class SistersFragment : Fragment() {
     private lateinit var horizontalRecyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
     private lateinit var notificationsButton: ImageButton
+    private lateinit var paginationDots: LinearLayout
+
+//    private fun setupPaginationDots(totalPages: Int, currentPage: Int) {
+//        paginationDots.removeAllViews()
+//        for (i in 0 until 3) {
+//            val dot = View(requireContext())
+//            val params = LinearLayout.LayoutParams(10, 10)
+//            params.setMargins(6, 0, 6, 0)
+//            dot.layoutParams = params
+//            val pageIndex = (currentPage / 3) * 3 + i
+//            if (pageIndex < totalPages) {
+//                dot.setBackgroundResource(if (pageIndex == currentPage) R.drawable.dot_active else R.drawable.dot_inactive)
+//                paginationDots.addView(dot)
+//            }
+//        }
+//    }
+private fun updatePaginationDots(currentPage: Int) {
+    paginationDots.removeAllViews()
+    for (i in 0 until 3) {
+        val dot = View(requireContext())
+        val params = LinearLayout.LayoutParams(16, 16)
+        params.setMargins(6, 0, 6, 0)
+        dot.layoutParams = params
+        dot.setBackgroundResource(
+            if (i == currentPage) R.drawable.dot_active else R.drawable.dot_inactive
+        )
+        paginationDots.addView(dot)
+    }
+}
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -134,6 +167,8 @@ class SistersFragment : Fragment() {
             view.findViewById<View>(R.id.notificationBadge)?.visibility = View.GONE
             showNotificationDialog()
         }
+        paginationDots = view.findViewById(R.id.paginationDots)
+
     }
 
     private fun initListener() {
@@ -181,6 +216,28 @@ class SistersFragment : Fragment() {
 
 
                 horizontalRecyclerView.adapter = postAdapter
+
+                horizontalRecyclerView.post {
+                    updatePaginationDots(0)
+                }
+
+                updatePaginationDots(0)
+                horizontalRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                        val firstVisible = layoutManager.findFirstCompletelyVisibleItemPosition()
+
+                        if (firstVisible != RecyclerView.NO_POSITION) {
+                            // כל 3 פוסטים – נקודה אחת
+                            val pageIndex = (firstVisible / 3).coerceIn(0, 2)
+                            updatePaginationDots(pageIndex)
+                        }
+                    }
+                })
+
+
+
+
 
             } catch (e: Exception) {
                 Log.e("SistersFragment", "Error loading posts: ${e.message}")
