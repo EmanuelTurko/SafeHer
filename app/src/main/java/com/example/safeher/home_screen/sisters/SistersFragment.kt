@@ -152,20 +152,19 @@ class SistersFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                val postsList: List<Post> = RetroFitClient
+                val latestPosts: List<Post> = RetroFitClient
                     .getApiService(requireContext())
                     .getAllPosts()
+                    .sortedByDescending { it.createdAt }
+                    .take(10)
 
                 postAdapter = PostAdapter(
                     context = requireContext(),
-                    posts = postsList.toMutableList(),
+                    posts = latestPosts.toMutableList(),
                     showPostDialog = { post -> showPostDialog(post) },
                     onEditPost = { post ->
                         val action = SistersFragmentDirections
-                            .actionSistersFragmentToEditPostFragment(
-                                post.id,
-                                post.body
-                            )
+                            .actionSistersFragmentToEditPostFragment(post.id, post.body)
                         findNavController().navigate(action)
                     },
                     isCarousel = true,
@@ -178,6 +177,8 @@ class SistersFragment : Fragment() {
                         findNavController().navigate(R.id.action_sistersFragment_to_newPostFragment)
                     }
                 )
+
+
 
                 horizontalRecyclerView.adapter = postAdapter
 
