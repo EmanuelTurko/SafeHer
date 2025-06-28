@@ -92,7 +92,7 @@
         android:fontFamily="@font/poppins_bold"
         android:text="Helper"
         android:textColor="#2D2D2D"
-        android:textSize="19sp"
+        android:textSize="15sp"
         app:layout_constraintTop_toBottomOf="@id/helperSwitchContainer"
         app:layout_constraintStart_toStartOf="@id/helperSwitchContainer"
         app:layout_constraintEnd_toEndOf="@id/helperSwitchContainer" />

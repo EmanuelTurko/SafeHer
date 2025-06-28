@@ -1,11 +1,14 @@
 package com.example.safeher.settings.profile
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
@@ -13,7 +16,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -22,7 +24,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.safeher.R
-import com.example.safeher.auth.MainActivity
 import com.example.safeher.databinding.FragmentProfileBinding
 import com.example.safeher.general.LoadingDialog
 import com.example.safeher.general.showCustomToast
@@ -108,7 +109,10 @@ class ProfileFragment : Fragment() {
 
         binding.saveButton.setOnClickListener { onSaveClicked() }
         binding.removeButton.setOnClickListener { showRemoveAccountDialog() }
-        binding.btnAddPhoto.setOnClickListener { openGallery() }
+
+        binding.btnAddPhoto.setOnClickListener {
+            showImageSourceDialog()
+        }
     }
 
     private fun showRemoveAccountDialog() {
@@ -175,6 +179,8 @@ class ProfileFragment : Fragment() {
                     showCustomToast("שגיאה: ${state.message}")
                     Log.e("ProfileFragment", state.message)
                 }
+
+                else -> { /* no-op */ }
             }
         }
     }
@@ -236,52 +242,101 @@ class ProfileFragment : Fragment() {
         viewModel.saveUserData(user)
     }
 
+    private fun showImageSourceDialog() {
+        val options = arrayOf("Choose from Gallery", "Take Photo")
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Select Image Source")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openGallery()
+                    1 -> openCamera()
+                }
+            }
+            .show()
+    }
+
     private fun openGallery() {
+        val requiredPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
-                android.Manifest.permission.CAMERA
+                requiredPermission
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            launchImageChooser()
+            launchGalleryChooser()
         } else {
-            requestPermissionLauncher.launch(
-                arrayOf(android.Manifest.permission.CAMERA)
-            )
+            permissionLauncher.launch(requiredPermission)
         }
     }
 
-    private fun launchImageChooser() {
-        val camera = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+    private fun launchGalleryChooser() {
         val gallery = Intent(
             Intent.ACTION_PICK,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         )
-        val chooser = Intent
-            .createChooser(gallery, "בחר תמונה")
-            .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(camera)) }
-        pickImageLauncher.launch(chooser)
+        pickImageLauncher.launch(gallery)
+    }
+
+    private fun openCamera() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            takePictureLauncher.launch(null)
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
     }
 
     private val pickImageLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            if (result.resultCode == android.app.Activity.RESULT_OK) {
+            if (result.resultCode == Activity.RESULT_OK) {
                 val uri: Uri? = result.data?.data
-                if (uri != null) binding.ivProfile.setImageURI(uri)
-                else (result.data?.extras?.get("data") as? Bitmap)
-                    ?.let { binding.ivProfile.setImageBitmap(it) }
+                uri?.let {
+                    binding.ivProfile.setImageURI(it)
+                    saveToPrefs()
+                }
             }
         }
 
-    private val requestPermissionLauncher =
+    private val takePictureLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { perms ->
-            if (perms[android.Manifest.permission.CAMERA] == true)
-                launchImageChooser()
-            else
-                showCustomToast("לא ניתן לבחור תמונה ללא הרשאת מצלמה")
+            ActivityResultContracts.TakePicturePreview()
+        ) { bitmap: Bitmap? ->
+            bitmap?.let {
+                binding.ivProfile.setImageBitmap(it)
+                saveToPrefs()
+            }
+        }
+
+    private val permissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            if (granted) {
+                launchGalleryChooser()
+            } else {
+                showCustomToast("Cannot select an image without storage permission")
+            }
+        }
+
+    // בקשה דינמית להרשאת מצלמה
+    private val cameraPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            if (granted) {
+                takePictureLauncher.launch(null)
+            } else {
+                showCustomToast("Cannot select an image without storage permission")
+            }
         }
 
     private fun saveToPrefs() {
@@ -305,5 +360,4 @@ class ProfileFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
