@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.safeher.R
 import com.example.safeher.databinding.FragmentProfileBinding
 import com.example.safeher.general.LoadingDialog
@@ -143,11 +144,21 @@ class ProfileFragment : Fragment() {
                         binding.emailEditText.setText(user.email)
                         user.profilePicture
                             ?.takeIf(String::isNotEmpty)
-                            ?.let { b64 ->
-                                val bytes = Base64.decode(b64, Base64.DEFAULT)
-                                val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                                binding.ivProfile.setImageBitmap(bmp)
+                            ?.let { image ->
+                                if (image.startsWith("data:image")) {
+                                    val base64Image = image.substringAfter(",")
+                                    val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
+                                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                    binding.ivProfile.setImageBitmap(bitmap)
+                                } else {
+                                    Glide.with(requireContext())
+                                        .load(image)
+                                        .placeholder(R.drawable.ic_profile) // שימי תמונת ברירת מחדל כאן
+                                        .error(R.drawable.ic_profile)
+                                        .into(binding.ivProfile)
+                                }
                             }
+
                     }
                     binding.nameEditText.isEnabled = false
                     binding.emailEditText.isEnabled = false
