@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2C2C2C"
+    android:padding="16dp">
+
+    <!-- Caller logo -->
+    <ImageView
+        android:id="@+id/caller_imageView"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/ic_female_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Caller name -->
+    <TextView
+        android:id="@+id/caller_name_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Shira"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/caller_imageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <!-- Call Duration -->
+    <TextView
+        android:id="@+id/call_duration_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="00:00"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/caller_name_textView" />
+
+    <!-- Mute -->
+    <ImageButton
+        android:id="@+id/muted_imageBtn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="360dp"
+        android:layout_marginEnd="25dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="muted btn"
+        android:src="@drawable/ic_muted"
+        app:layout_constraintEnd_toStartOf="@+id/hold_imageBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Hold -->
+
+    <!-- Video Call -->
+    <ImageButton
+        android:id="@+id/hold_imageBtn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="360dp"
+        android:layout_marginEnd="25dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="Hold"
+        android:src="@drawable/ic_hold"
+        app:layout_constraintEnd_toStartOf="@+id/speaker_imageBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/muted_imageBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/video_imageBtn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="460dp"
+        android:layout_marginEnd="25dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="video btn"
+        android:src="@drawable/ic_video_call"
+        app:layout_constraintEnd_toStartOf="@+id/add_imageBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
+    <!-- Add Call -->
+    <ImageButton
+        android:id="@+id/add_imageBtn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="460dp"
+        android:layout_marginEnd="25dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="add btn"
+        android:src="@drawable/ic_add_contact"
+        app:layout_constraintEnd_toStartOf="@+id/keypad_imageBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/video_imageBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Speaker -->
+
+    <!-- Hang Up -->
+
+    <ImageButton
+        android:id="@+id/speaker_imageBtn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="360dp"
+        android:layout_marginEnd="50dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="speaker btn"
+        android:src="@drawable/ic_speaker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/hold_imageBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/hang_up_imageBtn"
+        android:layout_width="170dp"
+        android:layout_height="174dp"
+        android:layout_marginTop="560dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="Hang up"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_hang_up"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Keypad -->
+    <ImageButton
+        android:id="@+id/keypad_imageBtn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="460dp"
+        android:layout_marginEnd="50dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="keypad btn"
+        android:src="@drawable/ic_keypad"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/add_imageBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

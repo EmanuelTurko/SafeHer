@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_home_screen"
+    app:startDestination="@id/SOSHomeScreenFragment">
+
+    <fragment
+        android:id="@+id/SOSHomeScreenFragment"
+        android:name="com.example.safeher.home_screen.sos.SOSHomeScreenFragment"
+        android:label="SOSHomeScreenFragment" >
+        <action
+            android:id="@+id/action_SOSHomeScreenFragment_to_videoLibraryFragment"
+            app:destination="@id/videoLibraryFragment" />
+        <action
+            android:id="@+id/action_SOSHomeScreenFragment_to_sistersFragment"
+            app:destination="@id/sistersFragment" />
+        <action
+            android:id="@+id/action_homePageFragment_to_supportCallAiFragment"
+            app:destination="@id/SupportCallAiFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/videoLibraryFragment"
+        android:name="com.example.safeher.home_screen.videoLibrary.VideoLibraryFragment"
+        android:label="VideoLibraryFragment" >
+        <action
+            android:id="@+id/action_videoLibraryFragment_to_SOSHomeScreenFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sistersFragment"
+        android:name="com.example.safeher.home_screen.sisters.SistersFragment"
+        android:label="SistersFragment" >
+        <action
+            android:id="@+id/action_sistersFragment_to_SOSHomeScreenFragment"
+            app:destination="@id/SOSHomeScreenFragment" />
+        <action
+            android:id="@+id/action_sistersFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment" />
+        <action
+            android:id="@+id/action_sistersFragment_to_editPostFragment"
+            app:destination="@id/editPostFragment" />
+        <action
+            android:id="@+id/action_sistersFragment_to_allPostsFragment"
+            app:destination="@id/allPostsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/allPostsFragment"
+        android:name="com.example.safeher.home_screen.sisters.AllPostsFragment"
+        android:label="All Posts"
+        tools:layout="@layout/fragment_all_posts">
+        <action
+            android:id="@+id/actionAllPostsFragmentToEditPostFragment"
+            app:destination="@id/editPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SupportCallAiFragment"
+        android:name="com.example.safeher.home_screen.support.SupportCallAiFragment"
+        android:label="SupportCallAIFragment"/>
+    <fragment
+        android:id="@+id/newPostFragment"
+        android:name="com.example.safeher.home_screen.sisters.NewPostFragment"
+        android:label="NewPostFragment"
+        tools:layout="@layout/fragment_new_post" >
+        <action
+            android:id="@+id/action_newPostFragment_to_sistersFragment"
+            app:destination="@id/sistersFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/editPostFragment"
+        android:name="com.example.safeher.EditPostFragment"
+        android:label="EditPostFragment"
+        tools:layout="@layout/fragment_edit_post" >
+        <action
+            android:id="@+id/action_editPostFragment_to_sistersFragment"
+            app:destination="@id/sistersFragment" />
+        <argument
+            android:name="postId"
+            app:argType="string" />
+        <argument
+            android:name="currentBody"
+            app:argType="string" />
+    </fragment>
+
+</navigation>
