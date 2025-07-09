@@ -90,26 +90,6 @@ SafeHer/
 └── README.md
 ```
 
-## Getting Started
-
-### Prerequisites
-- Node.js and npm (for backend)
-- Android Studio (for frontend)
-- MongoDB instance
-- Twilio account for SMS services
-
-### Backend Setup
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-### Frontend Setup
-1. Open the `frontend` directory in Android Studio
-2. Sync project with Gradle files
-3. Run on Android device or emulator
-
 ## Contributing
 
 This project represents a collaborative effort focused on women's safety technology. We welcome contributions that align with our mission of creating reliable, privacy-focused safety solutions.
