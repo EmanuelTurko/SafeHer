@@ -1,0 +1,6 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/EmanuelTurko/safeher-backend.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/amitby98/SafeHer.git
