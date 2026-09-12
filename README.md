@@ -1,103 +1,77 @@
 # SafeHer
 
-🚧 **Work in Progress** - This project is currently under active development
+A personal safety device that pairs a wearable pendant with an Android app: one button press sends your live location and a video clip to trusted contacts via WhatsApp.
 
-## Project Overview
+Built as a 4-person capstone project for our CS bachelor's degree.
+<p align="center"> <img src="docs/images/home-screen.png" height="380" alt="App home screen"> <img src="docs/images/safe-circle-setup.png" height="380" alt="Safe Circle setup screen"> <img src="docs/images/sos-alert.png" height="380" alt="SOS alert received via WhatsApp"> </p>
 
-SafeHer is an innovative personal safety solution designed to empower women with confidence through technology. The system combines a discreet wearable pendant with a comprehensive mobile application to provide instant emergency response capabilities.
+## What it does
 
-**Core Concept**: An elegant pendant with SOS button and camera. One press sends an alert with your live location to trusted contacts. Safety within reach.
+1. User presses the SOS button on the pendant.
+2. The pendant (Xiao Seeed ESP32S3) captures a short low-light video clip.
+3. The phone app attaches the user's live GPS coordinates.
+4. A WhatsApp alert with location and video is sent to the user's trusted contacts (their "Safe Circle") via the Twilio API.
 
-## System Architecture
+<p align="center">
+  <img src="docs/images/safe-circle-notification.png" width="220" alt="Contact notified they've been added to a Safe Circle">
+</p>
 
-### Hardware Component
-- **Pendant Device**: Xiao Seeed ESP32S3 camera module
-- **Form Factor**: Discreet necklace/locket/pendant design
-- **Features**:
-  - SOS button for emergency activation
-  - Low-light camera for situation documentation
-  - Secure data encryption
+Captured video clips are timestamped and stored in-app for later review:
 
-### Software Components
+<p align="center">
+  <img src="docs/images/video-library.png" width="220" alt="In-app video library of past SOS events">
+</p>
 
-#### Backend (`/backend`)
-- **Technology**: Node.js with TypeScript
-- **Database**: MongoDB
-- **Key Features**:
-  - Real-time data processing
-  - Emergency contact management
-  - GPS coordinate handling
-  - Twilio API integration for Whatsapp alerts
+## My role
 
-#### Frontend (`/frontend`)
-- **Technology**: Kotlin for Android (Android Studio)
-- **Key Features**:
-  - Emergency contact configuration
-  - Customizable alert messages
-  - Real-time location tracking
-  - Help tracking en route
-  - User-friendly interface
+I was one of four contributors. I focused on:
+- Backend (Node.js/TypeScript, MongoDB) — emergency contact storage, GPS handling, and the Twilio/WhatsApp alert pipeline
+- Camera integration on the ESP32S3 (C++ in Arduino IDE) — capturing and transmitting video from the pendant
+- Contributed to the Android frontend (Kotlin) alongside teammates
 
-## How It Works
+The pendant hardware itself — soldering the battery/button and the 3D-printed housing — was a team effort with outside help for the soldering.
 
-1. **Emergency Activation**: User presses the discreet SOS button on the pendant
-2. **Data Capture**: Device captures video with low-light camera and saves to the VideoLibrary
-3. **Location Services**: GPS coordinates are automatically attached
-4. **Emergency Alerts**: Twilio API sends SMS alerts with location to trusted contacts
+## Architecture
 
-## Key Features
+**Hardware**
+- Xiao Seeed ESP32S3 camera module, programmed in C++ via Arduino IDE
+- SOS push button, soldered onto the board, with a TP4056 charging module and battery
+- 3D-printed pendant housing
 
-- 📱 **Mobile Integration**: Seamless Android app for configuration and monitoring
-- 📍 **Live Location**: Real-time GPS tracking with emergency alerts
-- 👥 **Trusted Contacts**: Customizable emergency contact list
-- 📷 **Situation Documentation**: Low-light camera for evidence capture
-- 📞 **Whatsapp Integration**: Twilio API for reliable message delivery
+<p align="center">
+  <img src="docs/images/circuit-diagram.png" width="450" alt="ESP32S3 wiring diagram: button, battery, and charging module">
+</p>
 
-## Technology Stack
+**Backend** (`/backend`)
+- Node.js + TypeScript
+- MongoDB for contacts and event data
+- Twilio API for WhatsApp alert delivery
+- GPS coordinate handling
 
-### Backend
-- Node.js
-- TypeScript
-- MongoDB
-- Twilio API
+**Frontend** (`/frontend`)
+- Kotlin, Android Studio
+- Emergency contact configuration
+- Live location tracking during an active alert
+- Alert history / status view
 
-### Frontend
-- Kotlin
-- Android Studio
-- Android SDK
+## Tech stack
 
-### Hardware
-- Xiao Seeed ESP32S3 camera module
-- Custom pendant housing
-- GPS module
+| Layer | Tech |
+|---|---|
+| Hardware | ESP32S3, C++ (Arduino IDE) |
+| Backend | Node.js, TypeScript, MongoDB, Twilio API |
+| Frontend | Kotlin, Android SDK |
 
-## Development Status
-
-This project is currently under active development. Core functionalities are being implemented and tested. Contributions and feedback are welcome as we work towards creating a comprehensive safety solution.
-
-## Project Structure
+## Project structure
 
 ```
 SafeHer/
-├── backend/          # Node.js TypeScript backend
-│   ├── src/
-│   ├── package.json
-│   └── ...
-├── frontend/         # Kotlin Android application
-│   ├── app/
-│   ├── build.gradle
-│   └── ...
+├── backend/          # Node.js + TypeScript backend
+├── frontend/          # Kotlin Android app
+├── firmware/          # ESP32S3 C++ (Arduino) code
 └── README.md
 ```
 
-## Contributing
+## Status
 
-This project represents a collaborative effort focused on women's safety technology. We welcome contributions that align with our mission of creating reliable, privacy-focused safety solutions.
-
-## Mission
-
-SafeHer aims to deliver reliable protection and privacy, empowering women with confidence through innovative technology that puts safety within reach.
-
----
-
-*This project is developed with the vision of making personal safety accessible, discreet, and reliable for everyone.*
+Built and demoed as a capstone project. The SOS → video capture → location → WhatsApp alert flow was tested end-to-end on the working prototype (see screenshots above). Not actively maintained post-graduation.
